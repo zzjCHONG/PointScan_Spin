@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>net6.0-windows</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Font\HarmonyOS.ttf" />
+    <None Remove="Resources\Font\HarmonyOS_Sans_Regular.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Font\HarmonyOS.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controls\PropertyGrid\" />
+  </ItemGroup>
+
+</Project>

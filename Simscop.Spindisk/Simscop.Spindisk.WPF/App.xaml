@@ -1,0 +1,16 @@
+﻿<Application
+    x:Class="Simscop.Spindisk.WPF.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Simscop.Spindisk.WPF">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Simscop.UI;component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="Styles/ObjectiveRadioButton.xaml" />
+                <ResourceDictionary Source="Styles/CameraButton.xaml" />
+
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

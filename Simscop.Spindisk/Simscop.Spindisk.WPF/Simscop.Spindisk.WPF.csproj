@@ -1,0 +1,136 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFrameworks>net6.0-windows</TargetFrameworks>
+		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<LangVersion>latest</LangVersion>
+		<PackageIcon></PackageIcon>
+		<StartupObject></StartupObject>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<ApplicationIcon>Image\logo.ico</ApplicationIcon>
+		<PackAsTool>False</PackAsTool>
+		<NeutralLanguage>zh-Hans</NeutralLanguage>
+
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows|AnyCPU'">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Image\3d.png" />
+		<None Remove="Image\blue.jpg" />
+		<None Remove="Image\camera.png" />
+		<None Remove="Image\green.jpg" />
+		<None Remove="Image\not_select.png" />
+		<None Remove="Image\red.jpg" />
+		<None Remove="Image\remix.jpg" />
+		<None Remove="Image\select.png" />
+		<None Remove="Image\start.png" />
+		<None Remove="Image\stop.png" />
+		<None Remove="Image\temp.jpg" />
+		<None Remove="Image\z.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Image\logo.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Image\logo.png" />
+		<Resource Include="Image\red.jpg" />
+		<Resource Include="Image\remix.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Image\3d.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
+		<PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+		<PackageReference Include="OpenCvSharp4.Extensions" Version="4.8.0.20230708" />
+		<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.8.0.20230708" />
+		<PackageReference Include="OpenCvSharp4.Windows" Version="4.8.0.20230708" />
+		<PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.8.0.20230708" />
+		<PackageReference Include="System.Memory" Version="4.5.5" />
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Simscop.UI\Simscop.UI\Simscop.UI.csproj" />
+		<ProjectReference Include="..\Simscop.Spindisk.Core\Simscop.Spindisk.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Converters\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Image\blue.jpg" />
+		<Resource Include="Image\camera.png" />
+		<Resource Include="Image\green.jpg" />
+		<Resource Include="Image\not_select.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Image\select.png" />
+		<Resource Include="Image\start.png" />
+		<Resource Include="Image\stop.png" />
+		<Resource Include="Image\temp.jpg" />
+		<Resource Include="Image\z.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Properties\Settings.Designer.cs">
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Image\logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Update="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+</Project>

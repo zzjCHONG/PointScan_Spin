@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>94c26bb3-4dcb-4109-a2b4-38863041faf3</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Simscop.API</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Helper\SerialHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MshotMotor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Native\Dhyana\TUCamAPI.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dhyana.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Native\Mshot\Constant.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Native\Mshot\Motor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XLight.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Native\Dhyana\" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simscop.Spindisk.Core", "Simscop.Spindisk.Core\Simscop.Spindisk.Core.csproj", "{97FCA44A-26A5-4957-827A-5DB0025AED63}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simscop.Spindisk.WPF", "Simscop.Spindisk.WPF\Simscop.Spindisk.WPF.csproj", "{45577C35-1066-4F18-B261-E31686A472D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExternalLibrary", "ExternalLibrary", "{33C43665-0BC6-46EB-B646-50DB8482A113}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{E09C34A1-18B3-4FD9-B796-323D75C55ECE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simscop.UI", "..\Simscop.UI\Simscop.UI\Simscop.UI.csproj", "{81FB8673-FB31-4C4F-8406-4A3A8D6E154B}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Simscop.API", "..\Simscop.API\Simscop.API.shproj", "{94C26BB3-4DCB-4109-A2B4-38863041FAF3}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Simscop.Fake", "..\Simscop.Fake\Simscop.Fake.shproj", "{63ED047F-2718-4331-9038-5D56D0EA3F16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B056F436-75E0-4CCB-8D33-D035BD2216C8}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simscop.Lib", "..\Simscop.Lib\Simscop.Lib\Simscop.Lib.csproj", "{13C57555-EA33-4ED3-A5AD-C5986F76AAA7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97FCA44A-26A5-4957-827A-5DB0025AED63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97FCA44A-26A5-4957-827A-5DB0025AED63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97FCA44A-26A5-4957-827A-5DB0025AED63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97FCA44A-26A5-4957-827A-5DB0025AED63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45577C35-1066-4F18-B261-E31686A472D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45577C35-1066-4F18-B261-E31686A472D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45577C35-1066-4F18-B261-E31686A472D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45577C35-1066-4F18-B261-E31686A472D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81FB8673-FB31-4C4F-8406-4A3A8D6E154B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81FB8673-FB31-4C4F-8406-4A3A8D6E154B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81FB8673-FB31-4C4F-8406-4A3A8D6E154B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81FB8673-FB31-4C4F-8406-4A3A8D6E154B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13C57555-EA33-4ED3-A5AD-C5986F76AAA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13C57555-EA33-4ED3-A5AD-C5986F76AAA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13C57555-EA33-4ED3-A5AD-C5986F76AAA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13C57555-EA33-4ED3-A5AD-C5986F76AAA7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{81FB8673-FB31-4C4F-8406-4A3A8D6E154B} = {33C43665-0BC6-46EB-B646-50DB8482A113}
+		{94C26BB3-4DCB-4109-A2B4-38863041FAF3} = {E09C34A1-18B3-4FD9-B796-323D75C55ECE}
+		{63ED047F-2718-4331-9038-5D56D0EA3F16} = {E09C34A1-18B3-4FD9-B796-323D75C55ECE}
+		{13C57555-EA33-4ED3-A5AD-C5986F76AAA7} = {33C43665-0BC6-46EB-B646-50DB8482A113}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD0A5F91-AE7C-4F5C-A6B0-AF376D9869EC}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\Simscop.Fake\Simscop.Fake.projitems*{63ed047f-2718-4331-9038-5d56d0ea3f16}*SharedItemsImports = 13
+		..\Simscop.API\Simscop.API.projitems*{94c26bb3-4dcb-4109-a2b4-38863041faf3}*SharedItemsImports = 13
+		..\Simscop.API\Simscop.API.projitems*{97fca44a-26a5-4957-827a-5db0025aed63}*SharedItemsImports = 5
+	EndGlobalSection
+EndGlobal

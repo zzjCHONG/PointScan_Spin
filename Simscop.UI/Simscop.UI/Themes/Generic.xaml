@@ -1,0 +1,177 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:attach="clr-namespace:Simscop.UI.Controls.Attach"
+    xmlns:controls="clr-namespace:Simscop.UI.Controls"
+    xmlns:local="clr-namespace:Simscop.UI">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../Style/Common.xaml" />
+        <ResourceDictionary Source="../Style/Color.xaml" />
+        <ResourceDictionary Source="../Style/Shape.xaml" />
+        <ResourceDictionary Source="../Style/Value.xaml" />
+        <ResourceDictionary Source="../Style/Effect.xaml" />
+
+        <ResourceDictionary Source="../Controls/Label/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/TextBlock/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/ScrollView/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/TextBox/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/Slider/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/ToggleButton/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/CheckBox/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/RadioButton/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/ComboBox/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/MenuItem/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/Button/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/GroupBox/Generic.xaml" />
+        <ResourceDictionary Source="../Controls/Expander/Generic.xaml" />
+
+        <ResourceDictionary Source="../Controls/Window/Generic.xaml" />
+
+    </ResourceDictionary.MergedDictionaries>
+
+
+    <!--  Region  Label  -->
+
+    <Style BasedOn="{StaticResource BaseLabel}" TargetType="{x:Type Label}">
+        <Setter Property="Background" Value="{DynamicResource Region02}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush01}" />
+
+        <Setter Property="attach:ValueAttach.CornerRadius" Value="5" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Region02}" />
+        <Setter Property="BorderThickness" Value="1" />
+
+        <Setter Property="FontSize" Value="8" />
+        <Setter Property="FontFamily" Value="{StaticResource Harmony}" />
+        <Setter Property="FontWeight" Value="Regular" />
+
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  EndRegion  -->
+
+    <!--  Region  TextBlock  -->
+
+    <Style BasedOn="{StaticResource BaseTextBlock}" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush01}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="TextAlignment" Value="Center" />
+
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource Harmony}" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  EndRegion  -->
+
+    <!--  Region  ScrollViewer  -->
+
+    <Style BasedOn="{StaticResource BaseScrollViewer}" TargetType="{x:Type ScrollViewer}">
+        <Setter Property="Background" Value="{x:Null}" />
+        <Setter Property="Foreground" Value="{x:Null}" />
+
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  EndRegion  -->
+
+    <!--  Region TextBox  -->
+
+    <Style BasedOn="{StaticResource BaseTextBox}" TargetType="{x:Type TextBox}">
+        <Setter Property="Padding" Value="15,10" />
+        <Setter Property="MinHeight" Value="24" />
+
+        <Setter Property="FontSize" Value="{StaticResource TextSize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextWeight}" />
+
+        <Setter Property="attach:ValueAttach.CornerRadius" Value="3" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="{StaticResource Region02}" />
+
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+
+        <Setter Property="Background" Value="{DynamicResource Region04}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush01}" />
+
+        <Setter Property="CaretBrush" Value="{StaticResource TextBrush01}" />
+
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+
+    </Style>
+
+    <!--  EndRegion  -->
+
+    <!--  Region Slider  -->
+
+    <Style BasedOn="{StaticResource BaseSlider}" TargetType="{x:Type Slider}" />
+
+    <!--  这里如果直接由多个Slider，会因为xaml对象生成机制，导致只有一个slider满足，所以使用时请自己设置content  -->
+    <Style BasedOn="{StaticResource BasePreviewSlider}" TargetType="controls:PreviewSlider">
+        <Setter Property="PreviewContent">
+            <Setter.Value>
+                <Label Content="{Binding Path=(controls:PreviewSlider.PreviewPosition), RelativeSource={RelativeSource Self}}" ContentStringFormat="#0.00" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style BasedOn="{StaticResource BaseRangeSlider}" TargetType="controls:RangeSlider" />
+    <!--  EndRegion  -->
+
+    <!--  Region  ToggleButton  -->
+
+    <!--  EndRegion  -->
+
+    <!--  Region  CheckBox  -->
+
+    <Style BasedOn="{StaticResource BaseNativeCheckBox}" TargetType="{x:Type CheckBox}" />
+    <Style
+        x:Key="SwitchCheckBox"
+        BasedOn="{StaticResource BaseSwitchCheckBox}"
+        TargetType="{x:Type CheckBox}">
+        <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <Style
+        x:Key="CheckBoxAsButton"
+        BasedOn="{StaticResource BaseCheckBoxAsButton}"
+        TargetType="CheckBox">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <!--  EndRegion  -->
+
+    <!--  Region  RadioButton  -->
+
+    <Style BasedOn="{StaticResource BaseNativeRadioButton}" TargetType="{x:Type RadioButton}" />
+
+    <!--  EndRegion  -->
+
+    <!--  Region  ComboBox  -->
+
+    <Style BasedOn="{StaticResource BaseComboBox}" TargetType="{x:Type ComboBox}" />
+    <Style BasedOn="{StaticResource BaseComboBoxItem}" TargetType="{x:Type ComboBoxItem}" />
+
+    <!--  EndRegion  -->
+
+    <!--  Region Button  -->
+
+    <Style BasedOn="{StaticResource BaseNativeButton}" TargetType="{x:Type Button}" />
+
+    <Style BasedOn="{StaticResource BaseIconButton}" TargetType="controls:IconButton" />
+
+    <!--  EndRegion  -->
+
+    <!--  Region Button  -->
+
+    <Style BasedOn="{StaticResource BaseExpander}" TargetType="{x:Type Expander}">
+        <Setter Property="MinHeight" Value="35" />
+        <Setter Property="IsExpanded" Value="True" />
+    </Style>
+
+    <!--  EndRegion  -->
+
+</ResourceDictionary>

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simscop.Lib", "Simscop.Lib\Simscop.Lib.csproj", "{B889423B-6225-4DED-8C51-CCF2EC9E0A50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simscop.Lib.Sample", "Simscop.Lib.Sample\Simscop.Lib.Sample.csproj", "{0924A4AF-1F6C-4F57-BEDF-C73AC451CC2B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B889423B-6225-4DED-8C51-CCF2EC9E0A50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B889423B-6225-4DED-8C51-CCF2EC9E0A50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B889423B-6225-4DED-8C51-CCF2EC9E0A50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B889423B-6225-4DED-8C51-CCF2EC9E0A50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0924A4AF-1F6C-4F57-BEDF-C73AC451CC2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0924A4AF-1F6C-4F57-BEDF-C73AC451CC2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0924A4AF-1F6C-4F57-BEDF-C73AC451CC2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0924A4AF-1F6C-4F57-BEDF-C73AC451CC2B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {118A10A3-65FB-4FBC-98C0-E56E7CB2D3CC}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,228 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:attach="clr-namespace:Simscop.UI.Controls.Attach"
+    xmlns:controls="clr-namespace:Simscop.UI.Controls"
+    xmlns:o="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+
+    <Style x:Key="WindowTitleIconButton" TargetType="controls:IconButton">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Width" Value="46" />
+        <Setter Property="IconWidth" Value="10" />
+        <Setter Property="IconHeight" Value="10" />
+        <Setter Property="IconThickness" Value="10" />
+
+        <Setter Property="attach:ValueAttach.CornerRadius" Value="0" />
+
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush01}" />
+        <Setter Property="Background" Value="{DynamicResource Region02}" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:IconButton">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="{Binding Path=(attach:ValueAttach.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}">
+                        <Path
+                            x:Name="MinimizeIcon"
+                            Width="{TemplateBinding IconWidth}"
+                            Height="{TemplateBinding IconHeight}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Data="{TemplateBinding IconPath}"
+                            Fill="{TemplateBinding Foreground}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                            Stretch="Fill"
+                            StrokeThickness="{TemplateBinding IconThickness}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RegionReverse03}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RegionReverse02}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <ControlTemplate x:Key="BlankWindowTemplate" TargetType="{x:Type Window}">
+        <Border
+            Name="WindowBorder"
+            Margin="1"
+            BorderThickness="1"
+            SnapsToDevicePixels="True">
+            <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
+                <Grid
+                    x:Name="TitleBarPanel"
+                    Width="Auto"
+                    Height="32"
+                    Margin="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Background="{TemplateBinding Background}">
+
+                    <FrameworkElement.Resources>
+                        <Style BasedOn="{StaticResource WindowTitleIconButton}" TargetType="controls:IconButton">
+                            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+                        </Style>
+                    </FrameworkElement.Resources>
+
+                    <StackPanel
+                        x:Name="TitleBarButtonPanel"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+                        <controls:IconButton
+                            x:Name="MinimizeButton"
+                            attach:WindowAttach.TitleBarButtonState="Minimized"
+                            IconHeight="1"
+                            IconPath="{DynamicResource MinimizeButtonIcon}" />
+                        <controls:IconButton
+                            x:Name="RestoreButton"
+                            attach:WindowAttach.TitleBarButtonState="Normal"
+                            IconPath="{DynamicResource RestoreButtonIcon}" />
+                        <controls:IconButton
+                            x:Name="MaximizeButton"
+                            attach:WindowAttach.TitleBarButtonState="Maximized"
+                            IconPath="{DynamicResource MaximizeButtonIcon}" />
+                        <controls:IconButton
+                            x:Name="CloseButton"
+                            attach:WindowAttach.IsTitleBarCloseButton="True"
+                            IconPath="{DynamicResource CloseButtonIcon}">
+                            <controls:IconButton.Style>
+                                <Style BasedOn="{StaticResource WindowTitleIconButton}" TargetType="controls:IconButton">
+                                    <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource CloseBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </controls:IconButton.Style>
+                        </controls:IconButton>
+                    </StackPanel>
+                </Grid>
+
+                <AdornerDecorator>
+                    <ContentPresenter />
+                </AdornerDecorator>
+            </Grid>
+        </Border>
+
+
+        <ControlTemplate.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="WindowState" Value="Maximized" />
+
+                </MultiTrigger.Conditions>
+                <Setter TargetName="MaximizeButton" Property="Visibility" Value="Collapsed" />
+            </MultiTrigger>
+
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="WindowState" Value="Normal" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="RestoreButton" Property="Visibility" Value="Collapsed" />
+            </MultiTrigger>
+
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="BlankWindow" TargetType="Window">
+        <Setter Property="Background" Value="{DynamicResource PrimaryBlack}" />
+        <Setter Property="Topmost" Value="True" />
+
+        <Setter Property="BorderThickness" Value="1" />
+
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome
+                    CornerRadius="0"
+                    GlassFrameThickness="1"
+                    NonClientFrameEdges="None"
+                    ResizeBorderThickness="5"
+                    UseAeroCaptionButtons="False" />
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="Template" Value="{StaticResource BlankWindowTemplate}" />
+    </Style>
+
+
+    <ControlTemplate x:Key="TipWindowTemplate" TargetType="{x:Type Window}">
+        <Border
+            Name="WindowBorder"
+            Margin="1"
+            BorderThickness="1"
+            SnapsToDevicePixels="True">
+            <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
+                <Grid
+                    x:Name="TitleBarPanel"
+                    Width="Auto"
+                    Height="32"
+                    Margin="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Background="{TemplateBinding Background}">
+
+                    <FrameworkElement.Resources>
+                        <Style BasedOn="{StaticResource WindowTitleIconButton}" TargetType="controls:IconButton">
+                            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+                        </Style>
+                    </FrameworkElement.Resources>
+
+                    <StackPanel
+                        x:Name="TitleBarButtonPanel"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+                        <controls:IconButton
+                            x:Name="CloseButton"
+                            attach:WindowAttach.IsTitleBarCloseButton="True"
+                            IconPath="{DynamicResource CloseButtonIcon}">
+                            <controls:IconButton.Style>
+                                <Style BasedOn="{StaticResource WindowTitleIconButton}" TargetType="controls:IconButton">
+                                    <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource CloseBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </controls:IconButton.Style>
+                        </controls:IconButton>
+                    </StackPanel>
+                </Grid>
+
+                <AdornerDecorator>
+                    <ContentPresenter />
+                </AdornerDecorator>
+            </Grid>
+        </Border>
+    </ControlTemplate>
+
+    <Style x:Key="TipWindow" TargetType="{x:Type Window}">
+        <Setter Property="Background" Value="{DynamicResource PrimaryBlack}" />
+        <Setter Property="Topmost" Value="True" />
+
+        <Setter Property="BorderThickness" Value="1" />
+
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome
+                    CornerRadius="0"
+                    GlassFrameThickness="1"
+                    NonClientFrameEdges="None"
+                    ResizeBorderThickness="5"
+                    UseAeroCaptionButtons="False" />
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="Template" Value="{StaticResource TipWindowTemplate}" />
+
+    </Style>
+
+</ResourceDictionary>

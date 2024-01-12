@@ -1,0 +1,87 @@
+﻿<Window
+    x:Class="Simscop.UI.Original.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Simscop.UI.Original"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    Topmost="True"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <Style TargetType="Grid">
+            <Setter Property="Width" Value="300" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Height" Value="40" />
+        </Style>
+        <Style TargetType="UniformGrid">
+            <Setter Property="Width" Value="300" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Height" Value="40" />
+        </Style>
+    </Window.Resources>
+    <ScrollViewer
+        HorizontalContentAlignment="Left"
+        VerticalContentAlignment="Top"
+        HorizontalScrollBarVisibility="Visible"
+        VerticalScrollBarVisibility="Visible">
+        <StackPanel>
+            <Grid Width="900" Height="1" />
+            <Grid>
+                <Label Content="This is a Label" />
+            </Grid>
+            <Grid>
+                <TextBlock Text="This is a TextBlock" />
+            </Grid>
+            <Grid>
+                <Button Content="This is a Button" />
+            </Grid>
+
+            <UniformGrid Columns="3">
+                <CheckBox Content="Checkbox 01" />
+                <CheckBox Content="Checkbox 02" />
+                <CheckBox Content="Checkbox 03" />
+            </UniformGrid>
+
+            <Grid>
+                <ComboBox>
+                    <ComboBoxItem>Item01</ComboBoxItem>
+                    <ComboBoxItem>Item02</ComboBoxItem>
+                    <ComboBoxItem>Item03</ComboBoxItem>
+                    <ComboBoxItem>Item04</ComboBoxItem>
+                    <ComboBoxItem>Item05</ComboBoxItem>
+                </ComboBox>
+            </Grid>
+
+            <Grid Height="100">
+                <Expander>
+                    <StackPanel>
+                        <TextBlock Text="这是展开的内容体" />
+                        <TextBlock Text="这是展开的内容体" />
+                        <TextBlock Text="这是展开的内容体" />
+                        <TextBlock Text="这是展开的内容体" />
+                        <TextBlock Text="这是展开的内容体" />
+                    </StackPanel>
+                </Expander>
+            </Grid>
+
+
+            <UniformGrid Columns="3">
+                <RadioButton Content="Checkbox 01" />
+                <RadioButton Content="Checkbox 02" />
+                <RadioButton Content="Checkbox 03" />
+            </UniformGrid>
+
+            <Grid>
+                <Slider />
+            </Grid>
+
+            <Grid>
+                <TextBox Text="This is TextBox" />
+            </Grid>
+        </StackPanel>
+
+    </ScrollViewer>
+</Window>

@@ -1,0 +1,100 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Simscop.Spindisk.WPF.Controls"
+    xmlns:controls1="clr-namespace:Simscop.UI.Controls;assembly=Simscop.UI">
+
+    <Style TargetType="controls:CameraButton">
+        <Setter Property="StartImage" Value="/Image/start.png" />
+        <Setter Property="StopImage" Value="/Image/stop.png" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:CameraButton">
+                    <controls1:SimplePanel Name="border" RenderTransformOrigin="0.5,0.5">
+                        <Border>
+                            <Border.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform />
+                                    <SkewTransform />
+                                    <RotateTransform />
+                                    <TranslateTransform />
+                                </TransformGroup>
+                            </Border.RenderTransform>
+
+                            <Border.Background>
+                                <ImageBrush ImageSource="/Image/camera.png" Stretch="Uniform" />
+                            </Border.Background>
+                        </Border>
+
+
+                        <Grid x:Name="shower" Margin="35">
+                            <Grid.RenderTransform>
+                                <ScaleTransform x:Name="scaleTransform" CenterX="0.5" CenterY="0.5" ScaleX="1" ScaleY="1" />
+                            </Grid.RenderTransform>
+                            <controls1:SimplePanel>
+                                <Image x:Name="StartShower" Source="{TemplateBinding StartImage}" />
+                                <Image x:Name="StopShower" Source="{TemplateBinding StopImage}" />
+                            </controls1:SimplePanel>
+                        </Grid>
+                    </controls1:SimplePanel>
+
+
+                    <!--  Note  这部分的代码是有问题的，之后对动画这一部分需要重新来写  -->
+
+                    <ControlTemplate.Triggers>
+                        <!--<EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="shower" Storyboard.TargetProperty="(scaleTransform).ScaleX">
+                                        <SplineDoubleKeyFrame KeyTime="0:0:0.1" Value="2" />
+                                    </DoubleAnimationUsingKeyFrames>
+
+                        -->
+                        <!--<DoubleAnimationUsingKeyFrames Storyboard.TargetName="shower" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <SplineDoubleKeyFrame KeyTime="0:0:0.1" Value="2" />
+                                    </DoubleAnimationUsingKeyFrames>-->
+                        <!--
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>-->
+                        <!--<EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="shower" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
+                                        <SplineDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="shower" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <SplineDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>-->
+
+                        <Trigger Property="IsStart" Value="False">
+                            <Setter TargetName="StartShower" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="StopShower" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsStart" Value="True">
+                            <Setter TargetName="StartShower" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="StopShower" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Opacity" Value="0.8" />
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4" />
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

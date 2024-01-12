@@ -1,0 +1,57 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Simscop.Spindisk.WPF.Controls"
+    xmlns:controls1="clr-namespace:Simscop.UI.Controls;assembly=Simscop.UI">
+
+    <Style TargetType="controls:ObjectiveRadioButton">
+        <Setter Property="IsChecked" Value="False" />
+
+        <Setter Property="UnCheckImage" Value="/Image/not_select.png" />
+
+        <Setter Property="Background" Value="{DynamicResource Region03}" />
+
+        <Setter Property="TopLabel" Value="100x" />
+        <Setter Property="BottomLabel" Value="/1.40" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:ObjectiveRadioButton">
+                    <controls1:SimplePanel>
+                        <Border
+                            x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="10" />
+                        <Image
+                            Margin="15,8"
+                            Source="{TemplateBinding UnCheckImage}"
+                            Stretch="Fill" />
+                        <TextBlock
+                            Margin="15,0,0,0"
+                            HorizontalAlignment="Left"
+                            FontSize="10"
+                            Foreground="{DynamicResource TextReverseBrush01}"
+                            Opacity="0.7"
+                            Text="{TemplateBinding TopLabel}" />
+                        <TextBlock
+                            Margin="0,24,16,0"
+                            HorizontalAlignment="Right"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource TextReverseBrush01}"
+                            Text="{TemplateBinding BottomLabel}" />
+                    </controls1:SimplePanel>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="UnCheckImage" Value="/Image/select.png" />
+                            <Setter Property="Background" Value="{DynamicResource RegionReverse04}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
