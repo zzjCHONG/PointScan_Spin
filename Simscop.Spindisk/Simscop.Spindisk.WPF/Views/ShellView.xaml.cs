@@ -13,7 +13,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using OpenCvSharp.WpfExtensions;
 using Simscop.Spindisk.Core.ViewModels;
-using CameraViewModel = Simscop.Spindisk.Core.ViewModels.CameraViewModel;
 
 namespace Simscop.Spindisk.WPF.Views
 {
@@ -77,9 +76,6 @@ namespace Simscop.Spindisk.WPF.Views
             SetDataContext();
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
-
-
-            this.TestImage.Source = OpenCvSharp.Cv2.ImRead(@"E:\.test\test.png").ToBitmapSource();
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)

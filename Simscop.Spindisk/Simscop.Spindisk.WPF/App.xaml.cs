@@ -36,7 +36,7 @@ namespace Simscop.Spindisk.WPF
         {
             var view = new ShellView()
             {
-                DataContext = new ShellViewModel(),
+                //DataContext = new ShellViewModel(),
             };
 
             view.Show();

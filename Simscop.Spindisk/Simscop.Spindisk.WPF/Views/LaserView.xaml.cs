@@ -23,6 +23,8 @@ namespace Simscop.Spindisk.WPF.Views
         public LaserView()
         {
             InitializeComponent();
+
+
         }
     }
 }

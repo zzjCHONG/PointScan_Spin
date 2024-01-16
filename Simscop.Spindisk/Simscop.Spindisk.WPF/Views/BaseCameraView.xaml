@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
+    d:DataContext="{d:DesignInstance vm:CameraViewModel}"
     mc:Ignorable="d">
 
     <Grid>
@@ -52,7 +53,7 @@
                 Padding="0"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                Command="{Binding SaveFrameVm.QuickSaveFileCommand}"
+                Command="{Binding QuickSaveFileCommand}"
                 Content="存储图片"
                 IsEnabled="{Binding IsCapture}" />
 
@@ -63,31 +64,29 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Content="自动曝光"
-                IsChecked="{Binding IsAutoExposure}"
-                IsEnabled="{Binding CameraConnected}"
+                IsEnabled="False"
                 Style="{StaticResource CheckBoxAsButton}" />
         </UniformGrid>
 
-        <UniformGrid Grid.Row="2" Columns="2">
+        <UniformGrid
+            Grid.Row="2"
+            Columns="2"
+            IsEnabled="{Binding IsNoBusy}">
             <controls:CameraButton
                 Width="100"
                 Height="100"
                 Margin="0,30,0,0"
-                Command="{Binding OpenCameraAndCaptureCommand}"
+                Command="{Binding InitCommand}"
                 Focusable="False"
-                IsEnabled="{Binding CameraConnecting}"
                 IsStart="{Binding IsCapture}" />
 
-            <UniformGrid
-                Margin="0,10,0,0"
-                IsEnabled="{Binding CameraConnected}"
-                Rows="3">
+            <UniformGrid Margin="0,10,0,0" Rows="3">
                 <StackPanel Margin="0,0,5,0">
                     <Viewbox>
                         <ComboBox
                             Width="170"
                             ItemsSource="{Binding ResolutionsLite}"
-                            SelectedIndex="{Binding ResolutionIndex, Mode=TwoWay}" />
+                            SelectedIndex="0" />
                     </Viewbox>
                     <TextBlock
                         Margin="5,0,0,0"
@@ -98,12 +97,12 @@
                         Text="分辨率" />
                 </StackPanel>
 
-                <StackPanel Margin="0,0,5,0">
+                <StackPanel Margin="0,0,5,0" IsEnabled="False">
                     <Viewbox>
                         <ComboBox
                             Width="170"
                             ItemsSource="{Binding ImageModes}"
-                            SelectedIndex="{Binding ImageModeIndex, Mode=TwoWay}" />
+                            SelectedIndex="0" />
 
                     </Viewbox>
                     <TextBlock
@@ -115,12 +114,12 @@
                         Text="模式" />
                 </StackPanel>
 
-                <StackPanel Margin="0,0,5,0">
+                <StackPanel Margin="0,0,5,0" IsEnabled="False">
                     <Viewbox>
                         <ComboBox
                             Width="170"
                             ItemsSource="{Binding RoiModeLite}"
-                            SelectedIndex="{Binding RoiModeIndex, Mode=TwoWay}" />
+                            SelectedIndex="0" />
 
                     </Viewbox>
                     <TextBlock
@@ -131,12 +130,8 @@
                         Foreground="{DynamicResource TextBrush03}"
                         Text="ROI" />
                 </StackPanel>
-
             </UniformGrid>
-
         </UniformGrid>
     </Grid>
-
-
 
 </UserControl>

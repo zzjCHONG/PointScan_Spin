@@ -11,9 +11,11 @@
     Title="设置"
     Height="700"
     MaxWidth="520"
+    d:DataContext="{d:DesignInstance vm:CameraViewModel}"
     ResizeMode="CanResize"
     Style="{StaticResource TipWindow}"
-    Topmost="False">
+    Topmost="True"
+    mc:Ignorable="d">
 
     <Window.Resources>
         <SolidColorBrush x:Key="SliderSelectedBrush" Color="#2b42ab" />
@@ -69,11 +71,11 @@
                                 <CheckBox
                                     Margin="5"
                                     HorizontalAlignment="Stretch"
-                                    Command="{Binding ConnectCameraCommand}"
+                                    Command="{Binding InitCommand}"
                                     Content="连接相机"
                                     DockPanel.Dock="Left"
-                                    IsChecked="{Binding CameraFlag}"
-                                    IsEnabled="{Binding CameraConnecting}"
+                                    IsChecked="{Binding IsInit, Mode=OneWay}"
+                                    IsEnabled="{Binding IsNotInit, Mode=OneWay}"
                                     Style="{StaticResource CheckBoxAsButton}" />
 
                                 <Rectangle
@@ -90,11 +92,11 @@
                             <CheckBox
                                 Margin="5"
                                 HorizontalAlignment="Stretch"
-                                Command="{Binding CaptureFrameCommand}"
+                                Command="{Binding InitCommand}"
                                 Content="捕获画面"
                                 DockPanel.Dock="Left"
-                                IsChecked="{Binding IsCapture}"
-                                IsEnabled="{Binding CameraConnected}"
+                                IsChecked="{Binding IsCapture, Mode=OneWay}"
+                                IsEnabled="{Binding IsInit, Mode=OneWay}"
                                 Style="{StaticResource CheckBoxAsButton}" />
                         </UniformGrid>
 
@@ -106,8 +108,8 @@
                                 Content="分辨率" />
                             <ComboBox
                                 Margin="10,0,0,0"
-                                ItemsSource="{Binding Resolutions}"
-                                SelectedIndex="{Binding ResolutionIndex, Mode=TwoWay}" />
+                                ItemsSource="{Binding ResolutionsLite}"
+                                SelectedIndex="0" />
                         </DockPanel>
 
                         <DockPanel Margin="5" IsEnabled="{Binding CameraConnected}">
@@ -118,7 +120,7 @@
                             <ComboBox
                                 Margin="10,0,0,0"
                                 ItemsSource="{Binding ImageModes}"
-                                SelectedIndex="{Binding ImageModeIndex, Mode=TwoWay}" />
+                                SelectedIndex="0" />
                         </DockPanel>
 
                         <DockPanel Margin="5" IsEnabled="{Binding CameraConnected}">
@@ -128,8 +130,8 @@
                                 Content="Roi尺寸" />
                             <ComboBox
                                 Margin="10,0,0,0"
-                                ItemsSource="{Binding RoiMode}"
-                                SelectedIndex="{Binding RoiModeIndex, Mode=TwoWay}" />
+                                ItemsSource="{Binding RoiModeLite}"
+                                SelectedIndex="0" />
                         </DockPanel>
                     </StackPanel>
                 </Expander>
@@ -138,14 +140,14 @@
                 <Expander
                     Margin="8"
                     Header="曝光设置"
-                    IsEnabled="{Binding CameraConnected}">
+                    IsEnabled="{Binding IsCapture}">
                     <StackPanel>
                         <controls:PreviewSlider
                             Margin="15,10"
                             VerticalAlignment="Center"
-                            Maximum="{Binding ExposureModel.MaxExposure}"
-                            Minimum="{Binding ExposureModel.MinExposure}"
-                            TickFrequency="{Binding ExposureModel.StepExposure}"
+                            Maximum="30000"
+                            Minimum="0"
+                            TickFrequency="1"
                             Value="{Binding Exposure, Delay=100}">
                             <controls:PreviewSlider.PreviewContent>
                                 <Label Content="{Binding Path=(controls:PreviewSlider.PreviewPosition), RelativeSource={RelativeSource Self}}" ContentStringFormat="#0.00" />
@@ -158,6 +160,7 @@
                                 Margin="10,0,5,10"
                                 Content="自动曝光"
                                 IsChecked="{Binding IsAutoExposure}"
+                                IsEnabled="False"
                                 Style="{StaticResource CheckBoxAsButton}" />
 
                             <Button
@@ -168,7 +171,7 @@
                                 Content="曝光一次"
                                 IsEnabled="False" />
 
-                            <TextBox Margin="5,0,5,10" Text="{Binding ExposureModel.Exposure, StringFormat={}{0:F2}}" />
+                            <TextBox Margin="5,0,5,10" Text="{Binding Exposure, StringFormat={}{0:F2}}" />
 
                             <Button
                                 Height="40"
@@ -184,7 +187,8 @@
                 <Expander
                     Margin="8"
                     Header="ROI"
-                    IsEnabled="{Binding CameraConnected}">
+                    IsEnabled="{Binding IsCapture}"
+                    Visibility="Collapsed">
                     <StackPanel>
                         <UniformGrid Margin="10,10,10,0" Columns="2">
                             <CheckBox
@@ -279,6 +283,129 @@
                     </Grid>
                 </Expander>
 
+
+                <Expander
+                    Width="500"
+                    Margin="8"
+                    Header="文件保存"
+                    IsEnabled="{Binding IsCapture}">
+                    <StackPanel Margin="10">
+                        <UniformGrid Margin="0,0,0,5" Columns="6">
+                            <UniformGrid.Resources>
+                                <Style BasedOn="{StaticResource BaseNativeCheckBox}" TargetType="CheckBox">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </UniformGrid.Resources>
+                            <Label
+                                Width="80"
+                                Height="40"
+                                Content="格式选择" />
+                            <CheckBox
+                                Content="RAW"
+                                IsChecked="{Binding SaveFrameVm.SaveModel.IsRaw}"
+                                IsEnabled="False" />
+                            <CheckBox
+                                Content="TIF"
+                                IsChecked="True"
+                                IsEnabled="False" />
+                            <CheckBox
+                                Content="PNG"
+                                IsChecked="{Binding SaveFrameVm.SaveModel.IsPng}"
+                                IsEnabled="False" />
+                            <CheckBox
+                                Content="JPG"
+                                IsChecked="{Binding SaveFrameVm.SaveModel.IsJpg}"
+                                IsEnabled="False" />
+                            <CheckBox
+                                Content="BMP"
+                                IsChecked="{Binding SaveFrameVm.SaveModel.IsBmp}"
+                                IsEnabled="False" />
+                        </UniformGrid>
+
+
+                        <DockPanel Margin="0,5">
+                            <Label
+                                Width="80"
+                                Height="40"
+                                Margin="0,0,5,0"
+                                Content="文件夹"
+                                DockPanel.Dock="Left" />
+                            <Button
+                                Width="100"
+                                Margin="5,0,0,0"
+                                Command="{Binding LoadSaveDirectoryCommand}"
+                                Content="打开"
+                                DockPanel.Dock="Right" />
+                            <TextBox
+                                Height="40"
+                                Margin="5,0"
+                                Text="{Binding Root}" />
+                        </DockPanel>
+
+                        <DockPanel Margin="0,5">
+                            <Label
+                                Width="80"
+                                Height="40"
+                                Margin="0,0,5,0"
+                                Content="文件名称"
+                                DockPanel.Dock="Left" />
+                            <CheckBox
+                                Width="100"
+                                Margin="5,0,0,0"
+                                Content="时间后缀"
+                                DockPanel.Dock="Right"
+                                IsChecked="{Binding TimeSuffix}"
+                                Style="{StaticResource CheckBoxAsButton}" />
+                            <TextBox
+                                Height="40"
+                                Margin="5,0"
+                                Text="{Binding FileName}" />
+                        </DockPanel>
+
+                        <DockPanel Margin="0,5" IsEnabled="False">
+                            <Label
+                                Width="80"
+                                Height="40"
+                                Content="存储数量" />
+                            <TextBox Margin="10,0,0,0" Text="{Binding SaveFrameVm.SaveModel.Count}" />
+                        </DockPanel>
+
+                        <DockPanel Margin="0,5" IsEnabled="False">
+                            <Label
+                                Width="80"
+                                Height="40"
+                                Content="时间间隔" />
+                            <TextBox Margin="10,0,0,0" Text="{Binding SaveFrameVm.SaveModel.Interval}" />
+                        </DockPanel>
+
+                        <Button
+                            Height="40"
+                            Margin="0,10"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding SaveFileCommand}"
+                            Content="保存图片" />
+
+                        <DockPanel Margin="0,5" IsEnabled="False">
+                            <Label
+                                Width="80"
+                                Height="40"
+                                Margin="0,0,5,0"
+                                Content="录制时间" />
+                            <Button
+                                Width="100"
+                                Margin="5,0,0,0"
+                                Content="开始录制"
+                                DockPanel.Dock="Right" />
+                            <UniformGrid Margin="5,0" Columns="3">
+                                <TextBox Margin="0,0,5,0" />
+                                <TextBox Margin="5,0" />
+                                <TextBox Margin="5,0,0,0" />
+
+                            </UniformGrid>
+                        </DockPanel>
+                    </StackPanel>
+                </Expander>
+
                 <Expander
                     Margin="8"
                     Header="色彩管理"
@@ -290,7 +417,7 @@
                         <UniformGrid
                             Margin="10"
                             Columns="2"
-                            IsEnabled="{Binding IsCapture}">
+                            IsEnabled="False">
 
                             <TextBox
                                 Height="40"
@@ -304,7 +431,7 @@
 
                         </UniformGrid>
 
-                        <DockPanel Margin="10,5">
+                        <DockPanel Margin="10,5" IsEnabled="False">
                             <CheckBox
                                 Height="35"
                                 Content="左色阶"
@@ -327,7 +454,7 @@
                         </DockPanel>
 
 
-                        <DockPanel Margin="10">
+                        <DockPanel Margin="10" IsEnabled="False">
                             <Label
                                 Width="100"
                                 Height="40"
@@ -345,7 +472,7 @@
                             </controls:PreviewSlider>
                         </DockPanel>
 
-                        <DockPanel Margin="10">
+                        <DockPanel Margin="10" IsEnabled="False">
                             <Label
                                 Width="100"
                                 Height="40"
@@ -368,7 +495,8 @@
                 <Expander
                     Margin="8"
                     Header="图像设置"
-                    IsEnabled="{Binding CameraConnected}">
+                    IsEnabled="{Binding CameraConnected}"
+                    Visibility="Collapsed">
                     <StackPanel>
                         <DockPanel Margin="10">
                             <Label
@@ -419,114 +547,6 @@
                     </Grid>
                 </Expander>
 
-                <Expander
-                    Width="500"
-                    Margin="8"
-                    Header="文件保存">
-                    <StackPanel Margin="10">
-                        <UniformGrid Margin="0,0,0,5" Columns="6">
-                            <UniformGrid.Resources>
-                                <Style BasedOn="{StaticResource BaseNativeCheckBox}" TargetType="CheckBox">
-                                    <Setter Property="HorizontalAlignment" Value="Center" />
-                                </Style>
-                            </UniformGrid.Resources>
-                            <Label
-                                Width="80"
-                                Height="40"
-                                Content="格式选择" />
-                            <CheckBox
-                                Content="RAW"
-                                IsChecked="{Binding SaveFrameVm.SaveModel.IsRaw}"
-                                IsEnabled="False" />
-                            <CheckBox Content="TIF" IsChecked="{Binding SaveFrameVm.SaveModel.IsTif}" />
-                            <CheckBox Content="PNG" IsChecked="{Binding SaveFrameVm.SaveModel.IsPng}" />
-                            <CheckBox Content="JPG" IsChecked="{Binding SaveFrameVm.SaveModel.IsJpg}" />
-                            <CheckBox Content="BMP" IsChecked="{Binding SaveFrameVm.SaveModel.IsBmp}" />
-                        </UniformGrid>
-
-
-                        <DockPanel Margin="0,5">
-                            <Label
-                                Width="80"
-                                Height="40"
-                                Margin="0,0,5,0"
-                                Content="文件夹"
-                                DockPanel.Dock="Left" />
-                            <Button
-                                Width="100"
-                                Margin="5,0,0,0"
-                                Command="{Binding SaveFrameVm.LoadSaveDirectoryCommand}"
-                                Content="打开"
-                                DockPanel.Dock="Right" />
-                            <TextBox
-                                Height="40"
-                                Margin="5,0"
-                                Text="{Binding SaveFrameVm.SaveModel.Root}" />
-                        </DockPanel>
-
-                        <DockPanel Margin="0,5">
-                            <Label
-                                Width="80"
-                                Height="40"
-                                Margin="0,0,5,0"
-                                Content="文件名称"
-                                DockPanel.Dock="Left" />
-                            <CheckBox
-                                Width="100"
-                                Margin="5,0,0,0"
-                                Content="时间后缀"
-                                DockPanel.Dock="Right"
-                                IsChecked="{Binding SaveFrameVm.SaveModel.IsTimeSuffix}"
-                                Style="{StaticResource CheckBoxAsButton}" />
-                            <TextBox
-                                Height="40"
-                                Margin="5,0"
-                                Text="{Binding SaveFrameVm.SaveModel.Name}" />
-                        </DockPanel>
-
-                        <DockPanel Margin="0,5" IsEnabled="False">
-                            <Label
-                                Width="80"
-                                Height="40"
-                                Content="存储数量" />
-                            <TextBox Margin="10,0,0,0" Text="{Binding SaveFrameVm.SaveModel.Count}" />
-                        </DockPanel>
-
-                        <DockPanel Margin="0,5" IsEnabled="False">
-                            <Label
-                                Width="80"
-                                Height="40"
-                                Content="时间间隔" />
-                            <TextBox Margin="10,0,0,0" Text="{Binding SaveFrameVm.SaveModel.Interval}" />
-                        </DockPanel>
-
-                        <Button
-                            Height="40"
-                            Margin="0,10"
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding SaveFrameVm.SaveFileCommand}"
-                            Content="保存图片" />
-
-                        <DockPanel Margin="0,5" IsEnabled="False">
-                            <Label
-                                Width="80"
-                                Height="40"
-                                Margin="0,0,5,0"
-                                Content="录制时间" />
-                            <Button
-                                Width="100"
-                                Margin="5,0,0,0"
-                                Content="开始录制"
-                                DockPanel.Dock="Right" />
-                            <UniformGrid Margin="5,0" Columns="3">
-                                <TextBox Margin="0,0,5,0" />
-                                <TextBox Margin="5,0" />
-                                <TextBox Margin="5,0,0,0" />
-
-                            </UniformGrid>
-                        </DockPanel>
-                    </StackPanel>
-                </Expander>
             </StackPanel>
 
         </ScrollViewer>

@@ -9,7 +9,11 @@
     <Import_RootNamespace>Simscop.API</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Andor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Andor\AndorAPI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helper\SerialHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ICamera.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ILaser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MshotMotor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Native\Dhyana\TUCamAPI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dhyana.cs" />
@@ -19,5 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Native\Dhyana\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Native\Andor\" />
   </ItemGroup>
 </Project>

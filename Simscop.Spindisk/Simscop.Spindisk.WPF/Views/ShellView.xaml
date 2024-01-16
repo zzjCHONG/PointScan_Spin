@@ -4,10 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Simscop.UI.Controls;assembly=Simscop.UI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:liftui="https://github.com/pchuan98/Lift.UI"
     xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:viewModels="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
     Title="ShellView"
+    d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
     Style="{StaticResource BlankWindow}"
     Topmost="False"
     mc:Ignorable="d">
@@ -159,7 +162,6 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="1" />
                                 <ColumnDefinition Width="*" />
-
                             </Grid.ColumnDefinitions>
 
                             <Grid Grid.Column="0" Margin="0,0,1,0">
@@ -173,6 +175,86 @@
                                 <local:SpinView x:Name="SpinControl" />
                             </Grid>
                         </Grid>
+                    </Border>
+
+                    <Border
+                        Height="150"
+                        Margin="0,2,0,0"
+                        Background="{StaticResource Region02}"
+                        BorderBrush="{DynamicResource Region01}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                Margin="20,10,0,10"
+                                HorizontalAlignment="Left"
+                                FontSize="12"
+                                Text="伪彩设置" />
+
+                            <Separator Margin="10,0,10,10" Background="{DynamicResource Region01}" />
+
+                            <UniformGrid Columns="2" Rows="2">
+                                <UniformGrid.Resources>
+                                    <ResourceDictionary>
+                                        <Style TargetType="GroupBox">
+                                            <Setter Property="Margin" Value="20,5" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                                            <Setter Property="VerticalContentAlignment" Value="Top" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="GroupBox">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="50" />
+                                                                <ColumnDefinition />
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel
+                                                                Margin="0,8,6,8"
+                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                Orientation="Horizontal">
+                                                                <ContentPresenter
+                                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                    ContentSource="Header"
+                                                                    RecognizesAccessKey="True"
+                                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                    TextElement.Foreground="{TemplateBinding Foreground}" />
+                                                            </StackPanel>
+                                                            <ContentPresenter
+                                                                x:Name="Presenter"
+                                                                Grid.Column="1"
+                                                                Margin="{TemplateBinding Padding}"
+                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ResourceDictionary>
+                                </UniformGrid.Resources>
+
+                                <GroupBox Header="1">
+                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFirst}" />
+                                </GroupBox>
+
+                                <GroupBox Header="2">
+                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorSecond}" />
+                                </GroupBox>
+
+                                <GroupBox Header="3">
+                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorThird}" />
+                                </GroupBox>
+
+                                <GroupBox Header="4">
+                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFourth}" />
+                                </GroupBox>
+
+
+                            </UniformGrid>
+                        </StackPanel>
                     </Border>
 
                     <Border
@@ -217,9 +299,6 @@
                         CornerRadius="8">
                         <Image Opacity="0.5" Source="/Image/temp.jpg" />
                     </Border>
-
-
-
                 </StackPanel>
             </ScrollViewer>
 
@@ -236,31 +315,32 @@
                     Margin="0,5,2.5,2.5"
                     Background="{DynamicResource Region01}"
                     CornerRadius="10">
-                    <Viewbox>
-                        <Image
-                            x:Name="TestImage"
-                            Width="400"
-                            Source="{Binding ImageFirst}" />
-                    </Viewbox>
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageFirst}" />
                 </Border>
 
                 <Border
                     Name="Pic2"
                     Margin="2.5,5,2.5,2.5"
                     Background="{DynamicResource Region01}"
-                    CornerRadius="10" />
+                    CornerRadius="10">
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageSecond}" />
+                </Border>
 
                 <Border
                     Name="Pic3"
                     Margin="0,2.5,2.5,5"
                     Background="{DynamicResource Region01}"
-                    CornerRadius="10" />
+                    CornerRadius="10">
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageThird}" />
+                </Border>
 
                 <Border
                     Name="Pic4"
                     Margin="2.5,2.5,2.5,5"
                     Background="{DynamicResource Region01}"
-                    CornerRadius="10" />
+                    CornerRadius="10">
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageFourth}" />
+                </Border>
             </UniformGrid>
         </Grid>
     </Grid>

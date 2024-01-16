@@ -149,26 +149,26 @@ public partial class ExampleViewModel : ObservableObject
     [RelayCommand]
     void AppendConfig()
     {
-        if (Model == null) return;
+        //if (Model == null) return;
 
-        SteerVM?.MoveToX(Model.X);
-        SteerVM?.MoveToY(Model.Y);
-        SteerVM?.MoveToZ(Model.Z);
+        //SteerVM?.MoveToX(Model.X);
+        //SteerVM?.MoveToY(Model.Y);
+        //SteerVM?.MoveToZ(Model.Z);
 
-        if (CameraVM == null || !CameraVM.CameraConnected) return;
-        CameraVM.IsAutoExposure = false;
-        if (Model.Exposure != null) CameraVM.Exposure = (double)Model.Exposure;
+        //if (CameraVM == null || !CameraVM.CameraConnected) return;
+        //CameraVM.IsAutoExposure = false;
+        //if (Model.Exposure != null) CameraVM.Exposure = (double)Model.Exposure;
 
-        CameraVM.IsAutoLeftLevel = false;
-        if (Model.LeftLevel != null) CameraVM.LeftLevel = (double)Model.LeftLevel;
+        //CameraVM.IsAutoLeftLevel = false;
+        //if (Model.LeftLevel != null) CameraVM.LeftLevel = (double)Model.LeftLevel;
 
-        if (Model.Gamma != null) CameraVM.Gamma = (double)Model.Gamma;
-        if (Model.Contrast != null) CameraVM.Contrast = (double)Model.Contrast;
+        //if (Model.Gamma != null) CameraVM.Gamma = (double)Model.Gamma;
+        //if (Model.Contrast != null) CameraVM.Contrast = (double)Model.Contrast;
 
-        if (ScanVM == null) return;
-        if (Model.Start != null) ScanVM.ZStart = (double)Model.Start;
-        if (Model.Stop != null) ScanVM.ZEnd = (double)Model.Stop;
-        ScanVM.ZStep = ScanVM.ZStart > ScanVM.ZEnd ? -1 : 1;
+        //if (ScanVM == null) return;
+        //if (Model.Start != null) ScanVM.ZStart = (double)Model.Start;
+        //if (Model.Stop != null) ScanVM.ZEnd = (double)Model.Stop;
+        //ScanVM.ZStep = ScanVM.ZStart > ScanVM.ZEnd ? -1 : 1;
     }
 
 }

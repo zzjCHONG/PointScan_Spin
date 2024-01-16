@@ -10,6 +10,22 @@ namespace Simscop.Lib.ImageExtension;
 public static class ColorMaps
 {
 
+    private static Mat? _gray = null;
+    public static Mat Gray
+    {
+        get
+        {
+            if (_gray == null)
+            {
+                _gray = new Mat(256, 1, MatType.CV_8UC3);
+                for (var i = 0; i < 256; i++)
+                    _gray.Set(i, 0, new Vec3b((byte)i, (byte)i, (byte)i));
+
+            }
+            return _gray!;
+        }
+    }
+
     private static Mat? _green = null;
     public static Mat Green
     {
@@ -26,7 +42,7 @@ public static class ColorMaps
         }
     }
 
-    
+
 
     private static Mat? _red = null;
     public static Mat Red
@@ -57,6 +73,23 @@ public static class ColorMaps
 
             }
             return _blue!;
+        }
+    }
+
+
+    private static Mat? _purple = null;
+    public static Mat Pruple
+    {
+        get
+        {
+            if (_purple == null)
+            {
+                _purple = new Mat(256, 1, MatType.CV_8UC3);
+                for (var i = 0; i < 256; i++)
+                    _purple.Set(i, 0, new Vec3b((byte)i, (byte)0, (byte)i));
+
+            }
+            return _purple!;
         }
     }
 }

@@ -80,5 +80,8 @@ public class DisplayFrame
         mat = new Mat(Height, Width, type, FrameObject);
     }
 
+    public Mat? Image { get; set; }
+
+    public BitmapSource? Source { get; set; }
 
 }

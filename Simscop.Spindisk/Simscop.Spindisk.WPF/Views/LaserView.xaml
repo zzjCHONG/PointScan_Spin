@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
+    d:DataContext="{d:DesignInstance viewModels:LaserViewModel}"
     mc:Ignorable="d">
 
     <StackPanel>
@@ -59,7 +60,10 @@
                         Text="{Binding ChannelAValue, StringFormat='\{0\}%'}"
                         TextAlignment="Center" />
 
-                    <CheckBox Grid.Column="2" Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="2"
+                        IsChecked="{Binding ChannelAEnable}"
+                        Style="{StaticResource SwitchCheckBox}" />
 
                 </Grid>
             </StackPanel>
@@ -102,7 +106,10 @@
                         Text="{Binding ChannelBValue, StringFormat='\{0\}%'}"
                         TextAlignment="Center" />
 
-                    <CheckBox Grid.Column="2" Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="2"
+                        IsChecked="{Binding ChannelBEnable}"
+                        Style="{StaticResource SwitchCheckBox}" />
 
                 </Grid>
             </StackPanel>
@@ -145,7 +152,10 @@
                         Text="{Binding ChannelCValue, StringFormat='\{0\}%'}"
                         TextAlignment="Center" />
 
-                    <CheckBox Grid.Column="2" Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="2"
+                        IsChecked="{Binding ChannelCEnable}"
+                        Style="{StaticResource SwitchCheckBox}" />
 
                 </Grid>
             </StackPanel>
@@ -189,7 +199,10 @@
                         Text="{Binding ChannelDValue, StringFormat='\{0\}%'}"
                         TextAlignment="Center" />
 
-                    <CheckBox Grid.Column="2" Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="2"
+                        IsChecked="{Binding ChannelDEnable}"
+                        Style="{StaticResource SwitchCheckBox}" />
 
                 </Grid>
             </StackPanel>

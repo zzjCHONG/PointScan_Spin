@@ -119,6 +119,7 @@
                 Focusable="false"
                 IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                 OverridesDefaultStyle="True"
+                Style="{x:Null}"
                 Template="{StaticResource ComboBoxToggleButton}" />
 
 
@@ -134,6 +135,7 @@
                 Focusable="True"
                 IsReadOnly="{TemplateBinding IsReadOnly}"
                 OverridesDefaultStyle="True"
+                Style="{x:Null}"
                 Visibility="Hidden" />
 
             <!--  Popup 可显示 ComboBox 中的项列表。IsOpen 已数据绑定到通过 ComboBoxToggleButton 来切换的 IsDropDownOpen  -->
@@ -198,7 +200,6 @@
         <Setter Property="ScrollViewer.PanningMode" Value="Both" />
         <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
         <Setter Property="Template" Value="{StaticResource BaseComboBoxTemplate}" />
-
     </Style>
 
 </ResourceDictionary>

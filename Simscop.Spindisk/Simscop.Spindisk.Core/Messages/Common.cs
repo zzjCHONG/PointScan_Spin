@@ -53,3 +53,10 @@ public static class SteerMessage
             where field.Name == name select (string?)Convert.ToString(value)).FirstOrDefault();
     }
 }
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Index"></param>
+/// <param name="Status"></param>
+public record LaserMessage(int Index, bool Status);
