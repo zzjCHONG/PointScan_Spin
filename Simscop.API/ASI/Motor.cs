@@ -5,6 +5,7 @@ using System.IO.Ports;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Simscop.API.ASI
 {
@@ -79,10 +80,12 @@ namespace Simscop.API.ASI
 
         public void ReadPosition()
         {
-            serialPort.Write("W X\r\n");
-            serialPort.Write("W Y\r\n");
-            serialPort.Write("W Z\r\n");
-
+            if (serialPort.IsOpen)
+            {
+                serialPort.Write("W X\r\n");
+                serialPort.Write("W Y\r\n");
+                serialPort.Write("W Z\r\n");
+            }
             Convert(serialPort.ReadExisting());
 
         }
@@ -94,6 +97,7 @@ namespace Simscop.API.ASI
         /// <param name="value"></param>
         public bool MoveRelative(Axis axis, double value)
         {
+            if(serialPort.IsOpen)
             switch (axis)
             {
                 case Axis.X:
@@ -106,7 +110,9 @@ namespace Simscop.API.ASI
                     serialPort.Write($"R Z={value * 10}\r\n");
                     break;
             }
+            else return false;
             return true;
+           
         }
 
         /// <summary>
