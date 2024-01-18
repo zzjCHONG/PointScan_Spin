@@ -128,25 +128,28 @@ public partial class CameraViewModel : ObservableObject
 
     public CameraViewModel()
     {
-        Camera = new TestCamera();
+        //Camera = new TestCamera();
+        Camera = new Andor();
 
-        _timer = new DispatcherTimer(DispatcherPriority.Render)
-        {
-            Interval = TimeSpan.FromSeconds(Exposure / 2 / 1000),
-        };
-        _timer.Tick += (s, e) =>
-        {
-            Task.Run(() =>
-            {
-                if (Camera.Capture(out var mat))
-                {
-                    WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
-                    {
-                        Image = mat,
-                    }, "Display");
-                }
-            });
-        };
+        //_timer = new DispatcherTimer(DispatcherPriority.Render)
+        //{
+        //    Interval = TimeSpan.FromSeconds(Exposure / 2 / 1000),
+        //};
+        //_timer.Tick += (s, e) =>
+        //{
+        //    Task.Run(() =>
+        //    {
+        //        if (Camera.Capture(out var mat))
+        //        {
+        //            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+        //            {
+        //                Image = mat,
+        //            }, "Display");
+        //        }
+        //    });
+        //};
+
+     
 
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture,
             (s, e) => throw new Exception("当前方法不准使用了"));
@@ -182,6 +185,31 @@ public partial class CameraViewModel : ObservableObject
     [ObservableProperty]
     private bool _isNoBusy = true;
 
+    [ObservableProperty]
+    private bool _isStartAcquisition = false;
+
+    partial void OnIsStartAcquisitionChanged(bool value)
+    {
+        if (IsStartAcquisition)
+        {
+            Task.Run(() =>
+            {
+                while (IsStartAcquisition)
+                {
+                    if (Camera.Capture(out var mat))
+                    {
+                        WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+                        {
+                            Image = mat,
+                        }, "Display");
+                    }
+                }
+
+                Debug.WriteLine("推出线程");
+            });
+        }
+    }
+
     [RelayCommand]
     void Init()
     {
@@ -194,30 +222,33 @@ public partial class CameraViewModel : ObservableObject
                 IsInit = Camera.Init();
                 IsCapture = Camera.StartCapture();
 
-                _timer.Start();
+                IsStartAcquisition = true;
+                //_timer.Start();
                 IsNoBusy = true;
             });
         }
-        else if (IsInit && !IsCapture) 
+        else if (IsInit && !IsCapture)
         {
             IsCapture = Camera.StartCapture();
-            _timer.Interval= TimeSpan.FromSeconds(Exposure / 2 / 1000);
-            _timer.Start();
+            //_timer.Interval= TimeSpan.FromSeconds(Exposure / 2 / 1000);
+            //_timer.Start();
+            IsStartAcquisition = true;
             IsNoBusy = true;
         }
         else if (IsCapture)
         {
             IsCapture = !Camera.StopCapture();
-            _timer.Stop();
+            //_timer.Stop();
+            IsStartAcquisition = false;
             IsNoBusy = true;
         }
-        else{ }
+        else { }
 
-       
+
     }
 
     [RelayCommand]
-    void SetExposure()=> Camera.SetExposure(Exposure);
+    void SetExposure() => Camera.SetExposure(Exposure);
 
     #region File
 
@@ -267,7 +298,7 @@ public partial class CameraViewModel : ObservableObject
                    $"{(TimeSuffix ? $"{DateTime.Now:yyyyMMdd_HH_mm_ss}" : "")}";
 
         WeakReferenceMessenger.Default
-            .Send<string, string>(Path.Join(Root,name), MessageManage.SaveACapture);
+            .Send<string, string>(Path.Join(Root, name), MessageManage.SaveACapture);
     }
 
     #endregion

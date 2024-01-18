@@ -1,471 +1,398 @@
 ﻿using OpenCvSharp;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
-namespace Simscop.API;
-
-public class Andor
+namespace Simscop.API
 {
-    private BackgroundWorker LiveWorker = null;
-    private static int Hndl = 0;
-    private static int NumberDevices = 0;
-    private PixelEncodingEnum PixelEncoding = PixelEncodingEnum.Mono16;
 
-    private int imageSizeBytes;
-    public int ImageSizeBytes => imageSizeBytes;
-
-    private string imageFilePath = string.Empty;
-    public string ImageFilePath
+    public class Andor : ICamera
     {
-        get => imageFilePath;
-        set => imageFilePath = value;
-    }
+        AndorImplemented _andor = new AndorImplemented();
+        public bool Capture(out Mat mat) => _andor.Capture(out mat);
 
-    #region AssertRet
-    private bool AssertRet(int ret, bool assertInit = true, bool assertConnect = true)
-    {
-        if (assertInit && !IsInitialized()) return false;
-        if (assertConnect && !IsConnected()) return false;
+        public bool GetExposure(out double exposure) => _andor.GetExpose(out exposure);
 
-        var st = new StackTrace(true);
-        var msg = AndorErrorCodeEnum.NO_DEFINE;
-        msg = Enum.IsDefined(typeof(AndorErrorCodeEnum), ret) ? (AndorErrorCodeEnum)ret : AndorErrorCodeEnum.NO_DEFINE;
-        if (ret != (int)AndorErrorCodeEnum.AT_SUCCESS)
+        public bool Init() => _andor.InitializeSdk() && _andor.InitializeCamera();
+
+        public bool SaveCapture(string path) => _andor.SaveSingleFrame(path);
+
+        public bool SetExposure(double exposure) => _andor.SetExposure(exposure);
+
+        public bool StartCapture() => _andor.StartAcquisition();
+
+        public bool StopCapture() => _andor.StopAcquisition();
+
+        ~Andor()
         {
-            Debug.WriteLine($"[ERROR] [{st?.GetFrame(1)?.GetMethod()?.Name}] {ret}-{msg}");
-            return false;
+            _andor.UnInitializeCamera();
+            _andor.UninitializeSdk();
         }
 
-        Debug.WriteLine($"[INFO] [{st?.GetFrame(1)?.GetMethod()?.Name}] {ret}-{msg}");
-        return true;
     }
-    private bool IsInitialized()
+
+    public class AndorImplemented
     {
-        if (NumberDevices != 0) return true;
-        Debug.WriteLine("No camera found");
-        return false;
-    }
-    private bool IsConnected()
-    {
-        if (Hndl == 0 || imageSizeBytes == 0)
+        private static int Hndl = 0;
+        private static int NumberDevices = 0;
+        private static int ImageSizeBytes;  
+
+        #region AssertRet
+        private bool AssertRet(int ret, bool assertInit = true, bool assertConnect = true)
         {
-            Debug.WriteLine("No camera connected");
-            return false;
-        }
-        return true;
-    }
-    #endregion
+            if (assertInit && !IsInitialized()) return false;
+            if (assertConnect && !IsConnected()) return false;
 
-    /// <summary>
-    /// 初始化Sdk
-    /// </summary>
-    /// <returns></returns>
-    public bool InitializeSdk()
-    {
-        if (AndorAPI.InitialiseLibrary() != (int)AndorErrorCodeEnum.AT_SUCCESS) return false;
+            var st = new StackTrace(true);
+            var msg = AndorErrorCodeEnum.NO_DEFINE;
+            msg = Enum.IsDefined(typeof(AndorErrorCodeEnum), ret) ? (AndorErrorCodeEnum)ret : AndorErrorCodeEnum.NO_DEFINE;
+            if (ret != (int)AndorErrorCodeEnum.AT_SUCCESS)
+            {
+                Debug.WriteLine($"[ERROR] [{st?.GetFrame(1)?.GetMethod()?.Name}] {ret}-{msg}");
+                return false;
+            }
 
-        if (!AssertRet(AndorAPI.GetInt(1, "Device Count", ref NumberDevices), false, false)) return false;
-
-        Debug.WriteLine("InitializeSdk completed!");
-        return true;
-    }
-
-    /// <summary>
-    /// 释放SDK
-    /// </summary>
-    /// <returns></returns>
-    public bool UninitializeSdk()
-        => AssertRet(AndorAPI.FinaliseLibrary(), false, false);
-
-    /// <summary>
-    /// 初始化相机
-    /// </summary>
-    /// <param name="cameraId"></param>
-    /// <returns></returns>
-    public bool InitializeCamera(int cameraId)
-    {
-        if (!AssertRet(AndorAPI.Open(cameraId, ref Hndl), assertConnect: false)) return false;
-        if (!AssertRet(AndorAPI.GetInt(Hndl, "imageSizeBytes", ref imageSizeBytes), assertConnect: false)) return false;
-
-        Debug.WriteLine("InitializeCamera completed!");
-        return true;
-    }
-
-    /// <summary>
-    /// 释放相机
-    /// </summary>
-    /// <returns></returns>
-    public bool UnInitializeCamera()
-        => AssertRet(AndorAPI.Close(Hndl), false, false);
-
-    /// <summary>
-    /// 开始捕获
-    /// </summary>
-    /// <returns></returns>
-    public bool StartCapture()
-    {
-        byte[] userBuffer = new byte[imageSizeBytes];
-        if (!AssertRet(AndorAPI.QueueBuffer(Hndl, userBuffer, imageSizeBytes))) return false;
-
-        if (!AssertRet(AndorAPI.Command(Hndl, "AcquisitionStart"))) return false;
-
-        return true;
-    }
-
-    /// <summary>
-    /// 停止捕获
-    /// </summary>
-    /// <param name="imageSizeBytes"></param>
-    /// <returns></returns>
-    public bool StopCapture()
-    {
-        if (!AssertRet(AndorAPI.Command(Hndl, "Acquisition Stop"))) return false;
-
-        if (!AssertRet(AndorAPI.Flush(Hndl))) return false;
-
-        return true;
-    }
-
-    /// <summary>
-    /// 获得当前帧
-    /// </summary>
-    /// <param name="imageSizeBytes"></param>
-    /// <param name="imageBytes"></param>
-    /// <param name="interval"></param>
-    /// <returns></returns>
-    public bool GetCurrentFrame(ref byte[] imageBytes, uint interval = unchecked(0xFFFFFFFF))
-    {
-        IntPtr imgPtr = Marshal.AllocHGlobal(imageBytes.Length);
-        if (!AssertRet(AndorAPI.WaitBuffer(Hndl, ref imgPtr, ref imageSizeBytes, interval))) return false;
-        Marshal.Copy(imgPtr, imageBytes, 0, imageBytes.Length);
-        return true;
-    }
-
-    public Mat? GetCurrentFrame()
-    {
-        //获取图像->byte[] buffer
-        byte[] pBuf = new byte[imageSizeBytes];
-        if (!GetCurrentFrame(ref pBuf)) return null;
-
-        Mat matImg = new Mat();
-        Bytes2Mat(pBuf, ref matImg);
-
-        return matImg;
-
-    }
-
-    /// <summary>
-    /// Imagebyte[] to Mat
-    /// </summary>
-    /// <param name="imageBytes"></param>
-    /// <param name="matImg"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public bool Bytes2Mat(byte[] imageBytes, ref Mat matImg)
-    {
-        int imageHeight = 0;
-        AndorAPI.GetInt(Hndl, "AOI Height", ref imageHeight);
-        int imageWidth = 0;
-        AndorAPI.GetInt(Hndl, "AOI Width", ref imageWidth);
-        MatType matType = new MatType();
-        switch (PixelEncoding)
-        {
-            case PixelEncodingEnum.Mono8:
-                matType = MatType.CV_8UC1;
-                break;
-            case PixelEncodingEnum.Mono12:
-                matType = MatType.CV_16UC1;
-                break;
-            case PixelEncodingEnum.Mono12PACKED:
-                matType = MatType.CV_16UC1;
-                break;
-            case PixelEncodingEnum.Mono16:
-                matType = MatType.CV_16UC1;
-                break;
-            case PixelEncodingEnum.Mono32:
-                matType = MatType.CV_32SC1;
-                break;
-            default:
-                throw new ArgumentException("Invalid pixel format.");
-        }
-        matImg = new Mat(imageHeight, imageWidth, matType);
-        Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
-
-        return true;
-    }
-
-
-
-    /// <summary>
-    /// MatImgSave in Andor
-    /// Rotate&&Flip
-    /// 非tif格式，存图异常
-    /// </summary>
-    /// <param name="matImg"></param>
-    /// <param name="imageFileName"></param>
-    /// <returns></returns>
-    public bool MatSave(Mat matImg, string imageFileName)
-    {
-        try
-        {
-            if (string.IsNullOrEmpty(imageFileName)) return false;
-
-            //旋转
-            Mat matImgRotate = new Mat(matImg.Height, matImg.Width, matImg.Type());
-            Cv2.Rotate(matImg, matImgRotate, RotateFlags.Rotate180);
-            Mat matImgFlip = new Mat(matImg.Height, matImg.Width, matImg.Type());
-            Cv2.Flip(matImgRotate, matImgFlip, FlipMode.Y);
-
-            //图像水平&垂直分辨率、压缩比
-            ImwriteFlags flags = ImwriteFlags.TiffCompression;
-            ImwriteFlags dpix = ImwriteFlags.TiffXDpi;
-            ImwriteFlags dpiy = ImwriteFlags.TiffYDpi;
-            ImageEncodingParam[] encodingParams = new ImageEncodingParam[] { new ImageEncodingParam(dpix, 96), new ImageEncodingParam(dpiy, 96), new ImageEncodingParam(flags, 1) };
-
-            Cv2.ImWrite(imageFileName, matImgFlip, encodingParams);
-
-            Debug.WriteLine("MatImage save:" + imageFileName);
+            Debug.WriteLine($"[INFO] [{st?.GetFrame(1)?.GetMethod()?.Name}] {ret}-{msg}");
             return true;
         }
-        catch (Exception ex)
+        private bool IsInitialized()
         {
-            Debug.WriteLine("MatImage save error:" + ex.Message);
+            if (NumberDevices != 0) return true;
+            Debug.WriteLine("No camera found");
             return false;
         }
-    }
-
-    /// <summary>
-    /// 设置曝光值
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public bool SetExposure(double value)
-    {
-        double maxValue = 0;
-        if (!AssertRet(AndorAPI.GetFloatMax(Hndl, "ExposureTime", ref maxValue))) return false;
-        double minValue = 0;
-        if (!AssertRet(AndorAPI.GetFloatMin(Hndl, "ExposureTime", ref minValue))) return false;
-
-        if (value > maxValue || value < minValue)
+        private bool IsConnected()
         {
-            Debug.WriteLine($"Exposure value-{value} is out range:[{minValue},{maxValue}]");
-            return false;
+            if (Hndl == 0 || ImageSizeBytes == 0)
+            {
+                Debug.WriteLine("No camera connected");
+                return false;
+            }
+            return true;
+        }
+        #endregion
+
+        #region Init
+        /// <summary>
+        /// 初始化Sdk
+        /// </summary>
+        /// <returns></returns>
+        public bool InitializeSdk()
+        {
+            if (AndorAPI.InitialiseLibrary() != (int)AndorErrorCodeEnum.AT_SUCCESS)
+            {
+                Debug.WriteLine("InitialiseLibrary Error");
+                return false;
+            }
+                
+            if (!AssertRet(AndorAPI.GetInt(1, "Device Count", ref NumberDevices), false, false)) return false;
+
+            Debug.WriteLine("InitializeSdk completed!");
+            return true;
         }
 
-        if (!AssertRet(AndorAPI.SetFloat(Hndl, "Exposure Time", value))) return false;
-        return true;
-    }
+        /// <summary>
+        /// 释放SDK
+        /// </summary>
+        /// <returns></returns>
+        public bool UninitializeSdk()
+            => AssertRet(AndorAPI.FinaliseLibrary(), false, false);
 
-    /// <summary>
-    /// 设置像素编码类型
-    /// </summary>
-    /// <param name="pixelEncoding"></param>
-    /// <returns></returns>
-    public bool SetPixelEncoding(PixelEncodingEnum pixelEncoding)
-    {
-        if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "PixelEncoding", pixelEncoding.ToString()))) return false;
-        if (AndorAPI.GetInt(Hndl, "imageSizeBytes", ref imageSizeBytes) != (int)AndorErrorCodeEnum.AT_SUCCESS) return false;
-        PixelEncoding = pixelEncoding;
-
-        return true;
-    }
-
-    /// <summary>
-    /// 设置采样率
-    /// </summary>
-    /// <param name="pixelReadoutRate"></param>
-    /// <returns></returns>
-    public bool SetPixelReadoutRate(int pixelReadoutRate)
-    {
-        if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "PixelReadoutRate", $"{pixelReadoutRate} MHz")))
-            return false;
-
-        return true;
-
-    }
-
-    /// <summary>
-    /// 设置触发模式
-    /// </summary>
-    /// <param name="cycleMode"></param>
-    /// <returns></returns>
-    public bool SetCycleMode(CycleModeEnum cycleMode)
-        => AssertRet(AndorAPI.SetEnumeratedString(Hndl, "CycleMode", cycleMode.ToString()));
-
-    /// <summary>
-    /// 单张采集
-    /// </summary>
-    /// <param name="buffer"></param>
-    /// <returns></returns>
-    public bool SaveCurrentFrame()
-    {
-        //开始捕获
-        StartCapture();
-
-        //获取图像->byte[] buffer
-        byte[] pBuf = new byte[imageSizeBytes];
-        if (!GetCurrentFrame(ref pBuf)) return false;
-
-        Mat matImg = new Mat();
-        Bytes2Mat(pBuf, ref matImg);
-
-        //Show
-        //.......
-
-        //Save
-        string imageFile = Path.Combine(imageFilePath, $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff")}.tif");
-        MatSave(matImg, imageFile);
-
-        //停止捕获
-        StopCapture();
-
-        return true;
-    }
-
-    /// <summary>
-    /// Live存图
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void LiveSave_DoWork(object sender, DoWorkEventArgs e)
-    {
-        int times = 0;
-        while (!LiveWorker.CancellationPending)
+        /// <summary>
+        /// 初始化相机
+        /// </summary>
+        /// <param name="cameraId"></param>
+        /// <returns></returns>
+        public bool InitializeCamera(int cameraId = 0)
         {
-            times++;
-            SetExposure(times);
+            if (!AssertRet(AndorAPI.Open(cameraId, ref Hndl), assertConnect: false)) throw new Exception("OpenCamera Error");
+            if (!AssertRet(AndorAPI.GetInt(Hndl, "imageSizeBytes", ref ImageSizeBytes), assertConnect: false)) return false;
 
-            ////开始捕获
-            StartCapture();
+            //初始设置
+            SetPixelEncoding(PixelEncodingEnum.Mono16);//默认格式Mono12PACKED
+            SetPixelReadoutRate(100);
+            SetCycleMode(CycleModeEnum.Continuous);
 
-            //获取图像
-            byte[] pBuf = new byte[imageSizeBytes];
-            if (!GetCurrentFrame(ref pBuf)) return;
+            Debug.WriteLine("InitializeCamera completed!");
+            return true;
+        }
 
-            Mat matImg = new Mat();
-            Bytes2Mat(pBuf, ref matImg);
+        /// <summary>
+        /// 释放相机
+        /// </summary>
+        /// <returns></returns>
+        public bool UnInitializeCamera()
+            => AssertRet(AndorAPI.Close(Hndl), false, false);
+        #endregion
 
-            //Show
-            //.......
+        #region Setting
+        public bool GetExpose(out double exposure)
+        {
+            exposure = 0;
 
-            //Save
-            string imageFileName = Path.Combine(imageFilePath, $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff")}.tif");
-            MatSave(matImg, imageFileName);
+            bool isReadable = false;
+            if (!AssertRet(AndorAPI.IsReadable(Hndl, "ExposureTime", ref isReadable))) return false;
+
+            if(isReadable)
+                if (!AssertRet(AndorAPI.GetFloat(Hndl, "Exposure Time",ref exposure))) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// 设置曝光值
+        /// </summary>
+        /// <param name="exposure"></param>
+        /// <returns></returns>
+        public bool SetExposure(double exposure)
+        {
+            double exposureTran = exposure / 1000;
+
+            double maxValue = 0;
+            if (!AssertRet(AndorAPI.GetFloatMax(Hndl, "ExposureTime", ref maxValue))) return false;
+            double minValue = 0;
+            if (!AssertRet(AndorAPI.GetFloatMin(Hndl, "ExposureTime", ref minValue))) return false;
+            if (exposureTran > maxValue || exposureTran < minValue)
+            {
+                Debug.WriteLine($"Exposure exposure-{exposureTran} is out range:[{minValue},{maxValue}]");
+                return false;
+            }
+            bool isWritable = false;
+            if (!AssertRet(AndorAPI.IsWritable(Hndl, "ExposureTime", ref isWritable))) return false;
+
+            if (isWritable)
+                if (!AssertRet(AndorAPI.SetFloat(Hndl, "Exposure Time", exposureTran))) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// 设置像素编码类型
+        /// </summary>
+        /// <param name="pixelEncoding"></param>
+        /// <returns></returns>
+        private bool SetPixelEncoding(PixelEncodingEnum pixelEncoding)
+        {
+            bool isWritable = false;
+            if (!AssertRet(AndorAPI.IsWritable(Hndl, "PixelEncoding", ref isWritable))) return false;
+            if (isWritable)
+                if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "PixelEncoding", pixelEncoding.ToString()))) return false;
+            if (!AssertRet(AndorAPI.GetInt(Hndl, "imageSizeBytes", ref ImageSizeBytes))) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// 设置采样率
+        /// </summary>
+        /// <param name="pixelReadoutRate"></param>
+        /// <returns></returns>
+        private bool SetPixelReadoutRate(int pixelReadoutRate)
+        {
+            bool isWritable = false;
+            if (!AssertRet(AndorAPI.IsWritable(Hndl, "PixelReadoutRate", ref isWritable))) return false;
+            if (isWritable)
+                if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "PixelReadoutRate", $"{pixelReadoutRate} MHz")))
+                    return false;
+
+            return true;
+
+        }
+
+        /// <summary>
+        /// 设置触发模式
+        /// </summary>
+        /// <param name="cycleMode"></param>
+        /// <returns></returns>
+        private bool SetCycleMode(CycleModeEnum cycleMode)
+        {
+            bool isWritable = false;
+            if (!AssertRet(AndorAPI.IsWritable(Hndl, "PixelReadoutRate", ref isWritable))) return false;
+            if (isWritable)
+                if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "CycleMode", cycleMode.ToString()))) 
+                    return false;
+            return true;
+        }
+        #endregion
+
+        #region Save
+
+        /// <summary>
+        /// 单张存图
+        /// </summary>
+        /// <returns></returns>
+        public bool SaveSingleFrame(string path)
+        {
+            Debug.WriteLine("##Save");
+            if (!Capture(out Mat? matImg)) return false;
+
+            if (matImg == null || matImg.Cols == 0 || matImg.Rows == 0)
+                Debug.WriteLine("Get Frame Error.————————Save");
+
+            //matImg.Normalize();
+            //matImg.MinMaxLoc(out double min, out double max);
+            //Debug.WriteLine($"************Save:{min}-----{max}");
+
+            if (!MatSave(matImg, path)) return false;
+            Debug.WriteLine("***********************************************Save complete!");
+
+            return true;
+        }
+
+        /// <summary>
+        /// MatSave in Andor
+        /// Rotate&&Flip
+        /// 非tif格式，存图异常
+        /// </summary>
+        /// <param name="matImg"></param>
+        /// <param name="imageFilepath"></param>
+        /// <returns></returns>
+        private bool MatSave(Mat? matImg, string imageFilepath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(imageFilepath)) return false;
+
+                //旋转
+                Mat matImgRotate = new Mat(matImg.Height, matImg.Width, matImg.Type());
+                Cv2.Rotate(matImg, matImgRotate, RotateFlags.Rotate180);
+                Mat matImgFlip = new Mat(matImg.Height, matImg.Width, matImg.Type());
+                Cv2.Flip(matImgRotate, matImgFlip, FlipMode.Y);
+
+                //图像水平&垂直分辨率、压缩比
+                ImwriteFlags flags = ImwriteFlags.TiffCompression;
+                ImwriteFlags dpix = ImwriteFlags.TiffXDpi;
+                ImwriteFlags dpiy = ImwriteFlags.TiffYDpi;
+                ImageEncodingParam[] encodingParams = new ImageEncodingParam[] { new ImageEncodingParam(dpix, 96), new ImageEncodingParam(dpiy, 96), new ImageEncodingParam(flags, 1) };
+
+                //if (!Directory.Exists(imageFilepath)) Directory.CreateDirectory(imageFilepath);
+                string imageFile = Path.Combine(imageFilepath, $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff")}.tif");
+                if (!Cv2.ImWrite(imageFile, matImgFlip, encodingParams)) return false;
+
+                Debug.WriteLine("MatImage save:" + imageFile);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("MatImage save error:" + ex.Message);
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region Capture
+
+        /// <summary>
+        /// 图像捕获
+        /// </summary>
+        /// <param name="matImg"></param>
+        /// <returns></returns>
+        public bool Capture(out Mat? matImg)
+        {
+            Debug.WriteLine("##Cupture");
 
             //停止捕获
-            StopCapture();
+            StopAcquisition();
 
-            Thread.Sleep(5);
-        }
-    }
+            matImg = new Mat();
 
-    /// <summary>
-    /// 开始采集
-    /// </summary>
-    public void StartLive()
-    {
-        LiveWorker = new BackgroundWorker();
-        LiveWorker.DoWork += LiveSave_DoWork;
-        LiveWorker.WorkerSupportsCancellation = true;
-        LiveWorker.RunWorkerAsync();
-    }
+            //开始捕获
+            StartAcquisition();
 
-    /// <summary>
-    /// 结束采集
-    /// </summary>
-    public void StopLive()
-    {
-        LiveWorker.CancelAsync();
-        LiveWorker.Dispose();
-    }
+            //获取图像
+            GetCurrentFrame(PixelEncodingEnum.Mono16, out matImg);
 
-    #region demo
-    /// <summary>
-    /// 多张采集并存图
-    /// 按张数存储
-    /// </summary>
-    /// <param name="Hndl"></param>
-    /// <param name="imageFileName"></param>
-    /// <param name="pixelEncoding"></param>
-    /// <param name="numberOfBuffers"></param>
-    /// <param name="numberOfFrames">存图的张数</param>
-    /// <returns></returns>
-    private bool SaveLiveImages()
-    {
-        if (!SetPixelEncoding(PixelEncodingEnum.Mono16)) return false;
-        if (!SetPixelReadoutRate(100)) return false;
-        if (!SetExposure(0.01)) return false;
-        if (!SetCycleMode(CycleModeEnum.Continuous)) return false;
+            ////停止捕获
+            //StopAcquisition();
 
-        //开始捕获
-        int numberOfBuffers = 5;
-        byte[][] acqBuffers = new byte[numberOfBuffers][];
-        byte[][] alignedBuffers = new byte[numberOfBuffers][];
-        for (int i = 0; i < numberOfBuffers; i++)
-        {
-            acqBuffers[i] = new byte[imageSizeBytes + 7];
-            alignedBuffers[i] = (byte[])(Array.CreateInstance(typeof(byte), imageSizeBytes + 7));
-            Buffer.BlockCopy(acqBuffers[i % numberOfBuffers], 0, alignedBuffers[i], 0, imageSizeBytes + 7);
-
-            if (!AssertRet(AndorAPI.QueueBuffer(Hndl, alignedBuffers[i], imageSizeBytes))) return false;
-        }
-        if (!AssertRet(AndorAPI.Command(Hndl, "AcquisitionStart"))) return false;
-
-        //获取图像
-        int numberOfFrames = 50;
-        for (int i = 0; i < numberOfFrames; i++)
-        {
-            byte[] pBuf = new byte[0];
-            if (!GetCurrentFrame(ref pBuf)) return false;
-
-            string imageFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "AndorImage", $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff")}.tif");
-            SaveCVImage(Hndl, pBuf, PixelEncoding, imageFileName);
-            //Application specific data processing goes here..
-
-            if (!AssertRet(AndorAPI.QueueBuffer(Hndl, alignedBuffers[i % numberOfBuffers], imageSizeBytes))) return false;
+            return true;
         }
 
-        //停止捕获
-        StopCapture();
-
-        //buffer清除缓存
-        for (int i = 0; i < numberOfBuffers; i++)
+        /// <summary>
+        /// 开始捕获
+        /// </summary>
+        /// <returns></returns>
+        public bool StartAcquisition()
         {
-            acqBuffers[i] = null;
+            int NumberOfBuffers = 10;
+            byte[][]? AcqBuffers = new byte[NumberOfBuffers][];
+            byte[][]? AlignedBuffers = new byte[NumberOfBuffers][];
+            for (int i = 0; i < NumberOfBuffers; i++)
+            {
+                AcqBuffers[i] = new byte[ImageSizeBytes + 7];
+                AlignedBuffers[i] = (byte[])Array.CreateInstance(typeof(byte), ImageSizeBytes + 7);
+                Buffer.BlockCopy(AcqBuffers[i % NumberOfBuffers], 0, AlignedBuffers[i], 0, ImageSizeBytes + 7);
+
+                if (!AssertRet(AndorAPI.QueueBuffer(Hndl, AlignedBuffers[i], ImageSizeBytes))) return false;
+            }
+
+            Debug.WriteLine("##AcquisitionStart");
+            AssertRet(AndorAPI.Command(Hndl, "AcquisitionStart"));
+
+            AcqBuffers = null;
+            AlignedBuffers=null;
+
+            return true;
         }
-        alignedBuffers = null;
-        acqBuffers = null;
 
-        return true;
-    }
-    /// <summary>
-    /// 存图
-    /// 增加180旋转&&水平翻转
-    /// </summary>
-    /// <param name="Hndl"></param>
-    /// <param name="buffer"></param>
-    /// <param name="pixelEncoding"></param>
-    /// <param name="imageFileName"></param>
-    /// <returns></returns>
-    private bool SaveCVImage(int Hndl, byte[] buffer, PixelEncodingEnum pixelEncoding, string imageFileName)
-    {
-        try
+        /// <summary>
+        /// 停止捕获
+        /// </summary>
+        /// <param name="imageSizeBytes"></param>
+        /// <returns></returns>
+        public bool StopAcquisition()
         {
-            int ImageHeight = 0;
-            AndorAPI.GetInt(Hndl, "AOI Height", ref ImageHeight);
-            int ImageWidth = 0;
-            AndorAPI.GetInt(Hndl, "AOI Width", ref ImageWidth);
+            Debug.WriteLine("##AcquisitionStop");
+            AssertRet(AndorAPI.Command(Hndl, "Acquisition Stop"));
+
+            Debug.WriteLine("##Flush");
+            if (!AssertRet(AndorAPI.Flush(Hndl))) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// 获得当前帧
+        /// </summary>
+        /// <param name="pixelEncoding"></param>
+        /// <param name="matImg"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private bool GetCurrentFrame(PixelEncodingEnum pixelEncoding, out Mat matImg, uint interval = unchecked(0xFFFFFFFF))
+        {
+            try
+            {
+                matImg = new Mat();
+                GetFrameBytes(PixelEncodingEnum.Mono16, out byte[]? imageBytes);
+
+                Bytes2Mat(imageBytes, pixelEncoding, out matImg);
+
+                if (matImg == null || matImg.Cols == 0 || matImg.Rows == 0)
+                    Debug.WriteLine("Get Frame Error.");//throw new Exception("Get Frame Error.");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetCurrentFrame Error:" + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Byte[] to Mat
+        /// </summary>
+        /// <param name="imageBytes"></param>
+        /// <param name="matImg"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private bool Bytes2Mat(byte[] imageBytes, PixelEncodingEnum pixelEncoding, out Mat matImg)
+        {
+            int imageHeight = 0;
+            AndorAPI.GetInt(Hndl, "AOI Height", ref imageHeight);
+            int imageWidth = 0;
+            AndorAPI.GetInt(Hndl, "AOI Width", ref imageWidth);
             MatType matType = new MatType();
             switch (pixelEncoding)
             {
@@ -487,33 +414,70 @@ public class Andor
                 default:
                     throw new ArgumentException("Invalid pixel format.");
             }
-            Mat matImg = new Mat(ImageHeight, ImageWidth, matType);
-            Marshal.Copy(buffer, 0, matImg.Data, buffer.Length);
-
-            //旋转
-            Mat matImgRotate = new Mat((int)ImageHeight, (int)ImageWidth, MatType.CV_16UC1);
-            Cv2.Rotate(matImg, matImgRotate, RotateFlags.Rotate180);
-            Mat matImgFlip = new Mat((int)ImageHeight, (int)ImageWidth, MatType.CV_16UC1);
-            Cv2.Flip(matImgRotate, matImgFlip, FlipMode.Y);
-
-            //图像水平&垂直分辨率、压缩比
-            ImwriteFlags flags = ImwriteFlags.TiffCompression;
-            ImwriteFlags dpix = ImwriteFlags.TiffXDpi;
-            ImwriteFlags dpiy = ImwriteFlags.TiffYDpi;
-            ImageEncodingParam[] encodingParams = new ImageEncodingParam[] { new ImageEncodingParam(dpix, 96), new ImageEncodingParam(dpiy, 96), new ImageEncodingParam(flags, 1) };
-
-            Cv2.ImWrite(imageFileName, matImgFlip, encodingParams);
-            Debug.WriteLine("Image save:" + imageFileName);
+            matImg = new Mat(imageHeight, imageWidth, matType);
+            Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
 
             return true;
         }
-        catch (Exception ex)
+
+        /// <summary>
+        /// 获得当前帧
+        /// </summary>
+        /// <param name="imageSizeBytes"></param>
+        /// <param name="imageBytes"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        private bool GetFrameBytes(PixelEncodingEnum pixelEncoding, out byte[] imageBytes, uint interval = unchecked(0xFFFFFFFF))
         {
+            try
+            {
+                //    byte[]? imageBytesTemp = new byte[ImageSizeBytes];
 
-            Debug.WriteLine(ex.Message);
-            return false;
+                imageBytes = new byte[ImageSizeBytes];
+                IntPtr imgPtr = Marshal.AllocHGlobal(imageBytes.Length);
+                if (!AssertRet(AndorAPI.WaitBuffer(Hndl, ref imgPtr, ref ImageSizeBytes, interval))) return false;
+
+                Marshal.Copy(imgPtr, imageBytes, 0, imageBytes.Length);
+                //Marshal.Copy(imgPtr, imageBytesTemp, 0, imageBytes.Length);
+                //Buffer.BlockCopy(imageBytesTemp, 0, imageBytes, 0, imageBytesTemp.Length);
+                //imageBytesTemp = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetCurrentFrame Error:" + ex.Message);
+            }
         }
-    }
-    #endregion
 
+        /// <summary>
+        /// 获取缓存直至接收到完整图像
+        /// </summary>
+        /// <param name="isContinuous"></param>
+        /// <param name="matImg"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        private bool WaitBuffer(bool isContinuous, out Mat matImg, uint interval = unchecked(0xFFFFFFFF))
+        {
+            matImg = new Mat();
+
+            if (isContinuous) SetCycleMode(CycleModeEnum.Continuous);
+            GetFrameBytes(PixelEncodingEnum.Mono16, out byte[]? imageBytes);
+            Bytes2Mat(imageBytes, PixelEncodingEnum.Mono16, out matImg);
+            if (matImg == null || matImg.Cols == 0 || matImg.Rows == 0)
+                Debug.WriteLine("Get Frame Error.");
+
+            int NumberOfBuffers = 10;
+            for (int i = 0; i < NumberOfBuffers; i++)
+            {
+                if (!AssertRet(AndorAPI.QueueBuffer(Hndl, new byte[ImageSizeBytes], ImageSizeBytes))) return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
+    }
 }
+
+

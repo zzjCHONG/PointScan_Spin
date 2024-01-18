@@ -323,9 +323,7 @@ public partial class ShellViewModel : ObservableObject
     {
         _andor = new Andor();
 
-        _andor.InitializeSdk();
-        _andor.InitializeCamera(0);
-
+        _andor.Init();
 
         _andor.StartCapture();
 
@@ -333,7 +331,7 @@ public partial class ShellViewModel : ObservableObject
         {
             while (true)
             {
-                var mat = _andor.GetCurrentFrame();
+                _andor.Capture(out Mat mat);
 
                 WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
                 {
@@ -341,10 +339,7 @@ public partial class ShellViewModel : ObservableObject
                 }, "Display");
 
             }
-
-            _andor.StopCapture();
-            _andor.UnInitializeCamera();
-            _andor.UninitializeSdk();
+            _andor.StopCapture();           
         });
 
 
