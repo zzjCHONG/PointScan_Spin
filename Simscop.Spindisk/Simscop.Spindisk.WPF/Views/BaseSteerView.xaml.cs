@@ -39,10 +39,10 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 Interval = TimeSpan.FromMilliseconds(TimerInterval)
             };
-            _rightTimer.Tick += (s, e) => Vm?.MoveX(-Vm.XyStep);
+            _rightTimer.Tick += (s, e) => Vm?.MoveX(Vm.XyStep);
             RightMoveBt.PreviewMouseDown += (s, e) => _rightTimer.Start(); ;
             RightMoveBt.PreviewMouseUp += (s, e) => _rightTimer.Stop();
-            RightMoveBt.Click += (s, e) => Vm?.MoveX(-Vm.XyStep);
+            RightMoveBt.Click += (s, e) => Vm?.MoveX(Vm.XyStep);
 
             _rightBottomTimer = new DispatcherTimer(priority: DispatcherPriority.Render)
             {
@@ -91,10 +91,10 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 Interval = TimeSpan.FromMilliseconds(TimerInterval)
             };
-            _leftTimer.Tick += (s, e) => Vm?.MoveX(Vm.XyStep);
+            _leftTimer.Tick += (s, e) => Vm?.MoveX(-Vm.XyStep);
             LeftMoveBt.PreviewMouseDown += (s, e) => _leftTimer.Start();
             LeftMoveBt.PreviewMouseUp += (s, e) => _leftTimer.Stop();
-            LeftMoveBt.Click += (s, e) => Vm?.MoveX(Vm.XyStep);
+            LeftMoveBt.Click += (s, e) => Vm?.MoveX(-Vm.XyStep);
 
             _leftTopTimer = new DispatcherTimer(priority: DispatcherPriority.Render)
             {
@@ -102,14 +102,14 @@ namespace Simscop.Spindisk.WPF.Views
             };
             _leftTopTimer.Tick += (s, e) =>
             {
-                Vm?.MoveX(Vm.XyStep);
+                Vm?.MoveX(-Vm.XyStep);
                 Vm?.MoveY(Vm.XyStep);
             };
             LeftTopMoveBt.PreviewMouseDown += (s, e) => _leftTopTimer.Start();
             LeftTopMoveBt.PreviewMouseUp += (s, e) => _leftTopTimer.Stop();
             LeftTopMoveBt.Click += (s, e) =>
             {
-                Vm?.MoveX(Vm.XyStep);
+                Vm?.MoveX(-Vm.XyStep);
                 Vm?.MoveY(Vm.XyStep);
             };
 
@@ -128,14 +128,14 @@ namespace Simscop.Spindisk.WPF.Views
             };
             _rightTopTimer.Tick += (s, e) =>
             {
-                Vm?.MoveX(-Vm.XyStep);
+                Vm?.MoveX(Vm.XyStep);
                 Vm?.MoveY(Vm.XyStep);
             };
             RightTopMoveBt.PreviewMouseDown += (s, e) => _rightTopTimer.Start();
             RightTopMoveBt.PreviewMouseUp += (s, e) => _rightTopTimer.Stop();
             RightTopMoveBt.Click += (s, e) =>
             {
-                Vm?.MoveX(-Vm.XyStep);
+                Vm?.MoveX(Vm.XyStep);
                 Vm?.MoveY(Vm.XyStep);
             };
 

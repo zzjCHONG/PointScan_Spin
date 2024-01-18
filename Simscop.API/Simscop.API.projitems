@@ -11,6 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Andor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Andor\AndorAPI.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ASIMotor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ASI\Motor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BogaoLaser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Bogao\Laser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helper\SerialHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICamera.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ILaser.cs" />

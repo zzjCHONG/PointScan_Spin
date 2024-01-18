@@ -17,7 +17,7 @@ namespace Simscop.Spindisk.Core.ViewModels;
 /// </summary>
 public partial class SteerViewModel : ObservableObject
 {
-    private readonly MshotMotor _motor = new();
+    private readonly ASIMotor _motor = new();
 
     private readonly DispatcherTimer _timer;
 
@@ -32,7 +32,8 @@ public partial class SteerViewModel : ObservableObject
         {
             IsConnected = _motor.InitializeMotor();
             _timer.Tick += _timer_Tick;
-            _timer.Start();
+            if (IsConnected) _timer.Start();
+
         });
 
         WeakReferenceMessenger.Default.Register<string, string>(this, SteerMessage.MoveX, (s, e) =>
@@ -56,13 +57,15 @@ public partial class SteerViewModel : ObservableObject
 
     private void _timer_Tick(object? sender, EventArgs e)
     {
+        _motor.ReadPosition();
+
         X = _motor.X;
         Y = _motor.Y;
         Z = _motor.Z;
 
-        XEnable = _motor is { XEnabled: true, XAction: false, XException: false };
-        YEnable = _motor is { YEnabled: true, YAction: false, YException: false };
-        ZEnable = _motor is { ZEnabled: true, ZAction: false, ZException: false };
+        //XEnable = _motor is { XEnabled: true, XAction: false, XException: false };
+        //YEnable = _motor is { YEnabled: true, YAction: false, YException: false };
+        //ZEnable = _motor is { ZEnabled: true, ZAction: false, ZException: false };
     }
 
     [ObservableProperty]
