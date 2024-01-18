@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -63,7 +64,7 @@ public partial class LaserViewModel : ObservableObject
     public LaserViewModel()
     {
         // todo 这里初始化laser并且准备好Laser本身的数据
-        Laser = new TestLaser();
+        Laser = new BogaoLaser();
         Init();
     }
 
@@ -81,7 +82,9 @@ public partial class LaserViewModel : ObservableObject
             ChannelCEnable = cStatus;
             ChannelDEnable = dStatus;
         }
+
         else throw new Exception("Laser get status error.");
+        Thread.Sleep(500);
 
         if (Laser.GetPower(0, out var aPower) &&
             Laser.GetPower(1, out var bPower) &&
