@@ -153,13 +153,17 @@ namespace Simscop.API.Bogao
 
         public bool GetPower(int count,out int value)
         {
+            double result = 0;
             value = 0;
             string Text = $"*Power_{count}?";
-            _port.Write(Text);
-            Thread.Sleep(100);
-            var temp =_port.ReadExisting();
-
-             var result = ConvertPower(temp);
+            if (_port.IsOpen)
+            {
+                _port.Write(Text);
+                Thread.Sleep(100);
+                var temp = _port.ReadExisting();
+                result = ConvertPower(temp);
+            }
+            
             switch (count)
             {
                 case 1:
