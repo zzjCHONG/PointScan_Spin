@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,7 +10,9 @@ using System.Windows.Threading;
 using System.Xml;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Simscop.API;
+using Simscop.Spindisk.Core.Messages;
 
 namespace Simscop.Spindisk.Core.ViewModels;
 
@@ -26,6 +29,9 @@ public partial class SpinViewModel : ObservableObject
     public SpinViewModel()
     {
         ComList = Simscop.API.Helper.SerialHelper.GetAllCom();
+
+        WeakReferenceMessenger.Default.Register<SpindiskMessage, string>(this, 
+            nameof(SpindiskMessage), (r, m) => SetMode(m.Mode));
     }
 
     [ObservableProperty]
@@ -197,4 +203,36 @@ public partial class SpinViewModel : ObservableObject
     partial void OnExcitationIndexChanged(uint value) => XLight.SetExcitation(value + 1);
 
     #endregion
+
+    void SetMode(int mode)
+    {
+        if (!IsConnected)return;
+        
+        switch (mode)
+        {
+            case 0:
+                DichroicIndex = 4;
+                EmissionIndex = 0;
+                ExcitationIndex = 0;
+                break;
+            case 1:
+                DichroicIndex = 2;
+                EmissionIndex = 2;
+                ExcitationIndex = 2;
+                break;
+            case 2:
+                DichroicIndex = 1;
+                EmissionIndex = 5;
+                ExcitationIndex = 3;
+                break;
+            case 3:
+                DichroicIndex = 2;
+                EmissionIndex = 4;
+                ExcitationIndex = 5;
+                break;
+            default:
+                break;
+
+        }
+    }
 }

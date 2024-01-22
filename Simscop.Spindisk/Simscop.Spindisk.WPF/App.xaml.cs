@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,7 +20,13 @@ namespace Simscop.Spindisk.WPF
     {
         public App()
         {
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+            
+        }
 
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            Debug.WriteLine($"ERROR: {e}");
         }
 
         protected override void OnActivated(EventArgs e)

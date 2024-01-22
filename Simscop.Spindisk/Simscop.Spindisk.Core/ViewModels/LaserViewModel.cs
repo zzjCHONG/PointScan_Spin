@@ -114,12 +114,12 @@ public partial class LaserViewModel : ObservableObject
         DialogRun(() => Laser.SetStatus(0, value));
         WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(0, value), nameof(LaserMessage));
 
-        if (value)
-        {
-            ChannelBEnable = false;
-            ChannelCEnable = false;
-            ChannelDEnable = false;
-        }
+
+        if (!value) return;
+        WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(0), nameof(SpindiskMessage));
+        ChannelBEnable = false;
+        ChannelCEnable = false;
+        ChannelDEnable = false;
     }
 
     [ObservableProperty]
@@ -136,12 +136,13 @@ public partial class LaserViewModel : ObservableObject
         DialogRun(() => Laser.SetStatus(1, value));
         WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(1, value), nameof(LaserMessage));
 
-        if (value)
-        {
-            ChannelAEnable = false;
-            ChannelCEnable = false;
-            ChannelDEnable = false;
-        }
+        if (!value) return;
+
+        WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(1), nameof(SpindiskMessage));
+
+        ChannelAEnable = false;
+        ChannelCEnable = false;
+        ChannelDEnable = false;
     }
 
     [ObservableProperty]
@@ -158,12 +159,12 @@ public partial class LaserViewModel : ObservableObject
         DialogRun(() => Laser.SetStatus(2, value));
         WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(2, value), nameof(LaserMessage));
 
-        if (value)
-        {
-            ChannelAEnable = false;
-            ChannelBEnable = false;
-            ChannelDEnable = false;
-        }
+        if (!value) return;
+        WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(2), nameof(SpindiskMessage));
+
+        ChannelAEnable = false;
+        ChannelBEnable = false;
+        ChannelDEnable = false;
     }
 
     [ObservableProperty]
@@ -180,19 +181,19 @@ public partial class LaserViewModel : ObservableObject
         DialogRun(() => Laser.SetStatus(3, value));
         WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(3, value), nameof(LaserMessage));
 
-        if (value)
-        {
-            ChannelAEnable = false;
-            ChannelBEnable = false;
-            ChannelCEnable = false;
-        }
+        if (!value) return;
+        WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(3), nameof(SpindiskMessage));
+
+        ChannelAEnable = false;
+        ChannelBEnable = false;
+        ChannelCEnable = false;
     }
 
     void DialogRun(Func<bool> func)
     {
         if (!func.Invoke())
         {
-            MessageBox.Show("Error laser command");
+            //MessageBox.Show("Error laser command");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using OpenCvSharp;
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -29,14 +30,13 @@ namespace Simscop.API
             _andor.UnInitializeCamera();
             _andor.UninitializeSdk();
         }
-
     }
 
-    public class AndorImplemented
+    class AndorImplemented
     {
         private static int Hndl = 0;
         private static int NumberDevices = 0;
-        private static int ImageSizeBytes;  
+        private static int ImageSizeBytes;
 
         #region AssertRet
         private bool AssertRet(int ret, bool assertInit = true, bool assertConnect = true)
@@ -80,12 +80,12 @@ namespace Simscop.API
         /// <returns></returns>
         public bool InitializeSdk()
         {
-            if (AndorAPI.InitialiseLibrary() != (int)AndorErrorCodeEnum.AT_SUCCESS)
+            if (!AssertRet(AndorAPI.InitialiseLibrary(), false, false))
             {
                 Debug.WriteLine("InitialiseLibrary Error");
                 return false;
             }
-                
+
             if (!AssertRet(AndorAPI.GetInt(1, "Device Count", ref NumberDevices), false, false)) return false;
 
             Debug.WriteLine("InitializeSdk completed!");
@@ -112,8 +112,8 @@ namespace Simscop.API
             //初始设置
             SetPixelEncoding(PixelEncodingEnum.Mono16);//默认格式Mono12PACKED
             SetPixelReadoutRate(100);
-            SetCycleMode(CycleModeEnum.Continuous);
-
+            SetCycleMode(CycleModeEnum.Continuous);//必需
+            SetExposure(50);
             Debug.WriteLine("InitializeCamera completed!");
             return true;
         }
@@ -127,6 +127,15 @@ namespace Simscop.API
         #endregion
 
         #region Setting
+
+        private const double MaxExposure = 30;
+        private const double MinExposure = 1.0 / 1000 / 10;//0.0001
+
+        /// <summary>
+        /// 获取曝光值
+        /// </summary>
+        /// <param name="exposure"></param>
+        /// <returns></returns>
         public bool GetExpose(out double exposure)
         {
             exposure = 0;
@@ -134,8 +143,14 @@ namespace Simscop.API
             bool isReadable = false;
             if (!AssertRet(AndorAPI.IsReadable(Hndl, "ExposureTime", ref isReadable))) return false;
 
-            if(isReadable)
-                if (!AssertRet(AndorAPI.GetFloat(Hndl, "Exposure Time",ref exposure))) return false;
+            if (isReadable)
+                if (!AssertRet(AndorAPI.GetFloat(Hndl, "Exposure Time", ref exposure))) return false;
+            Debug.WriteLine($"++++++++++++++++++++++++++++ExposureTime-         GetExpose{exposure}");
+
+            double rate = 0;
+            if (!AssertRet(AndorAPI.GetFloat(Hndl, "FrameRate", ref rate))) return false;
+            Debug.WriteLine($"++++++++++++++++++++++++++++FrameRate-         FrameRate{rate}");
+
             return true;
         }
 
@@ -146,23 +161,34 @@ namespace Simscop.API
         /// <returns></returns>
         public bool SetExposure(double exposure)
         {
-            double exposureTran = exposure / 1000;
+            exposure = exposure / 1000.0;
 
-            double maxValue = 0;
-            if (!AssertRet(AndorAPI.GetFloatMax(Hndl, "ExposureTime", ref maxValue))) return false;
-            double minValue = 0;
-            if (!AssertRet(AndorAPI.GetFloatMin(Hndl, "ExposureTime", ref minValue))) return false;
-            if (exposureTran > maxValue || exposureTran < minValue)
-            {
-                Debug.WriteLine($"Exposure exposure-{exposureTran} is out range:[{minValue},{maxValue}]");
-                return false;
-            }
+            exposure = exposure > MaxExposure ? MaxExposure : exposure;
+            exposure = exposure < MinExposure ? MinExposure : exposure;
+
+            double rateold = 0;
+            if (!AssertRet(AndorAPI.GetFloat(Hndl, "FrameRate", ref rateold))) return false;
+            Debug.WriteLine($"++++++++++++++++++++++++++++FrameRate-         old{rateold}");
+
+            //设置曝光
             bool isWritable = false;
             if (!AssertRet(AndorAPI.IsWritable(Hndl, "ExposureTime", ref isWritable))) return false;
-
             if (isWritable)
-                if (!AssertRet(AndorAPI.SetFloat(Hndl, "Exposure Time", exposureTran))) return false;
+                if (!AssertRet(AndorAPI.SetFloat(Hndl, "Exposure Time", exposure))) return false;
+            Debug.WriteLine($"++++++++++++++++++++++++++++ExposureTime-            now{exposure}");
 
+            double max = 0;
+            if (!AssertRet(AndorAPI.GetFloatMax(Hndl, "FrameRate", ref max))) return false;
+            Debug.WriteLine($"++++++++++++++++++++++++++++FrameRate--         max{max}");
+
+            if (!AssertRet(AndorAPI.SetFloat(Hndl, "FrameRate",  max))) return false;
+            Debug.WriteLine($"++++++++++++++++++++++++++++FrameRate--       Set  max{max}");
+
+            double rate = 0;
+            if (!AssertRet(AndorAPI.GetFloat(Hndl, "FrameRate", ref rate))) return false;
+            Debug.WriteLine($"++++++++++++++++++++++++++++FrameRate-            new{rate}");
+
+            Debug.WriteLine("####################################Set Compelte!");
             return true;
         }
 
@@ -192,11 +218,8 @@ namespace Simscop.API
             bool isWritable = false;
             if (!AssertRet(AndorAPI.IsWritable(Hndl, "PixelReadoutRate", ref isWritable))) return false;
             if (isWritable)
-                if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "PixelReadoutRate", $"{pixelReadoutRate} MHz")))
-                    return false;
-
+                if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "PixelReadoutRate", $"{pixelReadoutRate} MHz"))) return false;
             return true;
-
         }
 
         /// <summary>
@@ -204,18 +227,18 @@ namespace Simscop.API
         /// </summary>
         /// <param name="cycleMode"></param>
         /// <returns></returns>
-        private bool SetCycleMode(CycleModeEnum cycleMode)
+        public bool SetCycleMode(CycleModeEnum cycleMode)
         {
             bool isWritable = false;
             if (!AssertRet(AndorAPI.IsWritable(Hndl, "PixelReadoutRate", ref isWritable))) return false;
             if (isWritable)
-                if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "CycleMode", cycleMode.ToString()))) 
-                    return false;
+                if (!AssertRet(AndorAPI.SetEnumeratedString(Hndl, "CycleMode", cycleMode.ToString()))) return false;
             return true;
         }
         #endregion
 
         #region Save
+        public Mat? CurrentFrameforSaving { get; set; }
 
         /// <summary>
         /// 单张存图
@@ -224,16 +247,11 @@ namespace Simscop.API
         public bool SaveSingleFrame(string path)
         {
             Debug.WriteLine("##Save");
-            if (!Capture(out Mat? matImg)) return false;
-
-            if (matImg == null || matImg.Cols == 0 || matImg.Rows == 0)
+            //if (!Capture(out Mat? matImg)) return false;
+            if (CurrentFrameforSaving == null || CurrentFrameforSaving.Cols == 0 || CurrentFrameforSaving.Rows == 0)
                 Debug.WriteLine("Get Frame Error.————————Save");
 
-            //matImg.Normalize();
-            //matImg.MinMaxLoc(out double min, out double max);
-            //Debug.WriteLine($"************Save:{min}-----{max}");
-
-            if (!MatSave(matImg, path)) return false;
+            if (!MatSave(CurrentFrameforSaving, path)) return false;
             Debug.WriteLine("***********************************************Save complete!");
 
             return true;
@@ -283,6 +301,13 @@ namespace Simscop.API
 
         #region Capture
 
+        private const int QueueCount = 15;
+        private static int QueueIndex = 0;
+        private const int ImageHeight = 2160;
+        private const int ImageWidth = 2560;
+        public static byte[][]? AlignedBuffers;
+        private static IntPtr GlobalFramePtr = IntPtr.Zero;
+
         /// <summary>
         /// 图像捕获
         /// </summary>
@@ -290,24 +315,99 @@ namespace Simscop.API
         /// <returns></returns>
         public bool Capture(out Mat? matImg)
         {
+            matImg = new Mat();
             Debug.WriteLine("##Cupture");
 
-            //停止捕获
-            StopAcquisition();
-
-            matImg = new Mat();
-
-            //开始捕获
-            StartAcquisition();
-
             //获取图像
-            GetCurrentFrame(PixelEncodingEnum.Mono16, out matImg);
+            if (!GetCircularFrame(out matImg, PixelEncodingEnum.Mono16, 10000)) return false;
 
-            ////停止捕获
-            //StopAcquisition();
+            CurrentFrameforSaving?.Dispose();
+            CurrentFrameforSaving = matImg;
+
+            if (!GetExpose(out double exposure)) return false;
+
+            Debug.WriteLine("-----------------------------------------------");
 
             return true;
         }
+
+        /// <summary>
+        /// 循环获得图像
+        /// </summary>
+        /// <param name="pixelEncoding"></param>
+        /// <param name="matImg"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        private bool GetCircularFrame( out Mat? matImg, PixelEncodingEnum pixelEncoding = PixelEncodingEnum.Mono16, uint interval = unchecked(0xFFFFFFFF))
+        {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            matImg = null;
+            byte[]? imageBytes = new byte[ImageSizeBytes];
+            GCHandle handle = GCHandle.Alloc(imageBytes, GCHandleType.Pinned);
+            try
+            {
+                GlobalFramePtr = new IntPtr(imageBytes.Length);
+                GlobalFramePtr = handle.AddrOfPinnedObject();
+                int bufferSize = 0;
+                stopwatch.Start();
+                AndorAPI.WaitBuffer(Hndl, ref GlobalFramePtr, ref bufferSize, interval);
+                stopwatch.Stop();
+                Debug.WriteLine($"WaitBuffer taste time:{stopwatch.ElapsedMilliseconds}ms");
+
+                MatType matType = new MatType();
+                switch (pixelEncoding)
+                {
+                    case PixelEncodingEnum.Mono8:
+                        matType = MatType.CV_8UC1;
+                        break;
+                    case PixelEncodingEnum.Mono12:
+                        matType = MatType.CV_16UC1;
+                        break;
+                    case PixelEncodingEnum.Mono12PACKED:
+                        matType = MatType.CV_16UC1;
+                        break;
+                    case PixelEncodingEnum.Mono16:
+                        matType = MatType.CV_16UC1;
+                        break;
+                    case PixelEncodingEnum.Mono32:
+                        matType = MatType.CV_32SC1;
+                        break;
+                    default:
+                        Debug.WriteLine("Invalid pixel format.");
+                        return false;
+                }
+                matImg = new Mat(ImageHeight, ImageWidth, matType);
+                Marshal.Copy(GlobalFramePtr, imageBytes, 0, imageBytes.Length);
+                Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
+
+                matImg.MinMaxLoc(out double min, out double max);
+                Debug.WriteLine($"{min}-----{max}");
+
+                AndorAPI.QueueBuffer(Hndl, AlignedBuffers[QueueIndex % QueueCount], ImageSizeBytes);
+                QueueIndex++;
+
+                //if (QueueIndex % ((QueueCount - 1) * 10) == 0)
+                //{
+                //    StopAcquisition();
+                //    StartAcquisition();
+                //}
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetCurrentFrame Error:" + ex.Message);
+                return false;
+            }
+            finally
+            {
+                imageBytes = null;
+                handle.Free();
+            }
+        }
+
+        public bool AcquisitionStart() => AssertRet(AndorAPI.Command(Hndl, "AcquisitionStart"));
+        public bool AcquisitionStop()=> AssertRet(AndorAPI.Command(Hndl, "Acquisition Stop"));
 
         /// <summary>
         /// 开始捕获
@@ -315,23 +415,20 @@ namespace Simscop.API
         /// <returns></returns>
         public bool StartAcquisition()
         {
-            int NumberOfBuffers = 10;
-            byte[][]? AcqBuffers = new byte[NumberOfBuffers][];
-            byte[][]? AlignedBuffers = new byte[NumberOfBuffers][];
-            for (int i = 0; i < NumberOfBuffers; i++)
+            int numberOfBuffers = QueueCount;
+            byte[][]? AcqBuffers = new byte[numberOfBuffers][];
+            AlignedBuffers = new byte[numberOfBuffers][];
+            for (int i = 0; i < numberOfBuffers; i++)
             {
                 AcqBuffers[i] = new byte[ImageSizeBytes + 7];
-                AlignedBuffers[i] = (byte[])Array.CreateInstance(typeof(byte), ImageSizeBytes + 7);
-                Buffer.BlockCopy(AcqBuffers[i % NumberOfBuffers], 0, AlignedBuffers[i], 0, ImageSizeBytes + 7);
+                AlignedBuffers[i] = new byte[ImageSizeBytes + 7];
+                Buffer.BlockCopy(AcqBuffers[i % numberOfBuffers], 0, AlignedBuffers[i], 0, ImageSizeBytes + 7);
 
                 if (!AssertRet(AndorAPI.QueueBuffer(Hndl, AlignedBuffers[i], ImageSizeBytes))) return false;
             }
 
             Debug.WriteLine("##AcquisitionStart");
             AssertRet(AndorAPI.Command(Hndl, "AcquisitionStart"));
-
-            AcqBuffers = null;
-            AlignedBuffers=null;
 
             return true;
         }
@@ -349,128 +446,7 @@ namespace Simscop.API
             Debug.WriteLine("##Flush");
             if (!AssertRet(AndorAPI.Flush(Hndl))) return false;
 
-            return true;
-        }
-
-        /// <summary>
-        /// 获得当前帧
-        /// </summary>
-        /// <param name="pixelEncoding"></param>
-        /// <param name="matImg"></param>
-        /// <param name="interval"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        private bool GetCurrentFrame(PixelEncodingEnum pixelEncoding, out Mat matImg, uint interval = unchecked(0xFFFFFFFF))
-        {
-            try
-            {
-                matImg = new Mat();
-                GetFrameBytes(PixelEncodingEnum.Mono16, out byte[]? imageBytes);
-
-                Bytes2Mat(imageBytes, pixelEncoding, out matImg);
-
-                if (matImg == null || matImg.Cols == 0 || matImg.Rows == 0)
-                    Debug.WriteLine("Get Frame Error.");//throw new Exception("Get Frame Error.");
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("GetCurrentFrame Error:" + ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Byte[] to Mat
-        /// </summary>
-        /// <param name="imageBytes"></param>
-        /// <param name="matImg"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        private bool Bytes2Mat(byte[] imageBytes, PixelEncodingEnum pixelEncoding, out Mat matImg)
-        {
-            int imageHeight = 0;
-            AndorAPI.GetInt(Hndl, "AOI Height", ref imageHeight);
-            int imageWidth = 0;
-            AndorAPI.GetInt(Hndl, "AOI Width", ref imageWidth);
-            MatType matType = new MatType();
-            switch (pixelEncoding)
-            {
-                case PixelEncodingEnum.Mono8:
-                    matType = MatType.CV_8UC1;
-                    break;
-                case PixelEncodingEnum.Mono12:
-                    matType = MatType.CV_16UC1;
-                    break;
-                case PixelEncodingEnum.Mono12PACKED:
-                    matType = MatType.CV_16UC1;
-                    break;
-                case PixelEncodingEnum.Mono16:
-                    matType = MatType.CV_16UC1;
-                    break;
-                case PixelEncodingEnum.Mono32:
-                    matType = MatType.CV_32SC1;
-                    break;
-                default:
-                    throw new ArgumentException("Invalid pixel format.");
-            }
-            matImg = new Mat(imageHeight, imageWidth, matType);
-            Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
-
-            return true;
-        }
-
-        /// <summary>
-        /// 获得当前帧
-        /// </summary>
-        /// <param name="imageSizeBytes"></param>
-        /// <param name="imageBytes"></param>
-        /// <param name="interval"></param>
-        /// <returns></returns>
-        private bool GetFrameBytes(PixelEncodingEnum pixelEncoding, out byte[] imageBytes, uint interval = unchecked(0xFFFFFFFF))
-        {
-            try
-            {
-                //    byte[]? imageBytesTemp = new byte[ImageSizeBytes];
-
-                imageBytes = new byte[ImageSizeBytes];
-                IntPtr imgPtr = Marshal.AllocHGlobal(imageBytes.Length);
-                if (!AssertRet(AndorAPI.WaitBuffer(Hndl, ref imgPtr, ref ImageSizeBytes, interval))) return false;
-
-                Marshal.Copy(imgPtr, imageBytes, 0, imageBytes.Length);
-                //Marshal.Copy(imgPtr, imageBytesTemp, 0, imageBytes.Length);
-                //Buffer.BlockCopy(imageBytesTemp, 0, imageBytes, 0, imageBytesTemp.Length);
-                //imageBytesTemp = null;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("GetCurrentFrame Error:" + ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// 获取缓存直至接收到完整图像
-        /// </summary>
-        /// <param name="isContinuous"></param>
-        /// <param name="matImg"></param>
-        /// <param name="interval"></param>
-        /// <returns></returns>
-        private bool WaitBuffer(bool isContinuous, out Mat matImg, uint interval = unchecked(0xFFFFFFFF))
-        {
-            matImg = new Mat();
-
-            if (isContinuous) SetCycleMode(CycleModeEnum.Continuous);
-            GetFrameBytes(PixelEncodingEnum.Mono16, out byte[]? imageBytes);
-            Bytes2Mat(imageBytes, PixelEncodingEnum.Mono16, out matImg);
-            if (matImg == null || matImg.Cols == 0 || matImg.Rows == 0)
-                Debug.WriteLine("Get Frame Error.");
-
-            int NumberOfBuffers = 10;
-            for (int i = 0; i < NumberOfBuffers; i++)
-            {
-                if (!AssertRet(AndorAPI.QueueBuffer(Hndl, new byte[ImageSizeBytes], ImageSizeBytes))) return false;
-            }
+            AlignedBuffers = null;//新增数组的释放
 
             return true;
         }
@@ -479,5 +455,3 @@ namespace Simscop.API
 
     }
 }
-
-

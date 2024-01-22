@@ -9,7 +9,7 @@ public class ASIMotor
 
     public bool InitializeMotor()
     {
-        _motor = new Motor();
+        _motor = new Simscop.API.ASI.Motor();
 
         if (!_motor.OpenCom()) return false;
         return true;
