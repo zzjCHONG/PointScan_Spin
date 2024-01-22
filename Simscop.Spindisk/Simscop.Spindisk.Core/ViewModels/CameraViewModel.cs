@@ -71,12 +71,7 @@ public class TestCamera : ICamera
 
     public bool Capture(out Mat mat)
     {
-        mat = new Mat();
-        var img = _imgs[Count++ % Total];
-
-        img.MinMaxIdx(out var min, out var max);
-
-        (((img - min) / (max - min)) * 255).ToMat().ConvertTo(mat, MatType.CV_8UC1);
+        mat = _imgs[Count++ % Total];
 
         return true;
     }
@@ -114,17 +109,17 @@ public partial class CameraViewModel : ObservableObject
 {
     public ICamera Camera { get; set; }
 
-    public List<string> ResolutionsLite { get; set; } = new List<string>()
+    public List<string> ResolutionsLite { get; set; } = new()
     {
         "2560 * 2160"
     };
 
-    public List<string> ImageModes { get; set; } = new List<string>()
+    public List<string> ImageModes { get; set; } = new()
     {
         "NONE"
     };
 
-    public List<string> RoiModeLite { get; set; } = new List<string>()
+    public List<string> RoiModeLite { get; set; } = new()
     {
         "NONE"
     };
@@ -217,15 +212,10 @@ public partial class CameraViewModel : ObservableObject
                         if (!Camera.Capture(out var mat)) continue;
 
                         CurrentFrame = mat.Clone();
-                        var img = new Mat();
-
-                        mat.MinMaxIdx(out var min, out var max);
-
-                        (((mat - min) / (max - min)) * 256).ToMat().ConvertTo(img, MatType.CV_8UC1);
 
                         WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
                         {
-                            Image = img,
+                            Image = mat,
                         }, "Display");
 
                         Thread.Sleep(1000);

@@ -7,6 +7,7 @@
     xmlns:liftui="https://github.com/pchuan98/Lift.UI"
     xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:Simscop.Spindisk.Core.Models;assembly=Simscop.Spindisk.Core"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:viewModels="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
     Title="ShellView"
@@ -178,63 +179,146 @@
                     </Border>
 
                     <Border
-                        Height="150"
+                        Height="400"
                         Margin="0,2,0,0"
                         Background="{StaticResource Region02}"
                         BorderBrush="{DynamicResource Region01}"
                         BorderThickness="1"
                         CornerRadius="8">
                         <StackPanel Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="GroupBox">
+                                    <Setter Property="Margin" Value="20,5" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                                    <Setter Property="VerticalContentAlignment" Value="Top" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GroupBox">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="100" />
+                                                        <ColumnDefinition />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel
+                                                        Margin="0,8,6,8"
+                                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                        Orientation="Horizontal">
+                                                        <ContentPresenter
+                                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                            ContentSource="Header"
+                                                            RecognizesAccessKey="True"
+                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                                                    </StackPanel>
+                                                    <ContentPresenter
+                                                        x:Name="Presenter"
+                                                        Grid.Column="1"
+                                                        Margin="{TemplateBinding Padding}"
+                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </StackPanel.Resources>
+
                             <TextBlock
                                 Margin="20,10,0,10"
                                 HorizontalAlignment="Left"
                                 FontSize="12"
-                                Text="伪彩设置" />
+                                Text="图像控制" />
 
                             <Separator Margin="10,0,10,10" Background="{DynamicResource Region01}" />
 
-                            <UniformGrid Columns="2" Rows="2">
-                                <UniformGrid.Resources>
-                                    <ResourceDictionary>
-                                        <Style TargetType="GroupBox">
-                                            <Setter Property="Margin" Value="20,5" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-                                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-                                            <Setter Property="VerticalContentAlignment" Value="Top" />
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="GroupBox">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="50" />
-                                                                <ColumnDefinition />
-                                                            </Grid.ColumnDefinitions>
-                                                            <StackPanel
-                                                                Margin="0,8,6,8"
-                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                Orientation="Horizontal">
-                                                                <ContentPresenter
-                                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                    ContentSource="Header"
-                                                                    RecognizesAccessKey="True"
-                                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                                    TextElement.Foreground="{TemplateBinding Foreground}" />
-                                                            </StackPanel>
-                                                            <ContentPresenter
-                                                                x:Name="Presenter"
-                                                                Grid.Column="1"
-                                                                Margin="{TemplateBinding Padding}"
-                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                                        </Grid>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </ResourceDictionary>
-                                </UniformGrid.Resources>
+                            <GroupBox Header="归一化">
+                                <ToggleButton
+                                    DockPanel.Dock="Right"
+                                    IsChecked="{Binding DisplayCurrent.Norm}"
+                                    Style="{DynamicResource ToggleButtonSwitch}" />
+                            </GroupBox>
+
+                            <GroupBox Header="色阶">
+                                <DockPanel>
+                                    <TextBlock Width="40" Text="{Binding ElementName=LevelSlider, Path=StartValue}" />
+                                    <TextBlock
+                                        Width="40"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding ElementName=LevelSlider, Path=EndValue}" />
+                                    <controls:RangeSlider
+                                        x:Name="LevelSlider"
+                                        Margin="20,0"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        EndValue="{Binding DisplayCurrent.Max}"
+                                        Maximum="{Binding DisplayCurrent.Threshold}"
+                                        Minimum="0"
+                                        StartValue="{Binding DisplayCurrent.Min}" />
+                                </DockPanel>
+                            </GroupBox>
+
+                            <GroupBox Header="亮度">
+                                <DockPanel>
+                                    <TextBlock
+                                        Width="40"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding ElementName=BrightnessSlider, Path=Value, StringFormat=N0}" />
+                                    <Slider
+                                        x:Name="BrightnessSlider"
+                                        VerticalAlignment="Center"
+                                        Maximum="{Binding DisplayCurrent.ContrastThreshold}"
+                                        Minimum="0"
+                                        Value="{Binding DisplayCurrent.Brightness}" />
+                                </DockPanel>
+                            </GroupBox>
+
+                            <GroupBox Header="对比度">
+                                <DockPanel>
+                                    <TextBlock
+                                        Width="40"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding ElementName=ContrastSlider, Path=Value, StringFormat=N2}" />
+                                    <Slider
+                                        x:Name="ContrastSlider"
+                                        VerticalAlignment="Center"
+                                        Maximum="10"
+                                        Minimum="0.1"
+                                        Value="{Binding DisplayCurrent.Contrast}" />
+                                </DockPanel>
+                            </GroupBox>
+
+                            <GroupBox Header="Gamma">
+                                <DockPanel>
+                                    <TextBlock
+                                        Width="40"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding ElementName=GammaSlider, Path=Value, StringFormat=N2}" />
+                                    <Slider
+                                        x:Name="GammaSlider"
+                                        VerticalAlignment="Center"
+                                        Maximum="10"
+                                        Minimum="0.1"
+                                        Value="{Binding DisplayCurrent.Gamma}" />
+                                </DockPanel>
+                            </GroupBox>
+
+                            <GroupBox Header="伪彩">
+                                <ComboBox ItemsSource="{x:Static models:MatExtension.Colors}" SelectedIndex="{Binding DisplayCurrent.ColorMode}" />
+                            </GroupBox>
+
+                            <Button
+                                Height="35"
+                                Margin="20,5"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Command="{Binding DisplayCurrent.SetAsDefaultCommand}"
+                                Content="恢复默认" />
+
+                            <!--<UniformGrid Columns="2" Rows="2">
+
 
                                 <GroupBox Header="1">
                                     <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFirst}" />
@@ -253,7 +337,7 @@
                                 </GroupBox>
 
 
-                            </UniformGrid>
+                            </UniformGrid>-->
                         </StackPanel>
                     </Border>
 
@@ -296,7 +380,8 @@
                         Background="{StaticResource Region02}"
                         BorderBrush="{DynamicResource Region01}"
                         BorderThickness="1"
-                        CornerRadius="8">
+                        CornerRadius="8"
+                        Visibility="Collapsed">
                         <Image Opacity="0.5" Source="/Image/temp.jpg" />
                     </Border>
                 </StackPanel>
@@ -315,7 +400,7 @@
                     Margin="0,5,2.5,2.5"
                     Background="{DynamicResource Region01}"
                     CornerRadius="10">
-                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageFirst}" />
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding DisplayFirst.Frame}" />
                 </Border>
 
                 <Border
@@ -323,7 +408,7 @@
                     Margin="2.5,5,2.5,2.5"
                     Background="{DynamicResource Region01}"
                     CornerRadius="10">
-                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageSecond}" />
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding DisplaySecond.Frame}" />
                 </Border>
 
                 <Border
@@ -331,7 +416,7 @@
                     Margin="0,2.5,2.5,5"
                     Background="{DynamicResource Region01}"
                     CornerRadius="10">
-                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageThird}" />
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding DisplayThird.Frame}" />
                 </Border>
 
                 <Border
@@ -339,7 +424,7 @@
                     Margin="2.5,2.5,2.5,5"
                     Background="{DynamicResource Region01}"
                     CornerRadius="10">
-                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding ImageFourth}" />
+                    <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding DisplayFourth.Frame}" />
                 </Border>
             </UniformGrid>
         </Grid>

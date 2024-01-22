@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using Simscop.Lib.ImageExtension;
@@ -89,6 +90,8 @@ public partial class DisplayModel : ObservableObject
 
     void ResetU8()
     {
+        if (!ValidMat(Original)) return;
+
         var depth = Original.Depth();
         switch (depth)
         {
@@ -125,10 +128,10 @@ public partial class DisplayModel : ObservableObject
         => Display = U8.Gamma(Gamma).Adjust(Contrast, Brightness);
 
     partial void OnDisplayChanged(Mat value)
-        => Frame = BitmapFrame.Create(Display.ApplyColor(ColorMode).ToBitmapSource());
+        => TempFrameDo();
 
     partial void OnColorModeChanged(int value)
-        => Frame = BitmapFrame.Create(Display.ApplyColor(ColorMode).ToBitmapSource());
+        => TempFrameDo();
 
     partial void OnMinChanged(int value)
     {
@@ -143,13 +146,38 @@ public partial class DisplayModel : ObservableObject
     }
 
     partial void OnContrastChanged(double value)
-        => Display = U8.Gamma(Gamma).Adjust(Contrast, Brightness);
+        => TempDisplayDo();
 
     partial void OnBrightnessChanged(int value)
-        => Display = U8.Gamma(Gamma).Adjust(Contrast, Brightness);
+        => TempDisplayDo();
 
     partial void OnGammaChanged(double value)
-        => Display = U8.Gamma(Gamma).Adjust(Contrast, Brightness);
+        => TempDisplayDo();
+
+    bool ValidMat(Mat mat)
+        => mat.Cols != 0 || mat.Rows != 0;
+
+    void TempDisplayDo()
+    {
+        if (ValidMat(Display))
+            Display = U8.Gamma(Gamma).Adjust(Contrast, Brightness);
+    }
+
+    void TempFrameDo()
+    {
+        if(ValidMat(Display))
+            Frame = BitmapFrame.Create(Display.ApplyColor(ColorMode).ToBitmapSource());
+    }
+
+    [RelayCommand]
+    void SetAsDefault()
+    {
+        Norm = true;
+        Contrast = 1;
+        Brightness = 0;
+        Gamma = 1;
+        ColorMode = 0;
+    }
 
 }
 public static class MatExtension
