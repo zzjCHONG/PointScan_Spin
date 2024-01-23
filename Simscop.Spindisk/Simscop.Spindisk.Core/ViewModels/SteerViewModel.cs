@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,6 +64,7 @@ public partial class SteerViewModel : ObservableObject
         Y = _motor.Y;
         Z = _motor.Z;
 
+        //queue.Take();
         //XEnable = _motor is { XEnabled: true, XAction: false, XException: false };
         //YEnable = _motor is { YEnabled: true, YAction: false, YException: false };
         //ZEnable = _motor is { ZEnabled: true, ZAction: false, ZException: false };
@@ -116,5 +118,7 @@ public partial class SteerViewModel : ObservableObject
 
     public void MoveToZ(double value)
         => _motor.SetZPosition(value);
+
+    //private BlockingCollection<object> queue = new BlockingCollection<object>();
 
 }

@@ -212,7 +212,7 @@ namespace Simscop.API
         /// <param name="Value"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_SetBool", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int SetBool(int Hndl, string Feature, int Value);
+        public static extern int SetBool(int Hndl, string Feature, bool Value);
 
         /// <summary>
         /// 返回Bool类型特征的当前值，若设置只读、当前不可写、特征不是Bool、未由相机实现则报错
@@ -222,7 +222,7 @@ namespace Simscop.API
         /// <param name="Value"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetBool", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int GetBool(int Hndl, string Feature, ref int Value);
+        public static extern int GetBool(int Hndl, string Feature, ref bool Value);
 
         /// <summary>
         /// 触发指定命令执行，若设置当前不可写，非命令功能或未由相机实现则报错
@@ -252,7 +252,6 @@ namespace Simscop.API
         /// <param name="stringLength"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetString", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        //public static extern int GetString(int Hndl, string Feature, out string String, int stringLength);
         public static extern int GetString(int Hndl, string Feature, StringBuilder String, int stringlength);
 
         /// <summary>
@@ -317,7 +316,7 @@ namespace Simscop.API
         /// <param name="stringLength"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetEnumStringByIndex", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int GetEnumstringByIndex(int Hndl, string Feature, int Index, StringBuilder String, int stringLength);
+        public static extern int GetEnumStringByIndex(int Hndl, string Feature, int Index, StringBuilder String, int stringLength);
 
         /// <summary>
         /// 是否可选指定的枚举索引

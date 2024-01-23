@@ -146,7 +146,7 @@
                             Margin="15,10"
                             VerticalAlignment="Center"
                             Maximum="30000"
-                            Minimum="0"
+                            Minimum="10"
                             TickFrequency="1"
                             Value="{Binding Exposure, Delay=100}">
                             <controls:PreviewSlider.PreviewContent>
@@ -171,7 +171,7 @@
                                 Content="曝光一次"
                                 IsEnabled="False" />
 
-                            <TextBox Margin="5,0,5,10" Text="{Binding Exposure, StringFormat={}{0:F2}}" />
+                            <TextBox Margin="5,0,5,10" Text="{Binding Exposure, StringFormat={}{0:F2},Delay=200}" />
 
                             <Button
                                 Height="40"
@@ -417,7 +417,7 @@
                         <UniformGrid
                             Margin="10"
                             Columns="2"
-                            IsEnabled="False">
+                            IsEnabled="True">
 
                             <TextBox
                                 Height="40"
@@ -431,7 +431,7 @@
 
                         </UniformGrid>
 
-                        <DockPanel Margin="10,5" IsEnabled="False">
+                        <DockPanel Margin="10,5" IsEnabled="True">
                             <CheckBox
                                 Height="35"
                                 Content="左色阶"
@@ -454,7 +454,7 @@
                         </DockPanel>
 
 
-                        <DockPanel Margin="10" IsEnabled="False">
+                        <DockPanel Margin="10" IsEnabled="True">
                             <Label
                                 Width="100"
                                 Height="40"
@@ -472,7 +472,7 @@
                             </controls:PreviewSlider>
                         </DockPanel>
 
-                        <DockPanel Margin="10" IsEnabled="False">
+                        <DockPanel Margin="10" IsEnabled="True">
                             <Label
                                 Width="100"
                                 Height="40"

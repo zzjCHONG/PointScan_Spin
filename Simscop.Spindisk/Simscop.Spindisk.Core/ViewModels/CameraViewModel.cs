@@ -26,16 +26,18 @@ public class TestCamera : ICamera
 
     public int Count { get; set; }
 
+    public int Total { get; set; }
+
     public TestCamera()
     {
         var paths = new List<string>()
         {
-            @"E:\.test\terrain0.tif",
-            @"E:\.test\terrain1.tif",
-            @"E:\.test\terrain2.tif",
-            @"E:\.test\terrain3.tif",
+            @"E:\.test\aa.tif",
+            //@"E:\.test\BPAE405&488&525.tif",
 
         };
+
+        Total = paths.Count;
 
         _imgs = paths
             .Select(path => Cv2.ImRead(path, ImreadModes.AnyDepth)).ToArray();
@@ -56,7 +58,7 @@ public class TestCamera : ICamera
     public bool Init()
     {
         Debug.WriteLine($"-> TestCamera.Init");
-        Thread.Sleep(3000);
+        Thread.Sleep(1);
         return true;
     }
 
@@ -68,9 +70,12 @@ public class TestCamera : ICamera
 
     public bool Capture(out Mat mat)
     {
-
         mat = new Mat();
-        _imgs[Count++ % 4].CopyTo(mat);
+        var img = _imgs[Count++ % Total];
+
+        img.MinMaxIdx(out var min, out var max);
+
+        (((img - min) / (max - min)) * 255).ToMat().ConvertTo(mat, MatType.CV_8UC1);
 
         return true;
     }

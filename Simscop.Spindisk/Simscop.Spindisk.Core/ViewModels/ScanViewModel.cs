@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using OpenCvSharp;
 using Simscop.Spindisk.Core.Messages;
 using System;
 using System.Diagnostics;
@@ -83,7 +84,7 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty]
     private string _title = $"自动扫描";
 
-    void StartScan(uint mode)
+    void StartScanXY()
     {
         //if (string.IsNullOrEmpty(Root))
         //{
@@ -94,6 +95,111 @@ public partial class ScanViewModel : ObservableObject
         var flags = new string[]
         {
             "X","Y","Z"
+        };
+
+
+        void EnableAction(bool value) => GetType().GetProperty($"{flags[0]}Enable")!.SetValue(this, value);
+
+        var xStartValue = (double)GetType().GetProperty("XStart")!.GetValue(this)!;
+        var xEndValue = (double)GetType().GetProperty("XEnd")!.GetValue(this)!;
+        var xStepValue = (double)GetType().GetProperty("XStep")!.GetValue(this)!;
+
+        var yStartValue = (double)GetType().GetProperty("YStart")!.GetValue(this)!;
+        var yEndValue = (double)GetType().GetProperty("YEnd")!.GetValue(this)!;
+        var yStepValue = (double)GetType().GetProperty("YStep")!.GetValue(this)!;
+
+        var xMessage = SteerMessage.GetValue($"Move{flags[0]}")!;
+
+        var yMessage = SteerMessage.GetValue($"Move{flags[1]}")!;
+
+        _cancelToken = new CancellationTokenSource();
+
+        Task.Run(() =>
+        {
+            EnableAction(false);
+            Percent = 0;
+
+            // 同号满足条件
+            if (xStepValue * (xEndValue - xStartValue) <= 0 | xStepValue == 0&& yStepValue * (yEndValue - yStartValue) <= 0 | yStepValue == 0)
+            {
+                EnableAction(true);
+                MessageBox.Show("参数设置有误");
+                return;
+            }
+
+            var xStep = 0;
+
+            var yStep = 0;
+
+            var xPos = xStartValue;
+
+            var yPos = yStartValue;
+
+            var xCount = (int)Math.Ceiling((xEndValue - xStartValue) / xStepValue);
+
+            var yCount = (int)Math.Ceiling((yEndValue - yStartValue) / yStepValue);
+
+            //var matss = new Mat[(xCount+1)*(yCount+1)]; 
+
+            for (int i = 0; i <= xCount; i++)
+            {
+                WeakReferenceMessenger.Default.Send<string, string>(xPos.ToString(CultureInfo.InvariantCulture), xMessage);
+                Thread.Sleep(1000);
+                for (int j = 0; j <= yCount; j++)
+                    {
+                            Debug.WriteLine($"[INFO] {flags[1]} -> {yPos}");
+                            WeakReferenceMessenger.Default.Send<string, string>(yPos.ToString(CultureInfo.InvariantCulture), yMessage);
+
+                            Thread.Sleep((int)(Span * 1000));
+
+                            var yPath = System.IO.Path.Join(Root, $"{flags[0]}_{xPos}_{flags[1]}_{yPos}.TIF");
+
+                            WeakReferenceMessenger.Default
+                                .Send<string, string>(yPath, MessageManage.SaveACapture);
+                            yPos += yStepValue;
+
+                            yPos = yStepValue > 0 ? Math.Min(yPos, yEndValue) : Math.Max(yPos, yEndValue);
+
+                            Percent = (double)++yStep / yCount * 100;
+                       
+                    }
+                yPos = yStartValue;
+
+                xPos += xStepValue;
+
+                xPos = xStepValue > 0 ? Math.Min(xPos, xEndValue) : Math.Max(xPos, xEndValue);
+
+                Percent = (double)++xStep / xCount * 100;
+
+                Debug.WriteLine($"[INFO] {flags[0]} -> {xPos}");
+                WeakReferenceMessenger.Default.Send<string, string>(xPos.ToString(CultureInfo.InvariantCulture), xMessage);
+
+                Thread.Sleep((int)(Span * 1000));
+
+                var xPath = System.IO.Path.Join(Root, $"{flags[0]}_{xPos}_{flags[1]}_{yPos}.TIF");
+                WeakReferenceMessenger.Default.Send<string, string>(xPath, MessageManage.SaveACapture);
+                if (_cancelToken.IsCancellationRequested)
+                {
+                    Percent = 0;break;
+                }
+
+            }
+
+            EnableAction(true);
+        });
+    }
+
+    void StartScan(uint mode)
+    {
+        //if (string.IsNullOrEmpty(Root))
+        //{
+        //    MessageBox.Show("请先设置存储路径");
+        //    return;
+        //}
+
+        var flags = new string[]
+        {
+        "X","Y","Z"
         };
 
         var flag = flags[mode];
@@ -133,7 +239,7 @@ public partial class ScanViewModel : ObservableObject
                 Debug.WriteLine($"[INFO] {flag} -> {pos}");
                 WeakReferenceMessenger.Default.Send<string, string>(pos.ToString(CultureInfo.InvariantCulture), message);
 
-                Thread.Sleep((int)(Span * 1000));
+                Thread.Sleep((int)(Span * 2000));
 
                 var path = System.IO.Path.Join(Root, $"{flag}_{pos}.TIF");
                 WeakReferenceMessenger.Default.Send<string, string>(path, MessageManage.SaveACapture);
@@ -154,11 +260,11 @@ public partial class ScanViewModel : ObservableObject
 
     [RelayCommand]
     public void StartScanX()
-        => StartScan(0);
+        => StartScanXY();
 
     [RelayCommand]
     public void StartScanY()
-        => StartScan(1);
+        => StartScanXY();
 
     [RelayCommand]
     public void StartScanZ()

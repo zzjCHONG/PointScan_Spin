@@ -256,10 +256,11 @@ public partial class ShellViewModel : ObservableObject
         {
 
             Application.Current?.Dispatcher.Invoke(() =>
-            {
+            { 
                 if (m.Image is not { } img) return;
 
-                _currentFrame= img.Clone();
+                //_currentFrame= img.Clone();
+                _currentFrame= img;
 
                 //img = img.Normalize();
 
