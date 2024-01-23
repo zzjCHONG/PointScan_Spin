@@ -32,8 +32,9 @@ public class TestCamera : ICamera
     {
         var paths = new List<string>()
         {
-            @"E:\.test\aa.tif",
-            //@"E:\.test\BPAE405&488&525.tif",
+            @"E:\.test\BPAE405.tif",
+            @"E:\.test\BPAE488.tif",
+            @"E:\.test\BPAE525.tif",
 
         };
 
@@ -70,12 +71,7 @@ public class TestCamera : ICamera
 
     public bool Capture(out Mat mat)
     {
-        mat = new Mat();
-        var img = _imgs[Count++ % Total];
-
-        img.MinMaxIdx(out var min, out var max);
-
-        (((img - min) / (max - min)) * 255).ToMat().ConvertTo(mat, MatType.CV_8UC1);
+        mat = _imgs[Count++ % Total];
 
         return true;
     }
@@ -113,32 +109,33 @@ public partial class CameraViewModel : ObservableObject
 {
     public ICamera Camera { get; set; }
 
-    public List<string> ResolutionsLite { get; set; } = new List<string>()
+    public List<string> ResolutionsLite { get; set; } = new()
     {
         "2560 * 2160"
     };
 
-    public List<string> ImageModes { get; set; } = new List<string>()
+    public List<string> ImageModes { get; set; } = new()
     {
         "NONE"
     };
 
-    public List<string> RoiModeLite { get; set; } = new List<string>()
+    public List<string> RoiModeLite { get; set; } = new()
     {
         "NONE"
     };
 
     private DispatcherTimer _timer;
 
-
+    public Mat? CurrentFrame { get; set; }
     public CameraViewModel()
     {
         //Camera = new TestCamera();
-        Camera = new Andor();
+        Camera = new TestCamera();
 
+        //var value = TimeSpan.FromSeconds(0.1);//Exposure / 2 / 1000
         //_timer = new DispatcherTimer(DispatcherPriority.Render)
         //{
-        //    Interval = TimeSpan.FromSeconds(Exposure / 2 / 1000),
+        //    Interval = value,
         //};
         //_timer.Tick += (s, e) =>
         //{
@@ -146,6 +143,10 @@ public partial class CameraViewModel : ObservableObject
         //    {
         //        if (Camera.Capture(out var mat))
         //        {
+        //            var img = new Mat();
+        //            mat.MinMaxIdx(out var min, out var max);
+        //            (((mat - min) / (max - min)) * 256).ToMat().ConvertTo(img, MatType.CV_8UC1);
+
         //            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
         //            {
         //                Image = mat,
@@ -154,15 +155,17 @@ public partial class CameraViewModel : ObservableObject
         //    });
         //};
 
-     
-
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture,
             (s, e) => throw new Exception("当前方法不准使用了"));
 
         WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.SaveACapture, (s, e) =>
         {
-            if (!IsInit || !IsCapture) return;
-            Camera.SaveCapture(e);
+            //if (!IsInit || !IsCapture) return;
+            if (IsCapture)
+            {
+                CurrentFrame?.SaveImage(e);
+            }
+
         });
     }
 
@@ -170,15 +173,18 @@ public partial class CameraViewModel : ObservableObject
     private bool _isCapture = false;
 
     [ObservableProperty]
-    private double _exposure = 100;
+    private double _exposure = 500;//0.01
 
     partial void OnExposureChanged(double value)
     {
-        var isTick = _timer.IsEnabled;
-        _timer.Stop();
-        _timer.Interval = TimeSpan.FromSeconds(value / 2 / 1000);
+        //var isTick = _timer.IsEnabled;
+        //_timer.Stop();
+        //_timer.Interval = TimeSpan.FromSeconds(value / 2 / 1000);
 
-        if (isTick) _timer.Start();
+        //if (isTick) _timer.Start();
+
+        Camera.SetExposure(value);
+
     }
 
     [ObservableProperty]
@@ -201,16 +207,22 @@ public partial class CameraViewModel : ObservableObject
             {
                 while (IsStartAcquisition)
                 {
-                    if (Camera.Capture(out var mat))
+                    try
                     {
+                        if (!Camera.Capture(out var mat)) continue;
+
+                        CurrentFrame = mat.Clone();
+
                         WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
                         {
                             Image = mat,
                         }, "Display");
+
+                        Thread.Sleep(1000);
                     }
+                    catch (Exception) { }
                 }
 
-                Debug.WriteLine("推出线程");
             });
         }
     }
@@ -235,9 +247,10 @@ public partial class CameraViewModel : ObservableObject
         else if (IsInit && !IsCapture)
         {
             IsCapture = Camera.StartCapture();
-            //_timer.Interval= TimeSpan.FromSeconds(Exposure / 2 / 1000);
+            //_timer.Interval = TimeSpan.FromSeconds(Exposure / 2 / 1000);
             //_timer.Start();
             IsStartAcquisition = true;
+
             IsNoBusy = true;
         }
         else if (IsCapture)
@@ -248,8 +261,6 @@ public partial class CameraViewModel : ObservableObject
             IsNoBusy = true;
         }
         else { }
-
-
     }
 
     [RelayCommand]
