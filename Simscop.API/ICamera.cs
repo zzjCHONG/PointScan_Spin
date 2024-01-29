@@ -41,6 +41,12 @@ public interface ICamera
     public bool GetExposure(out double exposure);
 
     /// <summary>
+    /// 获取当前帧数
+    /// </summary>
+    /// <returns></returns>
+    public bool GetFrameRate(out double frameRate);
+
+    /// <summary>
     /// 设置曝光
     /// </summary>
     /// <param name="exposure"></param>

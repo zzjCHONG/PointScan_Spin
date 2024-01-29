@@ -50,9 +50,9 @@ namespace Simscop.Spindisk.WPF.Views
             cameraVM = new CameraViewModel();
             shellVM = new ShellViewModel();
             spinVM = new SpinViewModel();
+            scanVM = new ScanViewModel();
             steerVM = new SteerViewModel();
             laserVM = new LaserViewModel();
-            scanVM = new ScanViewModel();
             exampleVM = new ExampleViewModel()
             {
                 CameraVM = cameraVM,
@@ -86,9 +86,9 @@ namespace Simscop.Spindisk.WPF.Views
             var elapsed = now - lastTime;
             if (elapsed >= TimeSpan.FromSeconds(1))
             {
-                var fps = frameCount / elapsed.TotalSeconds;
+                var fps = cameraVM.FrameRate;
                 // 更新界面显示
-                FpsLabel.Text = $"FPS: {fps:F0}";
+                FpsLabel.Text = $"FPS: {fps:F1}";
                 // 重置计数器
                 frameCount = 0;
                 lastTime = now;

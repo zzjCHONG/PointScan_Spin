@@ -139,13 +139,13 @@
 
                 <Expander
                     Margin="8"
-                    Header="曝光设置"
+                    Header="曝光设置(ms)"
                     IsEnabled="{Binding IsCapture}">
                     <StackPanel>
                         <controls:PreviewSlider
                             Margin="15,10"
                             VerticalAlignment="Center"
-                            Maximum="30000"
+                            Maximum="1000"
                             Minimum="10"
                             TickFrequency="1"
                             Value="{Binding Exposure, Delay=100}">
@@ -171,7 +171,7 @@
                                 Content="曝光一次"
                                 IsEnabled="False" />
 
-                            <TextBox Margin="5,0,5,10" Text="{Binding Exposure, StringFormat={}{0:F2},Delay=200}" />
+                            <TextBox x:Name="ExposureTextBox" Margin="5,0,5,10" Text="{Binding Exposure, StringFormat={}{0:F2},Delay=200}" LostFocus="ExposureTextBox_LostFocus"/>
 
                             <Button
                                 Height="40"

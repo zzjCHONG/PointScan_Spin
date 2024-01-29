@@ -97,17 +97,22 @@ namespace Simscop.API.ASI
         /// <param name="value"></param>
         public bool MoveRelative(Axis axis, double value)
         {
+            string text = "";
             if(serialPort.IsOpen)
             switch (axis)
             {
                 case Axis.X:
-                    serialPort.Write($"R X={value * 10}\r\n");
+                        text = $"R X={value * 10}\r\n";
+                    serialPort.WriteLine(text);
+                        Debug.WriteLine(x);
                     break;
                 case Axis.Y:
-                    serialPort.Write($"R Y={value * 10}\r\n");
+                        text = $"R Y={value * 10}\r\n";
+                        serialPort.Write(text);
                     break;
                 case Axis.Z:
-                    serialPort.Write($"R Z={value * 10}\r\n");
+                        text = $"R Z={value * 10}\r\n";
+                        serialPort.Write(text);
                     break;
             }
             else return false;
@@ -131,7 +136,7 @@ namespace Simscop.API.ASI
                     serialPort.Write($"M Y={value * 10}\r\n");
                     break;
                 case Axis.Z:
-                    serialPort.Write($"M Z={value * 10}\r\n");
+                    serialPort.Write($"M Z={value * 10.0}\r\n");
                     break;
             }
             return true;
@@ -236,6 +241,11 @@ namespace Simscop.API.ASI
                 if (_portName != null) return true;
                 return false;
             }
+        }
+
+        ~Motor()
+        {
+            CloseCom();
         }
     }
 

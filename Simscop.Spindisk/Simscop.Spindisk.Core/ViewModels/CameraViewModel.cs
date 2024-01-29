@@ -103,6 +103,11 @@ public class TestCamera : ICamera
         Debug.WriteLine($"-> TestCamera.StopCapture");
         return true;
     }
+
+    public bool GetFrameRate(out double frameRate)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public partial class CameraViewModel : ObservableObject
@@ -130,7 +135,7 @@ public partial class CameraViewModel : ObservableObject
     public CameraViewModel()
     {
         //Camera = new TestCamera();
-        Camera = new TestCamera();
+        Camera = new Andor();
 
         //var value = TimeSpan.FromSeconds(0.1);//Exposure / 2 / 1000
         //_timer = new DispatcherTimer(DispatcherPriority.Render)
@@ -173,7 +178,7 @@ public partial class CameraViewModel : ObservableObject
     private bool _isCapture = false;
 
     [ObservableProperty]
-    private double _exposure = 500;//0.01
+    private double _exposure = 0;//0.01a
 
     partial void OnExposureChanged(double value)
     {
@@ -184,6 +189,7 @@ public partial class CameraViewModel : ObservableObject
         //if (isTick) _timer.Start();
 
         Camera.SetExposure(value);
+        Camera.GetFrameRate(out _frameRate);
 
     }
 
@@ -209,23 +215,27 @@ public partial class CameraViewModel : ObservableObject
                 {
                     try
                     {
-                        if (!Camera.Capture(out var mat)) continue;
-
-                        CurrentFrame = mat.Clone();
-
-                        WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+                        if (Camera.Capture(out var mat))
                         {
-                            Image = mat,
-                        }, "Display");
+                            CurrentFrame = mat.Clone();
+                            GlobalValue.CurrentFrame = mat.Clone();
 
-                        Thread.Sleep(1000);
+                            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+                            {
+                                Image = mat,
+                            }, "Display");
+                        }
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    { }
                 }
 
             });
         }
     }
+
+    [ObservableProperty]
+    private double _frameRate = 0;
 
     [RelayCommand]
     void Init()
@@ -239,7 +249,12 @@ public partial class CameraViewModel : ObservableObject
                 IsInit = Camera.Init();
                 IsCapture = Camera.StartCapture();
 
-                IsStartAcquisition = true;
+                Camera.GetExposure(out var exposure);
+                Exposure = exposure * 1000.0;
+                Camera.GetFrameRate(out var frameRate);
+                FrameRate = frameRate;
+
+                                IsStartAcquisition = true;
                 //_timer.Start();
                 IsNoBusy = true;
             });

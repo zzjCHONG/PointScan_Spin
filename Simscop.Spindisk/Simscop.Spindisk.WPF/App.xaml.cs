@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
+using OpenCvSharp;
+using Simscop.API;
 using Simscop.Spindisk.Core.Models; 
 using Simscop.Spindisk.Core.ViewModels;
 using Simscop.Spindisk.WPF.Views;
@@ -18,6 +20,9 @@ namespace Simscop.Spindisk.WPF
     /// </summary>
     public partial class App : Application
     {
+        public static Mat CurrentFrame;
+
+
         public App()
         {
             DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -47,6 +52,11 @@ namespace Simscop.Spindisk.WPF
             };
 
             view.Show();
+        }
+
+        public static class Motor
+        {
+            
         }
     }
 }

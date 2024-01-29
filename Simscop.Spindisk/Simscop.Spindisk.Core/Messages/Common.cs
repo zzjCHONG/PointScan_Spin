@@ -43,6 +43,10 @@ public static class SteerMessage
 
     public const string StatusZ = "StatusZMessage";
 
+    public const string Motor = "MotorMessage";
+
+    public const string MotorReceive = "MotorReceiveMessage";
+
     public static string? GetValue(string name)
     {
         var type = typeof(SteerMessage);

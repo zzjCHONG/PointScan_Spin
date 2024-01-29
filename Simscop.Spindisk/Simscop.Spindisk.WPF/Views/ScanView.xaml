@@ -61,7 +61,7 @@
                 Background="{DynamicResource RegionReverse03}" />
 
 
-            <StackPanel IsEnabled="{Binding XEnable}">
+            <StackPanel IsEnabled="{Binding XYEnable}">
                 <UniformGrid Margin="0,10" Columns="2">
                     <DockPanel>
                         <TextBlock
@@ -131,7 +131,7 @@
                 Background="{DynamicResource RegionReverse03}" />
 
 
-            <StackPanel IsEnabled="{Binding YEnable}">
+            <StackPanel IsEnabled="{Binding XYEnable}">
                 <UniformGrid Margin="0,10" Columns="2">
                     <DockPanel>
                         <TextBlock
