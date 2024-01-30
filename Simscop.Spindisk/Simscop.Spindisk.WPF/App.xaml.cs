@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
 using OpenCvSharp;
-using Simscop.API;
-using Simscop.Spindisk.Core.Models; 
-using Simscop.Spindisk.Core.ViewModels;
 using Simscop.Spindisk.WPF.Views;
 
 namespace Simscop.Spindisk.WPF
@@ -21,7 +13,6 @@ namespace Simscop.Spindisk.WPF
     public partial class App : Application
     {
         public static Mat CurrentFrame;
-
 
         public App()
         {
@@ -44,19 +35,31 @@ namespace Simscop.Spindisk.WPF
 
         }
 
+
         protected override async void OnStartup(StartupEventArgs e)
         {
-            var view = new ShellView()
-            {
-                //DataContext = new ShellViewModel(),
-            };
+            //var view = new ShellView()
+            //{
+            //    //DataContext = new ShellViewModel(),
+            //};
+            //view.Show();
 
-            view.Show();
+            System.Threading.Mutex mutex = new System.Threading.Mutex(true, "Simscop.Spindisk.WPF",out bool ret);
+            if (!ret)
+            {
+                Environment.Exit(1);
+            }
+            else
+            {
+                ShellView.Instance.Show();
+            }    
         }
 
         public static class Motor
         {
-            
+
         }
     }
+
+
 }

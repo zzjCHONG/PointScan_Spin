@@ -254,7 +254,7 @@ public partial class CameraViewModel : ObservableObject
                 Camera.GetFrameRate(out var frameRate);
                 FrameRate = frameRate;
 
-                                IsStartAcquisition = true;
+                IsStartAcquisition = true;
                 //_timer.Start();
                 IsNoBusy = true;
             });

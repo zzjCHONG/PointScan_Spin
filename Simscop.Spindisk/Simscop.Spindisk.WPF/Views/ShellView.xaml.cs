@@ -16,6 +16,7 @@ using Simscop.Spindisk.Core.ViewModels;
 
 namespace Simscop.Spindisk.WPF.Views
 {
+
     /// <summary>
     /// Interaction logic for ShellView.xaml
     /// </summary>
@@ -29,7 +30,6 @@ namespace Simscop.Spindisk.WPF.Views
         private ScanViewModel scanVM;
         private ExampleViewModel exampleVM;
 
-
         private int frameCount = 0;
         private DateTime lastTime = DateTime.Now;
 
@@ -37,10 +37,22 @@ namespace Simscop.Spindisk.WPF.Views
         private ScanView scanView;
         private ExampleView exampleView;
 
-        public ShellView()
+        public static ShellView Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+        class Nested
+        {
+            static Nested() { }
+            internal static readonly ShellView instance = new ShellView();
+        }
+
+        private ShellView()
         {
             InitializeComponent();
-
 
             Pic1.MouseLeftButtonDown += PicDown;
             Pic2.MouseLeftButtonDown += PicDown;
@@ -177,5 +189,7 @@ namespace Simscop.Spindisk.WPF.Views
             exampleView.Topmost = true;
             exampleView.Topmost = false;
         }
+
     }
+
 }
