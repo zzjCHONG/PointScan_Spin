@@ -64,7 +64,7 @@ public partial class LaserViewModel : ObservableObject
     public LaserViewModel()
     {
         // todo 这里初始化laser并且准备好Laser本身的数据
-        Laser = new BogaoLaser();
+        Laser = new TestLaser();
         Init();
     }
 
@@ -99,7 +99,6 @@ public partial class LaserViewModel : ObservableObject
         else throw new Exception("Laser get power error.");
     }
 
-
     [ObservableProperty]
     private int _channelAValue = 25;
 
@@ -113,10 +112,12 @@ public partial class LaserViewModel : ObservableObject
     {
         DialogRun(() => Laser.SetStatus(0, value));
         WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(0, value), nameof(LaserMessage));
-
-
         if (!value) return;
+
         WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(0), nameof(SpindiskMessage));
+
+        WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(0));
+
         ChannelBEnable = false;
         ChannelCEnable = false;
         ChannelDEnable = false;
@@ -135,10 +136,11 @@ public partial class LaserViewModel : ObservableObject
     {
         DialogRun(() => Laser.SetStatus(1, value));
         WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(1, value), nameof(LaserMessage));
-
         if (!value) return;
 
         WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(1), nameof(SpindiskMessage));
+
+        WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(1));
 
         ChannelAEnable = false;
         ChannelCEnable = false;
@@ -161,6 +163,7 @@ public partial class LaserViewModel : ObservableObject
 
         if (!value) return;
         WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(2), nameof(SpindiskMessage));
+        WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(2));
 
         ChannelAEnable = false;
         ChannelBEnable = false;
@@ -183,6 +186,7 @@ public partial class LaserViewModel : ObservableObject
 
         if (!value) return;
         WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(3), nameof(SpindiskMessage));
+        WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(3));
 
         ChannelAEnable = false;
         ChannelBEnable = false;

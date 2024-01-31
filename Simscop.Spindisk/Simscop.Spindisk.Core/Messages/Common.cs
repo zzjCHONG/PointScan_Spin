@@ -66,3 +66,10 @@ public static class SteerMessage
 public record LaserMessage(int Index, bool Status);
 
 public record SpindiskMessage(int Mode);
+
+
+/// <summary>
+/// 双击全屏相关逻辑
+/// </summary>
+/// <param name="Index"></param>
+public record MainDisplayMessage(int Index);

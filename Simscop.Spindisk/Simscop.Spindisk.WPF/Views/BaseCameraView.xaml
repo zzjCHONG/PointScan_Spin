@@ -57,47 +57,48 @@
                 Content="存储图片"
                 IsEnabled="{Binding IsCapture}" />
 
-            <CheckBox
-                Width="auto"
-                Margin="5,0"
-                Padding="0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Content="自动曝光"
-                IsEnabled="False"
-                Style="{StaticResource CheckBoxAsButton}" />
+            <StackPanel>
+
+                <Grid Height="28" Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="45*" />
+                        <ColumnDefinition Width="15*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Column="1"
+                        Width="auto"
+                        Margin="3,-3,0,0"
+                        FontSize="9"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource TextBrush03}"
+                        IsEnabled="{Binding IsCapture}"
+                        Text="曝光" />
+                    <TextBox
+                        x:Name="ExposureTextBox"
+                        Grid.Column="0"
+                        Width="auto"
+                        Margin="5,0,0,0"
+                        Padding="15,6,0,0"
+                        FontSize="15"
+                        IsEnabled="{Binding IsCapture}"
+                        LostFocus="ExposureTextBox_LostFocus"
+                        Text="{Binding Exposure, StringFormat={}{0:F2}, Delay=200}" />
+                </Grid>
+            </StackPanel>
+
+
         </UniformGrid>
 
         <UniformGrid
             Grid.Row="2"
             Columns="2"
             IsEnabled="{Binding IsNoBusy}">
-
             <UniformGrid Margin="0,0,0,0" Rows="1">
-                <StackPanel Margin="0,0,10,0">
-
-                    <TextBox
-                        x:Name="ExposureTextBox"
-                        Width="147"
-                        Height="35"
-                        Margin="0,5,0,0"
-                        VerticalAlignment="Center"
-                        FontSize="12"
-                        IsEnabled="{Binding IsCapture}"
-                        LostFocus="ExposureTextBox_LostFocus"
-                        Text="{Binding Exposure, StringFormat={}{0:F2}, Delay=200}" />
-                    <TextBlock
-                        Margin="15,0,0,0"
-                        HorizontalAlignment="Left"
-                        FontSize="9"
-                        FontWeight="Bold"
-                        Foreground="{DynamicResource TextBrush03}"
-                        IsEnabled="{Binding IsCapture}"
-                        Text="曝光" />
+                <StackPanel Margin="0,0,0,0">
                     <controls:CameraButton
                         Width="100"
                         Height="100"
-                        Margin="10,0,0,0"
+                        Margin="0,25,0,0"
                         Command="{Binding InitCommand}"
                         Focusable="False"
                         IsStart="{Binding IsCapture}" />

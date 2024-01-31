@@ -51,7 +51,7 @@ namespace Simscop.Spindisk.WPF
             }
             else
             {
-                ShellView.Instance.Show();
+                ShellView.Instance.Show();      
             }    
         }
 

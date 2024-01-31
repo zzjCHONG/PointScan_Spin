@@ -6,7 +6,6 @@ public class ASIMotor
 {
     Motor _motor;
 
-
     public bool InitializeMotor()
     {
         _motor = new Motor();
