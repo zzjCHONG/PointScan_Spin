@@ -137,8 +137,7 @@ public partial class CameraViewModel : ObservableObject
 
     public CameraViewModel()
     {
-        Camera = new TestCamera();
-        //Camera = new Andor();
+        Camera = new Andor();
         GlobalValue.GlobalCamera = Camera;
 
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture,
