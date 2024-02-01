@@ -13,7 +13,7 @@
     Title="ShellView"
     d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
     Style="{StaticResource BlankWindow}"
-    Topmost="True"
+    Topmost="False"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>

@@ -45,6 +45,7 @@ namespace Simscop.Spindisk.Core.Models
 
         private AutoFocus()
         {
+            
             WeakReferenceMessenger.Default.Register<ASIMotor, string>(this, SteerMessage.Motor, (s, e) =>
             {
                 _motor = e;

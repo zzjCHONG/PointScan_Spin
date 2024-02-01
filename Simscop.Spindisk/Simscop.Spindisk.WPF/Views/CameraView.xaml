@@ -171,7 +171,11 @@
                                 Content="曝光一次"
                                 IsEnabled="False" />
 
-                            <TextBox x:Name="ExposureTextBox" Margin="5,0,5,10" Text="{Binding Exposure, StringFormat={}{0:F2},Delay=200}" LostFocus="ExposureTextBox_LostFocus"/>
+                            <TextBox
+                                x:Name="ExposureTextBox"
+                                Margin="5,0,5,10"
+                                LostFocus="ExposureTextBox_LostFocus"
+                                Text="{Binding Exposure, StringFormat={}{0:F2}, Delay=200}" />
 
                             <Button
                                 Height="40"

@@ -4,6 +4,8 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
@@ -90,7 +92,6 @@ public partial class ShellViewModel : ObservableObject
                     EnableFourth = m.Status;
                     break;
             }
-
             Debug.WriteLine($"ShellViewModel {m.Index} - {m.Status}");
         });
 

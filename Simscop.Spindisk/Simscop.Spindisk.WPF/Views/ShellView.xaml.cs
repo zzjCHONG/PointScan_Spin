@@ -11,11 +11,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using CommunityToolkit.Mvvm.Messaging;
 using OpenCvSharp.WpfExtensions;
+using Simscop.Spindisk.Core;
+using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.ViewModels;
 
 namespace Simscop.Spindisk.WPF.Views
 {
+
     /// <summary>
     /// Interaction logic for ShellView.xaml
     /// </summary>
@@ -27,7 +31,7 @@ namespace Simscop.Spindisk.WPF.Views
         private SteerViewModel steerVM;
         private LaserViewModel laserVM;
         private ExampleViewModel exampleVM;
-
+        private ScanViewModel scanVM;
 
         private int frameCount = 0;
         private DateTime lastTime = DateTime.Now;
@@ -35,10 +39,22 @@ namespace Simscop.Spindisk.WPF.Views
         private CameraView cameraView;
         private ExampleView exampleView;
 
-        public ShellView()
+        public static ShellView Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+        class Nested
+        {
+            static Nested() { }
+            internal static readonly ShellView instance = new ShellView();
+        }
+
+        private ShellView()
         {
             InitializeComponent();
-
 
             Pic1.MouseLeftButtonDown += PicDown;
             Pic2.MouseLeftButtonDown += PicDown;
@@ -48,6 +64,7 @@ namespace Simscop.Spindisk.WPF.Views
             cameraVM = new CameraViewModel();
             shellVM = new ShellViewModel();
             spinVM = new SpinViewModel();
+            scanVM = new ScanViewModel();
             steerVM = new SteerViewModel();
             laserVM = new LaserViewModel();
             exampleVM = new ExampleViewModel()
@@ -69,6 +86,11 @@ namespace Simscop.Spindisk.WPF.Views
             SetDataContext();
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
+
+            WeakReferenceMessenger.Default.Register<MainDisplayMessage>(this, (o, m) =>
+            {
+                RemotePicDown(m.Index);
+            });  
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -99,7 +121,7 @@ namespace Simscop.Spindisk.WPF.Views
 
         private bool IsFull { get; set; } = false;
 
-        private void PicDown(object sender, MouseButtonEventArgs e)
+        public void PicDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
             {
@@ -124,9 +146,24 @@ namespace Simscop.Spindisk.WPF.Views
                     IsFull = false;
                 }
             }
+        }
 
+        void RemotePicDown(int index)
+        {
+            if (!IsFull) return;
 
+            var childs = Client.Children;
 
+            var count = 0;
+
+            foreach (Border child in childs)
+            {
+                child.Visibility = Visibility.Collapsed;
+                if (count == index)
+                    child.Visibility = Visibility.Visible;
+
+                count++;
+            }
         }
 
         // TODO 这里的卡顿问题已经定位了，原因就是在给datacontext的时候数据变化和赋值原因，解决办法挺简单的，单个窗口重复利用就行，但是这里目前就卡着吧，有空再改
@@ -162,5 +199,7 @@ namespace Simscop.Spindisk.WPF.Views
             exampleView.Topmost = true;
             exampleView.Topmost = false;
         }
+
     }
+
 }
