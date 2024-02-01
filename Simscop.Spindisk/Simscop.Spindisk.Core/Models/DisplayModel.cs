@@ -77,7 +77,7 @@ public partial class DisplayModel : ObservableObject
         if (Norm)
         {
             Min = 0;
-            Max = 0;
+            Max = Threshold;
             Threshold = 255;
 
             U8 = Original.To8U(1);
@@ -108,15 +108,12 @@ public partial class DisplayModel : ObservableObject
 
         var temp = new Mat();
 
-        Original.MinMaxLoc(out double minval, out double maxval);
-        if (Min > minval) Min = (int)minval;
-        if (Max < maxval) Max = (int)maxval;
+        //Original.MinMaxLoc(out double minval, out double maxval);
+        //if (Min > minval) Min = (int)minval;
+        //if (Max < maxval) Max = (int)maxval;
 
-        ((Original - Min) / (Max - Min) * 255)
-            .ToMat()
-            .ConvertTo(temp, MatType.CV_8UC1);
 
-        U8 = temp;
+        U8 = (((Original.RangeIn(Min, Max) - Min) / (Max - Min)) * 255).ToMat().To8U();
     }
 
     partial void OnOriginalChanged(Mat value) => Init();
@@ -184,7 +181,7 @@ public static class MatExtension
 {
     /// <summary>
     /// 转换任意xC1数据类型成为64FC1
-    /// </summary>
+    /// </summary>c
     /// <param name="mat"></param>
     /// <returns></returns>
     public static Mat? To64F(this Mat mat)
@@ -193,6 +190,24 @@ public static class MatExtension
         var temp = new Mat(mat.Rows, mat.Cols, MatType.CV_64FC1);
         mat.ConvertTo(temp, MatType.CV_64FC1, 1, 0);
         return temp;
+    }
+
+    /// <summary>
+    /// 范围外值为0
+    /// </summary>
+    /// <param name="mat"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Mat RangeIn(this Mat mat, double min, double max)
+    {
+        var mask = new Mat();
+        Cv2.InRange(mat, new Scalar(min, min, min), new Scalar(max, max, max), mask);
+
+        var result = new Mat();
+        Cv2.BitwiseAnd(mat, mat, result, mask);
+
+        return result;
     }
 
     /// <summary>

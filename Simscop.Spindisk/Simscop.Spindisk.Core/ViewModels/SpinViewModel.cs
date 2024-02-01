@@ -30,6 +30,8 @@ public partial class SpinViewModel : ObservableObject
     {
         ComList = Simscop.API.Helper.SerialHelper.GetAllCom();
 
+        GlobalValue.GlobalSpin = new XLight();
+
         WeakReferenceMessenger.Default.Register<SpindiskMessage, string>(this, 
             nameof(SpindiskMessage), (r, m) => SetMode(m.Mode));
     }

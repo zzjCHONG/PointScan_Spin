@@ -9,7 +9,7 @@ public class ASIMotor
 
     public bool InitializeMotor()
     {
-        _motor = new Simscop.API.ASI.Motor();
+        _motor = new Motor();
 
         if (!_motor.OpenCom()) return false;
         return true;
@@ -74,8 +74,7 @@ public class ASIMotor
 
     public bool SetOffset(Motor.Axis axis, double value)
     {
-        var offset = (int)(value);
-        if (_motor.MoveRelative(axis, offset)) return true;
+        if (_motor.MoveRelative(axis, value)) return true;
 
 
 
@@ -96,8 +95,7 @@ public class ASIMotor
     #region 绝对路径
     public bool SetPosition(Motor.Axis axis, double value)
     {
-        var position = (int)(value);
-        if (_motor.MoveAbsolute(axis, position)) return true;
+        if (_motor.MoveAbsolute(axis, value)) return true;
 
 
         return false;

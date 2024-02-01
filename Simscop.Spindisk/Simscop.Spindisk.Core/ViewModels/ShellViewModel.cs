@@ -102,7 +102,7 @@ public partial class ShellViewModel : ObservableObject
                 if (m.Image is not { } img) return;
                 if (!(EnableFirst || EnableSecond || EnableThird || EnableFourth)) return;
 
-                DisplayCurrent.Original = img;
+                DisplayCurrent.Original = img.Clone();
             });
         });
     }

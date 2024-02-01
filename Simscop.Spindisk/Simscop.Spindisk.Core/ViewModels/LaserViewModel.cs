@@ -65,6 +65,7 @@ public partial class LaserViewModel : ObservableObject
     {
         // todo 这里初始化laser并且准备好Laser本身的数据
         Laser = new BogaoLaser();
+        GlobalValue.GlobalLaser = Laser;
         Init();
     }
 

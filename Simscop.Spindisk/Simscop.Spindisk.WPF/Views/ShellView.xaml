@@ -13,7 +13,7 @@
     Title="ShellView"
     d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
     Style="{StaticResource BlankWindow}"
-    Topmost="False"
+    Topmost="True"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -42,14 +42,7 @@
                 <Image Source="../Image/logo.png" />
             </Viewbox>-->
 
-            <Button
-                Margin="5,0"
-                Background="{DynamicResource Region02}"
-                BorderThickness="0"
-                Click="OpenBtClick"
-                Content="扫描"
-                FontFamily="{StaticResource Harmony}"
-                FontSize="14" />
+
             <Button
                 Margin="5,0"
                 Background="{DynamicResource Region02}"
@@ -87,7 +80,7 @@
             <TextBlock x:Name="FpsLabel" Margin="10,0" />
 
             <Grid
-                Width="10000"
+                Width="1000"
                 Background="{DynamicResource Region02}"
                 WindowChrome.IsHitTestVisibleInChrome="False" />
 

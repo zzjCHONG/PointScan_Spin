@@ -43,7 +43,7 @@ namespace Simscop.API;
 
 // NOTE 上面的结论只适合初期，后面依旧要要求返回值的，因为必须需要返回值来标定每一次数据更新带来的事件是否完成成功
 
-public static class XLight
+public class XLight
 {
     private static void WaitValue(object sender, SerialDataReceivedEventArgs e)
     {

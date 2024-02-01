@@ -3,11 +3,13 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
+using Simscop.Spindisk.Core.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -18,12 +20,17 @@ namespace Simscop.Spindisk.Core.ViewModels;
 /// </summary>
 public partial class SteerViewModel : ObservableObject
 {
-    private readonly ASIMotor _motor = new();
+    private readonly ASIMotor _motor;
 
     private readonly DispatcherTimer _timer;
 
+    private ConcurrentQueue<Func<bool>> taskQueue;
+
     public SteerViewModel()
     {
+        _motor = new();
+
+        GlobalValue.GlobalMotor = _motor;
 
         _timer = new DispatcherTimer(priority: DispatcherPriority.Background)
         {
@@ -54,6 +61,14 @@ public partial class SteerViewModel : ObservableObject
             var value = double.Parse(e);
             _motor.SetZPosition(value);
         });
+
+        WeakReferenceMessenger.Default.Register<string>(SteerMessage.MotorReceive, (s, e) =>
+        {
+            WeakReferenceMessenger.Default.Send<ASIMotor, string>(_motor, SteerMessage.Motor);
+        });
+
+
+        _ = Queue();
     }
 
     private void _timer_Tick(object? sender, EventArgs e)
@@ -68,6 +83,25 @@ public partial class SteerViewModel : ObservableObject
         //XEnable = _motor is { XEnabled: true, XAction: false, XException: false };
         //YEnable = _motor is { YEnabled: true, YAction: false, YException: false };
         //ZEnable = _motor is { ZEnabled: true, ZAction: false, ZException: false };
+    }
+
+    async Task Queue()
+    {
+        taskQueue = new ConcurrentQueue<Func<bool>>();
+
+        await Task.Run(async () =>
+        {
+            while (true)
+            {
+                if (taskQueue.TryDequeue(out Func<bool> taskFunc))
+                {
+                    taskFunc.Invoke();
+                }
+
+                await Task.Delay(100);
+            }
+        });
+
     }
 
     [ObservableProperty]
@@ -101,14 +135,51 @@ public partial class SteerViewModel : ObservableObject
     void PositionToZero()
         => _motor.ResetPosition();
 
+    [RelayCommand]
+    void Focus()
+    {
+        Thread.Sleep(100);
+
+        Task.Run(() =>
+        {
+            focus = AutoFocus.Create();
+            focus.FirstCount = 5;
+            focus.FirstStep = 10;
+            focus.SeccondCount = 5;
+            focus.SecondStep = 1;
+            focus.Threshold = 0.02;
+            focus.CropSize = 0.5;
+            focus.Focus();
+        });
+    }
+
+    void MicroFocus()
+    {
+        Thread.Sleep(100);
+
+        Task.Run(() =>
+        {
+            focus = AutoFocus.Create();
+            focus.FirstCount = 4;
+            focus.FirstStep = 5;
+            focus.SeccondCount = 5;
+            focus.SecondStep = 1;
+            focus.Threshold = 0.02;
+            focus.CropSize = 0.5;
+            focus.Focus();
+        });
+    }
+
+    AutoFocus focus;
+
     public void MoveX(double step)
-        => _motor.SetXOffset(step);
+        => taskQueue.Enqueue(() => _motor.SetXOffset(step));
 
     public void MoveY(double step)
-        => _motor.SetYOffset(step);
+        => taskQueue.Enqueue(() => _motor.SetYOffset(step));
 
     public void MoveZ(double step)
-        => _motor.SetZOffset(step);
+        => taskQueue.Enqueue(() => _motor.SetZOffset(step));
 
     public void MoveToX(double value)
         => _motor.SetXPosition(value);
@@ -118,6 +189,7 @@ public partial class SteerViewModel : ObservableObject
 
     public void MoveToZ(double value)
         => _motor.SetZPosition(value);
+
 
     //private BlockingCollection<object> queue = new BlockingCollection<object>();
 

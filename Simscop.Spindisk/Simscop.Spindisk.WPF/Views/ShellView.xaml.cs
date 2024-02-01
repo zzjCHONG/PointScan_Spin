@@ -26,7 +26,6 @@ namespace Simscop.Spindisk.WPF.Views
         private ShellViewModel shellVM;
         private SteerViewModel steerVM;
         private LaserViewModel laserVM;
-        private ScanViewModel scanVM;
         private ExampleViewModel exampleVM;
 
 
@@ -34,7 +33,6 @@ namespace Simscop.Spindisk.WPF.Views
         private DateTime lastTime = DateTime.Now;
 
         private CameraView cameraView;
-        private ScanView scanView;
         private ExampleView exampleView;
 
         public ShellView()
@@ -52,11 +50,9 @@ namespace Simscop.Spindisk.WPF.Views
             spinVM = new SpinViewModel();
             steerVM = new SteerViewModel();
             laserVM = new LaserViewModel();
-            scanVM = new ScanViewModel();
             exampleVM = new ExampleViewModel()
             {
                 CameraVM = cameraVM,
-                ScanVM = scanVM,
                 SteerVM = steerVM
             };
 
@@ -64,10 +60,7 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 DataContext = cameraVM,
             };
-            scanView = new()
-            {
-                DataContext = scanVM,
-            };
+            
             exampleView = new()
             {
                 DataContext = exampleVM,
@@ -86,9 +79,9 @@ namespace Simscop.Spindisk.WPF.Views
             var elapsed = now - lastTime;
             if (elapsed >= TimeSpan.FromSeconds(1))
             {
-                var fps = frameCount / elapsed.TotalSeconds;
+                var fps = cameraVM.FrameRate;
                 // 更新界面显示
-                FpsLabel.Text = $"FPS: {fps:F0}";
+                FpsLabel.Text = $"FPS: {fps:F1}";
                 // 重置计数器
                 frameCount = 0;
                 lastTime = now;
@@ -161,14 +154,6 @@ namespace Simscop.Spindisk.WPF.Views
         {
             System.Diagnostics.Process.Start("explorer.exe",
                 @"https://www.simscop.com/WebShop/Contact.aspx");
-        }
-
-
-        private void OpenBtClick(object sender, RoutedEventArgs e)
-        {
-            scanView.Show();
-            scanView.Topmost = true;
-            scanView.Topmost = false;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

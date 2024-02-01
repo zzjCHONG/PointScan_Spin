@@ -44,8 +44,10 @@
                 Padding="0"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                Content="O 录制"
-                IsEnabled="False" />
+                Content="扫描"
+                 IsEnabled="{Binding IsCapture}"
+                Click="Button_Click"/>
+            <!--IsEnabled="{Binding IsCapture}" />-->
 
             <Button
                 Width="auto"
