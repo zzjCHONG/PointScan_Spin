@@ -44,7 +44,6 @@ public class TestCamera : ICamera
             .Select(path => Cv2.ImRead(path, ImreadModes.AnyDepth)).ToArray();
 
         //var count = 0;
-
         //while (true)
         //{
         //    Thread.Sleep(300);
