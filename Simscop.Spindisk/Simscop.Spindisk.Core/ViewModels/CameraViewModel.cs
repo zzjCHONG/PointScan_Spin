@@ -137,9 +137,18 @@ public partial class CameraViewModel : ObservableObject
 
     public CameraViewModel()
     {
-        Camera = new TestCamera();
-        //Camera = new Andor();
+        Camera = new Andor();
         GlobalValue.GlobalCamera = Camera;
+
+        IsInit = Camera.Init();
+        if (IsInit)
+        {
+            Camera.GetExposure(out var exposure);
+            Exposure = Math.Floor(exposure * 1000.0);
+            Camera.GetFrameRate(out var frameRate);
+            FrameRate = frameRate;
+        }
+
 
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture,
             (s, e) => throw new Exception("当前方法不准使用了"));

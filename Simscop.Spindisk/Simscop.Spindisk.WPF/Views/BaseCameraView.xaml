@@ -84,7 +84,7 @@
                         FontSize="15"
                         IsEnabled="{Binding IsCapture}"
                         LostFocus="ExposureTextBox_LostFocus"
-                        Text="{Binding Exposure, StringFormat={}{0:F2}, Delay=200}" />
+                        Text="{Binding Exposure, StringFormat={}, Delay=200}" />
                 </Grid>
             </StackPanel>
 
