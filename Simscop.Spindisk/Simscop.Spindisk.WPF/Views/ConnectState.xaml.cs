@@ -10,20 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Simscop.Spindisk.WPF.Views
 {
     /// <summary>
-    /// Interaction logic for LaserView.xaml
+    /// ConnectState.xaml 的交互逻辑
     /// </summary>
-    public partial class LaserView : UserControl
+    public partial class ConnectState : Window
     {
-        public LaserView()
+        public ConnectState()
         {
             InitializeComponent();
         }
-
     }
 }

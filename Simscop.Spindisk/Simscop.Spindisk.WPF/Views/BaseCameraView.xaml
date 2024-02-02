@@ -44,8 +44,10 @@
                 Padding="0"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                Content="O 录制"
-                IsEnabled="False" />
+                Content="扫描"
+                 IsEnabled="{Binding IsCapture}"
+                Click="Button_Click"/>
+            <!--IsEnabled="{Binding IsCapture}" />-->
 
             <Button
                 Width="auto"
@@ -57,28 +59,53 @@
                 Content="存储图片"
                 IsEnabled="{Binding IsCapture}" />
 
-            <CheckBox
-                Width="auto"
-                Margin="5,0"
-                Padding="0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Content="自动曝光"
-                IsEnabled="False"
-                Style="{StaticResource CheckBoxAsButton}" />
+            <StackPanel>
+
+                <Grid Height="28" Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="45*" />
+                        <ColumnDefinition Width="15*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Column="1"
+                        Width="auto"
+                        Margin="3,-3,0,0"
+                        FontSize="9"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource TextBrush03}"
+                        IsEnabled="{Binding IsCapture}"
+                        Text="曝光" />
+                    <TextBox
+                        x:Name="ExposureTextBox"
+                        Grid.Column="0"
+                        Width="auto"
+                        Margin="5,0,0,0"
+                        Padding="15,6,0,0"
+                        FontSize="15"
+                        IsEnabled="{Binding IsCapture}"
+                        LostFocus="ExposureTextBox_LostFocus"
+                        Text="{Binding Exposure, StringFormat={}{0:F2}, Delay=200}" />
+                </Grid>
+            </StackPanel>
+
+
         </UniformGrid>
 
         <UniformGrid
             Grid.Row="2"
             Columns="2"
             IsEnabled="{Binding IsNoBusy}">
-            <controls:CameraButton
-                Width="100"
-                Height="100"
-                Margin="0,30,0,0"
-                Command="{Binding InitCommand}"
-                Focusable="False"
-                IsStart="{Binding IsCapture}" />
+            <UniformGrid Margin="0,0,0,0" Rows="1">
+                <StackPanel Margin="0,0,0,0">
+                    <controls:CameraButton
+                        Width="100"
+                        Height="100"
+                        Margin="0,25,0,0"
+                        Command="{Binding InitCommand}"
+                        Focusable="False"
+                        IsStart="{Binding IsCapture}" />
+                </StackPanel>
+            </UniformGrid>
 
             <UniformGrid Margin="0,10,0,0" Rows="3">
                 <StackPanel Margin="0,0,5,0">

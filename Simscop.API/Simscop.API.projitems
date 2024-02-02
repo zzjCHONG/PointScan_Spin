@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Andor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IStitcher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Native\Andor\AndorAPI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ASIMotor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ASI\Motor.cs" />

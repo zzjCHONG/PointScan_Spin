@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Simscop.Spindisk.Core.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +19,44 @@ namespace Simscop.Spindisk.WPF.Views
     /// <summary>
     /// Interaction logic for BaseCameraView.xaml
     /// </summary>
-    public partial class BaseCameraView : UserControl
+    public partial class BaseCameraView
     {
         public BaseCameraView()
         {
             InitializeComponent();
+            scanView.DataContext = scanVm;
+        }
+
+        ScanView scanView = new();
+
+        ScanViewModel scanVm = new();
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            scanView.Show();
+            scanView.Topmost = true;
+            scanView.Topmost = false;
+        }
+
+        private void ExposureTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            double value;
+
+            if (double.TryParse(ExposureTextBox.Text, out value))
+            {
+                if (value < 10.00)
+                {
+                    ExposureTextBox.Text = "10.00";
+                }
+                else if (value > 1000.00)
+                {
+                    ExposureTextBox.Text = "1000.00";
+                }
+            }
+            else
+            {
+                ExposureTextBox.Text = "";
+            }
         }
     }
 }

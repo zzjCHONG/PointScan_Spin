@@ -20,9 +20,11 @@ using Simscop.Spindisk.Core.Models;
 
 namespace Simscop.Spindisk.Core.ViewModels;
 
+#region Test
 public class TestCamera : ICamera
 {
-    private Mat[] _imgs;
+
+    private readonly Mat[] _imgs;
 
     public int Count { get; set; }
 
@@ -32,9 +34,7 @@ public class TestCamera : ICamera
     {
         var paths = new List<string>()
         {
-            @"E:\.test\BPAE405.tif",
-            @"E:\.test\BPAE488.tif",
-            @"E:\.test\BPAE525.tif",
+            @"C:\Users\Administrator\Pictures\Camera Roll\1.jpg",
 
         };
 
@@ -44,7 +44,6 @@ public class TestCamera : ICamera
             .Select(path => Cv2.ImRead(path, ImreadModes.AnyDepth)).ToArray();
 
         //var count = 0;
-
         //while (true)
         //{
         //    Thread.Sleep(300);
@@ -103,7 +102,17 @@ public class TestCamera : ICamera
         Debug.WriteLine($"-> TestCamera.StopCapture");
         return true;
     }
+
+    public bool GetFrameRate(out double frameRate)
+    {
+        Debug.WriteLine($"-> TestCamera.GetFrameRate");
+
+        frameRate = 100;
+        return true;
+    }
 }
+
+#endregion
 
 public partial class CameraViewModel : ObservableObject
 {
@@ -124,77 +133,37 @@ public partial class CameraViewModel : ObservableObject
         "NONE"
     };
 
-    private DispatcherTimer _timer;
+    private Mat? CurrentFrameforSaving { get; set; }
 
-    public Mat? CurrentFrame { get; set; }
     public CameraViewModel()
     {
-        //Camera = new TestCamera();
-        Camera = new TestCamera();
-
-        //var value = TimeSpan.FromSeconds(0.1);//Exposure / 2 / 1000
-        //_timer = new DispatcherTimer(DispatcherPriority.Render)
-        //{
-        //    Interval = value,
-        //};
-        //_timer.Tick += (s, e) =>
-        //{
-        //    Task.Run(() =>
-        //    {
-        //        if (Camera.Capture(out var mat))
-        //        {
-        //            var img = new Mat();
-        //            mat.MinMaxIdx(out var min, out var max);
-        //            (((mat - min) / (max - min)) * 256).ToMat().ConvertTo(img, MatType.CV_8UC1);
-
-        //            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
-        //            {
-        //                Image = mat,
-        //            }, "Display");
-        //        }
-        //    });
-        //};
+        Camera = new Andor();
+        GlobalValue.GlobalCamera = Camera;
 
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture,
             (s, e) => throw new Exception("当前方法不准使用了"));
 
         WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.SaveACapture, (s, e) =>
         {
-            //if (!IsInit || !IsCapture) return;
             if (IsCapture)
-            {
-                CurrentFrame?.SaveImage(e);
-            }
-
+                CurrentFrameforSaving?.SaveImage(e);
         });
     }
 
     [ObservableProperty]
-    private bool _isCapture = false;
+    private double _exposure = 0;//[10,30000]，ms
 
     [ObservableProperty]
-    private double _exposure = 500;//0.01
+    private double _frameRate = 0;//随曝光&采样率实时变化
 
     partial void OnExposureChanged(double value)
     {
-        //var isTick = _timer.IsEnabled;
-        //_timer.Stop();
-        //_timer.Interval = TimeSpan.FromSeconds(value / 2 / 1000);
-
-        //if (isTick) _timer.Start();
-
         Camera.SetExposure(value);
-
+        Camera.GetFrameRate(out _frameRate);
     }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsNotInit))]
-    private bool _isInit = false;
-
-    public bool IsNotInit => !IsInit;
-
-    [ObservableProperty]
-    private bool _isNoBusy = true;
+    [RelayCommand]
+    void SetExposure() => Camera.SetExposure(Exposure);//未绑定
 
     [ObservableProperty]
     private bool _isStartAcquisition = false;
@@ -209,23 +178,34 @@ public partial class CameraViewModel : ObservableObject
                 {
                     try
                     {
-                        if (!Camera.Capture(out var mat)) continue;
-
-                        CurrentFrame = mat.Clone();
-
-                        WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+                        if (Camera.Capture(out var mat))
                         {
-                            Image = mat,
-                        }, "Display");
+                            CurrentFrameforSaving = mat.Clone();
+                            GlobalValue.CurrentFrame = mat.Clone();
 
-                        Thread.Sleep(1000);
+                            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+                            {
+                                Image = mat,
+                            }, "Display");
+                        }
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    { }
                 }
-
             });
         }
     }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotInit))]
+    private bool _isInit = false;
+    public bool IsNotInit => !IsInit;
+
+    [ObservableProperty]
+    private bool _isCapture = false;
+
+    [ObservableProperty]
+    private bool _isNoBusy = true;
 
     [RelayCommand]
     void Init()
@@ -238,33 +218,28 @@ public partial class CameraViewModel : ObservableObject
             {
                 IsInit = Camera.Init();
                 IsCapture = Camera.StartCapture();
-
+                Camera.GetExposure(out var exposure);
+                Exposure = Math.Floor(exposure * 1000.0);
+                Camera.GetFrameRate(out var frameRate);
+                FrameRate = frameRate;
                 IsStartAcquisition = true;
-                //_timer.Start();
                 IsNoBusy = true;
             });
         }
         else if (IsInit && !IsCapture)
         {
             IsCapture = Camera.StartCapture();
-            //_timer.Interval = TimeSpan.FromSeconds(Exposure / 2 / 1000);
-            //_timer.Start();
             IsStartAcquisition = true;
-
             IsNoBusy = true;
         }
         else if (IsCapture)
         {
             IsCapture = !Camera.StopCapture();
-            //_timer.Stop();
             IsStartAcquisition = false;
             IsNoBusy = true;
         }
         else { }
     }
-
-    [RelayCommand]
-    void SetExposure() => Camera.SetExposure(Exposure);
 
     #region File
 

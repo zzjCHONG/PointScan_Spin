@@ -32,5 +32,26 @@ namespace Simscop.Spindisk.WPF.Views
             this.Hide();
             e.Cancel = true;
         }
+
+        private void ExposureTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            double value;
+
+            if (double.TryParse(ExposureTextBox.Text, out value))
+            {
+                if (value < 10.00)
+                {
+                    ExposureTextBox.Text = "20.00";
+                }
+                else if (value > 1000.00)
+                {
+                    ExposureTextBox.Text = "1000.00";
+                }
+            }
+            else
+            {
+                ExposureTextBox.Text = "";
+            }
+        }
     }
 }

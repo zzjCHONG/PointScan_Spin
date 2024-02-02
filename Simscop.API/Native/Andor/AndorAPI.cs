@@ -1,6 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text;
+using System;
 
 namespace Simscop.API
 {
@@ -141,7 +141,7 @@ namespace Simscop.API
         /// <param name="Value"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetInt", CallingConvention = CallingConvention.StdCall,CharSet =CharSet.Unicode)]
-        public static extern int GetInt(int Hndl, string Feature, ref int Value);//AT_64 *
+        public static extern int GetInt(int Hndl, string Feature, ref int Value);
 
         /// <summary>
         /// 获取INT特性的最大允许值
@@ -152,7 +152,7 @@ namespace Simscop.API
         /// <param name="MaxValue"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetIntMax", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int GetIntMax(int Hndl, string Feature,ref int MaxValue);//AT_64 *
+        public static extern int GetIntMax(int Hndl, string Feature,ref int MaxValue);
 
         /// <summary>
         /// 获取INT特性的最小允许值
@@ -182,7 +182,7 @@ namespace Simscop.API
         /// <param name="Value"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetFloat", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int GetFloat(int Hndl, string Feature,ref double Value);//double *
+        public static extern int GetFloat(int Hndl, string Feature,ref double Value);
 
         /// <summary>
         /// 获取FLOAT特性的最大允许值
@@ -192,7 +192,7 @@ namespace Simscop.API
         /// <param name="MaxValue"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetFloatMax", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int GetFloatMax(int Hndl, string Feature,ref double MaxValue);//double *
+        public static extern int GetFloatMax(int Hndl, string Feature,ref double MaxValue);
 
         /// <summary>
         /// 获取INT特性的最小允许值
@@ -202,7 +202,7 @@ namespace Simscop.API
         /// <param name="MinValue"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_GetFloatMin", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int GetFloatMin(int Hndl, string Feature,ref double MinValue);//double *
+        public static extern int GetFloatMin(int Hndl, string Feature,ref double MinValue);
 
         /// <summary>
         /// 设定指定的bool类型的值，若设置只读、当前不可写、特征不是bool、未由相机实现则报错
@@ -282,8 +282,8 @@ namespace Simscop.API
         /// <param name="Feature"></param>
         /// <param name="string"></param>
         /// <returns></returns>
-        [DllImport("atcore.dll", EntryPoint = "AT_SetEnumstring", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int SetEnumstring(int Hndl, string Feature, string String);
+        [DllImport("atcore.dll", EntryPoint = "AT_SetEnumString", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
+        public static extern int SetEnumString(int Hndl, string Feature, string String);
 
         /// <summary>
         /// 检索指定枚举特性的当前选定索引
@@ -327,7 +327,7 @@ namespace Simscop.API
         /// <param name="Available"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_IsEnumIndexAvailable", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int IsEnumIndexAvailable(int Hndl, string Feature, int Index, ref int Available);
+        public static extern int IsEnumIndexAvailable(int Hndl, string Feature, int Index, ref bool Available);
 
         /// <summary>
         /// 相机是否支持指定的枚举特征索引。过滤实际可能不可用但仍列举出来的特性。
@@ -338,7 +338,7 @@ namespace Simscop.API
         /// <param name="Implemented"></param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_IsEnumIndexImplemented", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int IsEnumIndexImplemented(int Hndl, string Feature, int Index, ref int Implemented);
+        public static extern int IsEnumIndexImplemented(int Hndl, string Feature, int Index, ref bool Implemented);
 
         /// <summary>
         /// 配置存储获取的图像内存区域，调用WaitBuffer或Flush前，缓存区不可修改或释放
@@ -348,7 +348,7 @@ namespace Simscop.API
         /// <param name="ImageBufferSize">单个图像的大小，字节为单位</param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_QueueBuffer", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int QueueBuffer(int Hndl, byte[] ImageBuffer, int ImageBufferSize);//AT_U8*， byte[]或string/ref byte
+        public static extern int QueueBuffer(int Hndl, byte[] ImageBuffer, int ImageBufferSize);
 
         /// <summary>
         /// QueueBuffer使用后，接收图像缓存区的数据
@@ -359,7 +359,7 @@ namespace Simscop.API
         /// <param name="Timeout">等待时间设置</param>
         /// <returns></returns>
         [DllImport("atcore.dll", EntryPoint = "AT_WaitBuffer", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int WaitBuffer(int Hndl,ref IntPtr Ptr, ref int PtrSize, uint Timeout);//AT_U8**
+        public static extern int WaitBuffer(int Hndl,ref IntPtr Ptr, ref int PtrSize, uint Timeout);
 
         /// <summary>
         /// 清除QueueBuffer队列的所有缓存区。需在AT_Command后调用，否则将在下次采图时将重复调用，有无法预知的错误
@@ -376,7 +376,7 @@ namespace Simscop.API
         public static extern int SetEnumerated(int Hndl, string Feature, int Value);
 
         [DllImport("atcore.dll", EntryPoint = "AT_SetEnumeratedString", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int SetEnumeratedString(int Hndl, string Feature, string String);//const AT_WC*
+        public static extern int SetEnumeratedString(int Hndl, string Feature, string String);
 
         [DllImport("atcore.dll", EntryPoint = "AT_GetEnumerated", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
         public static extern int GetEnumerated(int Hndl, string Feature, ref int Value);
@@ -388,7 +388,7 @@ namespace Simscop.API
         public static extern int IsEnumeratedIndexAvailable(int Hndl, string Feature, int Index, ref int Available);
 
         [DllImport("atcore.dll", EntryPoint = "AT_IsEnumeratedIndexImplemented", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
-        public static extern int IsEnumeratedIndexImplemented(int Hndl, string Feature, int Index, ref int Implemented);
+        public static extern int IsEnumeratedIndexImplemented(int Hndl, string Feature, int Index, ref bool Implemented);
 
         [DllImport("atcore.dll", EntryPoint = "AT_GetEnumeratedString", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode)]
         public static extern int GetEnumeratedstring(int Hndl, string Feature, int Index, StringBuilder String, int stringLength);
@@ -479,16 +479,27 @@ namespace Simscop.API
 
     public enum CycleModeEnum
     {
-        //还有其他采集方式，待添加
-        Continuous = 0,
+        Fixed,
+        Continuous,
     }
     public enum PixelEncodingEnum
     {
-        Mono12PACKED,
         Mono12,
+        Mono12Packed,
         Mono16,
-        Mono32,
+        RGB8Packed,
+        Mono12Coded,
+        Mono12CodedPacked,
+        Mono22Parallel,
+        Mono22PackedParallel,
         Mono8,
+        Mono32,
     }
-
+    public enum PixelReadoutRateEnum
+    {
+        TenMHz,
+        OneHundredMHz,
+        TwoHundredMHz,
+        TwoHundredandEightyMHz,
+    }
 }

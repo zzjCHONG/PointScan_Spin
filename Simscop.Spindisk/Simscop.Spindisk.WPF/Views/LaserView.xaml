@@ -44,7 +44,7 @@
                             IsSnapToTickEnabled="True"
                             Maximum="100"
                             TickFrequency="1"
-                            Value="{Binding ChannelAValue,Delay=200}">
+                            Value="{Binding ChannelAValue, Delay=200}">
                             <Slider.Resources>
                                 <LinearGradientBrush x:Key="SliderSelectedBrush" StartPoint="0,0" EndPoint="1,1">
                                     <GradientStop Offset="0" Color="#53aea0" />
@@ -90,7 +90,7 @@
                             IsSnapToTickEnabled="True"
                             Maximum="100"
                             TickFrequency="1"
-                            Value="{Binding ChannelBValue,Delay=200}">
+                            Value="{Binding ChannelBValue, Delay=200}">
                             <Slider.Resources>
                                 <LinearGradientBrush x:Key="SliderSelectedBrush" StartPoint="0,0" EndPoint="1,1">
                                     <GradientStop Offset="0" Color="#479546" />
@@ -136,7 +136,7 @@
                             IsSnapToTickEnabled="True"
                             Maximum="100"
                             TickFrequency="1"
-                            Value="{Binding ChannelCValue,Delay=200}">
+                            Value="{Binding ChannelCValue, Delay=200}">
                             <Slider.Resources>
                                 <LinearGradientBrush x:Key="SliderSelectedBrush" StartPoint="0,0" EndPoint="1,1">
                                     <GradientStop Offset="0" Color="#a4251c" />
@@ -182,7 +182,7 @@
                             IsSnapToTickEnabled="True"
                             Maximum="100"
                             TickFrequency="1"
-                            Value="{Binding ChannelDValue,Delay=200}">
+                            Value="{Binding ChannelDValue, Delay=200}">
                             <Slider.Resources>
                                 <LinearGradientBrush x:Key="SliderSelectedBrush" StartPoint="0,0" EndPoint="1,1">
                                     <GradientStop Offset="0" Color="#872083" />

@@ -35,13 +35,13 @@
                 <StackPanel Margin="5,0">
                     <TextBox
                         Width="70"
-                        Padding="10,0,0,0"
+                        Padding="5,0,0,0"
                         VerticalContentAlignment="Center"
                         AcceptsReturn="True"
                         FontSize="14"
                         IsEnabled="{Binding XEnable}"
                         PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
-                        Text="{Binding X}" />
+                        Text="{Binding X,StringFormat={}{0:F2}}" />
                     <TextBlock
                         Margin="5,5,0,0"
                         HorizontalAlignment="Left"
@@ -53,12 +53,12 @@
                 <StackPanel Margin="5,0">
                     <TextBox
                         Width="70"
-                        Padding="10,0,0,0"
+                        Padding="5,0,0,0"
                         VerticalContentAlignment="Center"
                         FontSize="14"
                         IsEnabled="{Binding YEnable}"
                         PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
-                        Text="{Binding Y}" />
+                        Text="{Binding Y,StringFormat={}{0:F2}}" />
                     <TextBlock
                         Margin="5,5,0,0"
                         HorizontalAlignment="Left"
@@ -70,12 +70,12 @@
                 <StackPanel Margin="5,0">
                     <TextBox
                         Width="70"
-                        Padding="10,0,0,0"
+                        Padding="5,0,0,0"
                         VerticalContentAlignment="Center"
                         FontSize="14"
                         IsEnabled="{Binding ZEnable}"
                         PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
-                        Text="{Binding Z}" />
+                        Text="{Binding Z,StringFormat={}{0:F1}}" />
                     <TextBlock
                         Margin="5,5,0,0"
                         HorizontalAlignment="Left"
@@ -167,7 +167,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalContentAlignment="Center"
                         FontSize="14"
-                        Text="{Binding XyStep}" />
+                        Text="{Binding XyStep,StringFormat={}{0:F1}}" />
                     <TextBlock
                         HorizontalAlignment="Left"
                         FontSize="11"
@@ -183,7 +183,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalContentAlignment="Center"
                         FontSize="14"
-                        Text="{Binding ZStep}" />
+                        Text="{Binding ZStep,StringFormat={}{0:F2}}" />
                     <TextBlock
                         HorizontalAlignment="Left"
                         FontSize="11"
@@ -198,9 +198,10 @@
                         Height="28"
                         Margin="0,10,0,0"
                         Padding="0"
+                        Command="{Binding FocusCommand}"
                         Content="自动对焦"
                         FontSize="12"
-                        IsEnabled="False" />
+                        IsEnabled="True" />
                     <Button
                         Width="60"
                         Height="28"
