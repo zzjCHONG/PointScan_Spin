@@ -26,6 +26,8 @@ public partial class SteerViewModel : ObservableObject
 
     private ConcurrentQueue<Func<bool>> taskQueue;
 
+    SteerViewModel steerVM;
+
     public SteerViewModel()
     {
         _motor = new();
@@ -68,13 +70,17 @@ public partial class SteerViewModel : ObservableObject
         });
 
 
+        ReSetFocus();
+
+        ReSetCustomFocus();
+
         _ = Queue();
     }
 
     private void _timer_Tick(object? sender, EventArgs e)
     {
         _motor.ReadPosition();
-
+        GlobalValue.GlobalMotor = _motor;
         X = _motor.X;
         Y = _motor.Y;
         Z = _motor.Z;
@@ -131,6 +137,105 @@ public partial class SteerViewModel : ObservableObject
     [ObservableProperty]
     private bool _isConnected = false;
 
+    #region 自动对焦餐宿
+    [ObservableProperty]
+    private int _firstCount = 5;
+
+    [ObservableProperty]
+    private int _firstStep = 10;
+
+    [ObservableProperty]
+    private int _seccondCount = 5;
+
+    [ObservableProperty]
+    private int _secondStep = 1;
+
+    [ObservableProperty]
+    private double _cropSize = 0.5;
+
+    [ObservableProperty]
+    private double _threshold = 0.02;
+
+    [ObservableProperty]
+    private int _customFirstCount = 0;
+
+    [ObservableProperty]
+    private int _customFirstStep = 0;
+
+    [ObservableProperty]
+    private int _customSeccondCount = 5;
+
+    [ObservableProperty]
+    private int _customSecondStep = 1;
+
+    [ObservableProperty]
+    private double _customCropSize = 0.5;
+
+    [ObservableProperty]
+    private double _customThreshold = 0.02;
+
+    #endregion
+
+    [RelayCommand]
+    void SetFocus()
+    {
+        GlobalValue.GeneralFocus = AutoFocus.Create();
+        GlobalValue.GeneralFocus.FirstCount = FirstCount;
+        GlobalValue.GeneralFocus.FirstStep = FirstStep;
+        GlobalValue.GeneralFocus.SeccondCount = SeccondCount;
+        GlobalValue.GeneralFocus.SecondStep = SecondStep;
+        GlobalValue.GeneralFocus.Threshold = Threshold;
+        GlobalValue.GeneralFocus.CropSize = CropSize;
+    }
+
+    [RelayCommand]
+    void ReSetFocus()
+    {
+        GlobalValue.GeneralFocus = AutoFocus.Create();
+        FirstCount = 5;
+        FirstStep = 10;
+        SeccondCount = 5;
+        SecondStep = 1;
+        Threshold = 0.02;
+        CropSize = 0.5;
+        GlobalValue.GeneralFocus.FirstCount = FirstCount;
+        GlobalValue.GeneralFocus.FirstStep = FirstStep;
+        GlobalValue.GeneralFocus.SeccondCount = SeccondCount;
+        GlobalValue.GeneralFocus.SecondStep = SecondStep;
+        GlobalValue.GeneralFocus.Threshold = Threshold;
+        GlobalValue.GeneralFocus.CropSize = CropSize;
+    }
+
+    [RelayCommand]
+    void SetCustomFocus()
+    {
+        GlobalValue.CustomFocus = AutoFocus.Create();
+        GlobalValue.CustomFocus.FirstCount = CustomFirstCount;
+        GlobalValue.CustomFocus.FirstStep = CustomFirstStep;
+        GlobalValue.CustomFocus.SeccondCount = CustomSeccondCount;
+        GlobalValue.CustomFocus.SecondStep = CustomSecondStep;
+        GlobalValue.CustomFocus.Threshold = CustomThreshold;
+        GlobalValue.CustomFocus.CropSize = CustomCropSize;
+    }
+
+    [RelayCommand]
+    void ReSetCustomFocus()
+    {
+        GlobalValue.CustomFocus = AutoFocus.Create();
+        CustomFirstCount = 0;
+        CustomFirstStep = 0;
+        CustomSeccondCount = 5;
+        CustomSecondStep = 1;
+        CustomThreshold = 0.02;
+        CustomCropSize = 0.5;
+        GlobalValue.CustomFocus.FirstCount = CustomFirstCount;
+        GlobalValue.CustomFocus.FirstStep = CustomFirstStep;
+        GlobalValue.CustomFocus.SeccondCount = CustomSeccondCount;
+        GlobalValue.CustomFocus.SecondStep = CustomSecondStep;
+        GlobalValue.CustomFocus.Threshold = CustomThreshold;
+        GlobalValue.CustomFocus.CropSize = CustomCropSize;
+    }
+
     [RelayCommand]
     void PositionToZero()
         => _motor.ResetPosition();
@@ -142,31 +247,17 @@ public partial class SteerViewModel : ObservableObject
 
         Task.Run(() =>
         {
-            focus = AutoFocus.Create();
-            focus.FirstCount = 5;
-            focus.FirstStep = 10;
-            focus.SeccondCount = 5;
-            focus.SecondStep = 1;
-            focus.Threshold = 0.02;
-            focus.CropSize = 0.5;
-            focus.Focus();
+            GlobalValue.GeneralFocus.Focus();
         });
     }
 
-    void MicroFocus()
+    void CustomFocus()
     {
         Thread.Sleep(100);
 
         Task.Run(() =>
         {
-            focus = AutoFocus.Create();
-            focus.FirstCount = 4;
-            focus.FirstStep = 5;
-            focus.SeccondCount = 5;
-            focus.SecondStep = 1;
-            focus.Threshold = 0.02;
-            focus.CropSize = 0.5;
-            focus.Focus();
+            GlobalValue.CustomFocus.Focus() ;
         });
     }
 
