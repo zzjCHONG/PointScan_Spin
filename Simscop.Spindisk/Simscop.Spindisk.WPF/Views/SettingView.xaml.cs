@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using Simscop.Spindisk.Core.Messages;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,11 +16,11 @@ using System.Windows.Shapes;
 namespace Simscop.Spindisk.WPF.Views
 {
     /// <summary>
-    /// Interaction logic for ScanView.xaml
+    /// SettingView.xaml 的交互逻辑
     /// </summary>
-    public partial class ScanView : Window
+    public partial class SettingView : Window
     {
-        public ScanView()
+        public SettingView()
         {
             InitializeComponent();
         }
@@ -35,24 +33,23 @@ namespace Simscop.Spindisk.WPF.Views
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            TabItem selectedTabItem = ScanTabControl.SelectedItem as TabItem;
-
-            if (selectedTabItem != null)
+            TabControl? tabControl = sender as TabControl;
+            if (tabControl != null && tabControl.SelectedItem != null)
             {
-                if (selectedTabItem.Name == "XYScanItem")
+                TabItem? selectedTab = tabControl.SelectedItem as TabItem;
+                if (selectedTab != null)
                 {
-                    this.Height = 390; 
-                }
-                else if (selectedTabItem.Name == "ZScanItem")
-                {
-                    this.Height = 320;
+
+                    if (selectedTab.Header.ToString() == "常规对焦")
+                    {
+
+                    }
+                    else if (selectedTab.Header.ToString() == "自定义对焦")
+                    {
+
+                    }
                 }
             }
-        }
-
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            WeakReferenceMessenger.Default.Send<string>(SteerMessage.Setting);
         }
     }
 }

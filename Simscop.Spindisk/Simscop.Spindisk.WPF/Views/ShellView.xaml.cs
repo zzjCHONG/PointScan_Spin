@@ -37,6 +37,7 @@ namespace Simscop.Spindisk.WPF.Views
         private DateTime lastTime = DateTime.Now;
 
         private CameraView cameraView;
+        private SettingView settingView;
         private ExampleView exampleView;
 
         public static ShellView Instance
@@ -64,8 +65,8 @@ namespace Simscop.Spindisk.WPF.Views
             cameraVM = new CameraViewModel();
             shellVM = new ShellViewModel();
             spinVM = new SpinViewModel();
-            scanVM = new ScanViewModel();
             steerVM = new SteerViewModel();
+            scanVM = new ScanViewModel();
             laserVM = new LaserViewModel();
             exampleVM = new ExampleViewModel()
             {
@@ -77,7 +78,12 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 DataContext = cameraVM,
             };
-            
+
+            settingView = new()
+            {
+                DataContext = steerVM,
+            };
+
             exampleView = new()
             {
                 DataContext = exampleVM,
@@ -90,7 +96,12 @@ namespace Simscop.Spindisk.WPF.Views
             WeakReferenceMessenger.Default.Register<MainDisplayMessage>(this, (o, m) =>
             {
                 RemotePicDown(m.Index);
-            });  
+            });
+
+            WeakReferenceMessenger.Default.Register<string>(SteerMessage.Setting, (s, e) =>
+            {
+                settingView.Show();
+            });
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -169,9 +180,8 @@ namespace Simscop.Spindisk.WPF.Views
         // TODO 这里的卡顿问题已经定位了，原因就是在给datacontext的时候数据变化和赋值原因，解决办法挺简单的，单个窗口重复利用就行，但是这里目前就卡着吧，有空再改
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            cameraView.Show();
-            cameraView.Topmost = true;
-            cameraView.Topmost = false;
+            settingView.Show();
+            settingView.Topmost = true;
         }
 
 
@@ -200,6 +210,11 @@ namespace Simscop.Spindisk.WPF.Views
             exampleView.Topmost = false;
         }
 
+        private void LevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<UI.Controls.RangeValue> e)
+        {
+
+        }
+    
     }
 
 }

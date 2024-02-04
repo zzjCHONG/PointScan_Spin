@@ -29,6 +29,8 @@ namespace Simscop.Spindisk.Core.Models
                     if (focus == null)
                     {
                         focus = new AutoFocus();
+                        GlobalValue.GeneralFocus = focus;
+                        GlobalValue.GeneralFocus = focus;
 
                         WeakReferenceMessenger.Default.Send<string>(SteerMessage.MotorReceive);
 
@@ -39,7 +41,6 @@ namespace Simscop.Spindisk.Core.Models
             return focus;
         }
 
-        Andor _andor = new Andor();
 
         ASIMotor _motor;
 
