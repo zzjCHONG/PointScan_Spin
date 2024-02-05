@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Simscop.Spindisk.WPF.Views
 {
     /// <summary>
-    /// ConnectState.xaml 的交互逻辑
+    /// MultiChannelPreview.xaml 的交互逻辑
     /// </summary>
-    public partial class ConnectState : Window
+    public partial class MultiChannelPreview : Window
     {
-        public ConnectState()
+        public MultiChannelPreview()
         {
             InitializeComponent();
         }

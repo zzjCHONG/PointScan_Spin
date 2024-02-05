@@ -66,12 +66,30 @@ public partial class LaserViewModel : ObservableObject
         // todo 这里初始化laser并且准备好Laser本身的数据
         Laser = new BogaoLaser();
         GlobalValue.GlobalLaser = Laser;
-        Init();
+
+        WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) => 
+        { 
+            if (m.isPreInit) LaserInit(); 
+        });
     }
 
-    void Init()
+    [ObservableProperty]
+    private bool _isConnected=false;
+
+    [ObservableProperty]
+    private bool _isConnecting=true;
+
+    partial void OnIsConnectingChanged(bool value)
     {
-        Laser.Init();
+        if (!value)
+            WeakReferenceMessenger.Default.Send<LaserConnectMessage>(new LaserConnectMessage(IsConnected, value));
+    }
+
+    void LaserInit()
+    {
+        IsConnecting = true;
+        IsConnected= Laser.Init();
+        IsConnecting = false;
 
         if (Laser.GetStatus(0, out var aStatus) &&
             Laser.GetStatus(1, out var bStatus) &&

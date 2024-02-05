@@ -9,7 +9,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.Models;
@@ -95,7 +95,6 @@ public partial class ShellViewModel : ObservableObject
             Debug.WriteLine($"ShellViewModel {m.Index} - {m.Status}");
         });
 
-
         WeakReferenceMessenger.Default.Register<DisplayFrame, string>(this, "Display", (s, m) =>
         {
             Application.Current?.Dispatcher.Invoke(() =>
@@ -106,5 +105,17 @@ public partial class ShellViewModel : ObservableObject
                 DisplayCurrent.Original = img.Clone();
             });
         });
+
+        WeakReferenceMessenger.Default.Register<MultiChannelSaveMessage>(this, (s, m) =>
+        {
+            DisplayCurrent.ColorMode = m.codeModel;//多通道采图传来的伪彩通道
+        });
+
+        WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.DisplayFrame, (s, m) =>
+        {
+            if (DisplayCurrent.Frame != null)
+                DisplayCurrent.Frame.Clone().ToMat().SaveImage(m);//多通道存图
+        });
+
     }
 }

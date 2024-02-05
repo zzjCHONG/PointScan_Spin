@@ -29,20 +29,32 @@ public partial class SteerViewModel : ObservableObject
     public SteerViewModel()
     {
         _motor = new();
-
         GlobalValue.GlobalMotor = _motor;
 
         _timer = new DispatcherTimer(priority: DispatcherPriority.Background)
         {
             Interval = TimeSpan.FromSeconds(0.1),
         };
-        Task.Run(() =>
-        {
-            IsConnected = _motor.InitializeMotor();
-            _timer.Tick += _timer_Tick;
-            if (IsConnected) _timer.Start();
+        _timer.Tick += _timer_Tick;
 
+        WeakReferenceMessenger.Default.Register<SteerInitMessage>(this, (o, m) => 
+        { 
+            if (m.isPreInit) SteerInit(); 
         });
+    }
+
+    partial void OnIsConnectingChanged(bool value)
+    {
+        if (!value)
+            WeakReferenceMessenger.Default.Send<SteerConnectMessage>(new SteerConnectMessage(IsConnected, value));
+    }
+
+    private void SteerInit()
+    {
+        IsConnecting = true;
+        IsConnected = _motor.InitializeMotor();   
+        if (IsConnected) _timer.Start();
+        IsConnecting = false;
 
         WeakReferenceMessenger.Default.Register<string, string>(this, SteerMessage.MoveX, (s, e) =>
         {
@@ -66,7 +78,6 @@ public partial class SteerViewModel : ObservableObject
         {
             WeakReferenceMessenger.Default.Send<ASIMotor, string>(_motor, SteerMessage.Motor);
         });
-
 
         _ = Queue();
     }
@@ -130,6 +141,9 @@ public partial class SteerViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isConnected = false;
+
+    [ObservableProperty]
+    private bool _isConnecting=true;
 
     [RelayCommand]
     void PositionToZero()

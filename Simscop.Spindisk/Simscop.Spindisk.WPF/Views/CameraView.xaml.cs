@@ -26,7 +26,6 @@ namespace Simscop.Spindisk.WPF.Views
             InitializeComponent();
         }
 
-
         protected override void OnClosing(CancelEventArgs e)
         {
             this.Hide();

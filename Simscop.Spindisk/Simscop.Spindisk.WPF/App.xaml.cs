@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
 using OpenCvSharp;
+using Simscop.Spindisk.Core.ViewModels;
 using Simscop.Spindisk.WPF.Views;
 
 namespace Simscop.Spindisk.WPF
@@ -38,29 +39,22 @@ namespace Simscop.Spindisk.WPF
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            //var view = new ShellView()
-            //{
-            //    //DataContext = new ShellViewModel(),
-            //};
-            //view.Show();
-
             System.Threading.Mutex mutex = new System.Threading.Mutex(true, "Simscop.Spindisk.WPF",out bool ret);
             if (!ret)
             {
-                Environment.Exit(1);
+                 Environment.Exit(1);
             }
             else
             {
-                ShellView.Instance.Show();      
-            }    
-        }
+                ShellView.Instance.Show();  
+            }
 
-        public static class Motor
-        {
+            var conView = new ConnectStateView();
+            var ConVm = new ConnectStateViewModel();
+            conView.DataContext = ConVm;
+            conView.Show();
 
         }
 
     }
-
-
 }

@@ -162,7 +162,7 @@ public partial class DisplayModel : ObservableObject
 
     void TempFrameDo()
     {
-        if(ValidMat(Display))
+        if (ValidMat(Display))
             Frame = BitmapFrame.Create(Display.ApplyColor(ColorMode).ToBitmapSource());
     }
 

@@ -1,30 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using CommunityToolkit.Mvvm.Messaging;
-using OpenCvSharp.WpfExtensions;
-using Simscop.Spindisk.Core;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.ViewModels;
 
 namespace Simscop.Spindisk.WPF.Views
 {
-
     /// <summary>
     /// Interaction logic for ShellView.xaml
     /// </summary>
     public partial class ShellView : Window
     {
+        private int frameCount = 0;
+        private DateTime lastTime = DateTime.Now;
+
         private CameraViewModel cameraVM;
         private SpinViewModel spinVM;
         private ShellViewModel shellVM;
@@ -32,12 +24,12 @@ namespace Simscop.Spindisk.WPF.Views
         private LaserViewModel laserVM;
         private ExampleViewModel exampleVM;
         private ScanViewModel scanVM;
-
-        private int frameCount = 0;
-        private DateTime lastTime = DateTime.Now;
-
+        private MultiChannelPreviewViewModel multiChannelPreviewVM;
+        private MultiChannelSaveViewModel multiChannelSaveVM;
         private CameraView cameraView;
         private ExampleView exampleView;
+        private MultiChannelSave multiChannelSaveView;
+        private MultiChannelPreview multiChannelPreview;
 
         public static ShellView Instance
         {
@@ -67,6 +59,8 @@ namespace Simscop.Spindisk.WPF.Views
             scanVM = new ScanViewModel();
             steerVM = new SteerViewModel();
             laserVM = new LaserViewModel();
+            multiChannelPreviewVM = new MultiChannelPreviewViewModel();
+            multiChannelSaveVM= new MultiChannelSaveViewModel();
             exampleVM = new ExampleViewModel()
             {
                 CameraVM = cameraVM,
@@ -77,10 +71,17 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 DataContext = cameraVM,
             };
-            
             exampleView = new()
             {
                 DataContext = exampleVM,
+            };
+            multiChannelPreview = new ()
+            {
+                DataContext= multiChannelPreviewVM,
+            };
+            multiChannelSaveView = new()
+            {
+                DataContext = multiChannelSaveVM,
             };
 
             SetDataContext();
@@ -90,7 +91,7 @@ namespace Simscop.Spindisk.WPF.Views
             WeakReferenceMessenger.Default.Register<MainDisplayMessage>(this, (o, m) =>
             {
                 RemotePicDown(m.Index);
-            });  
+            });
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -174,7 +175,6 @@ namespace Simscop.Spindisk.WPF.Views
             cameraView.Topmost = false;
         }
 
-
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
@@ -198,6 +198,21 @@ namespace Simscop.Spindisk.WPF.Views
             exampleView.Show();
             exampleView.Topmost = true;
             exampleView.Topmost = false;
+        }
+
+        private void MultiChannelSave_OnClick(object sender, RoutedEventArgs e)
+        {
+            multiChannelSaveView.Show();
+            multiChannelSaveView.Topmost = true;
+            multiChannelSaveView.Topmost = false;
+        }
+
+
+        private void MultiChannelPreview_OnClick(object sender, RoutedEventArgs e)
+        {
+            multiChannelPreview.Show();
+            multiChannelPreview.Topmost = true;
+            multiChannelPreview.Topmost = false;
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenCvSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,7 @@ public static class MessageManage
     /// <summary>
     /// 只保存一个，只支持TIF
     /// </summary>
-    public const string SaveACapture = "SaveACaptureMessage";
+    public const string SaveACapture = "SaveACaptureMessage";//原图
 
     /// <summary>
     /// 当前显示frame数据
@@ -58,11 +59,6 @@ public static class SteerMessage
     }
 }
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Index"></param>
-/// <param name="Status"></param>
 public record LaserMessage(int Index, bool Status);
 
 public record SpindiskMessage(int Mode);
@@ -73,3 +69,31 @@ public record SpindiskMessage(int Mode);
 /// </summary>
 /// <param name="Index"></param>
 public record MainDisplayMessage(int Index);
+
+/// <summary>
+/// 设备初始化
+/// 相机
+/// </summary>
+/// <param name="isPreInit"></param>
+public record CameraInitMessage(bool isPreInit);
+
+public record LaserInitMessage(bool isPreInit);
+
+public record SteerInitMessage(bool isPreInit);
+
+public record SpinInitMessage(bool isPreInit);
+
+public record CameraConnectMessage(bool isConnected, bool isConnecting);
+
+public record LaserConnectMessage(bool isConnected, bool isConnecting);
+
+public record SteerConnectMessage(bool isConnected, bool isConnecting);
+
+public record SpinConnectMessage(bool isConnected, bool isConnecting);
+
+/// <summary>
+/// 多通道采集-伪彩通道
+/// </summary>
+/// <param name="codeModel"></param>
+public record MultiChannelSaveMessage(int codeModel);
+

@@ -12,7 +12,7 @@
     Height="700"
     MaxWidth="520"
     d:DataContext="{d:DesignInstance vm:CameraViewModel}"
-    ResizeMode="CanResize"
+    ResizeMode="NoResize"
     Style="{StaticResource TipWindow}"
     Topmost="True"
     mc:Ignorable="d">

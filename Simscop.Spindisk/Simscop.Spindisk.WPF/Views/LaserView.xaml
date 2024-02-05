@@ -206,8 +206,7 @@
 
                 </Grid>
             </StackPanel>
-
-
         </UniformGrid>
+
     </StackPanel>
 </UserControl>

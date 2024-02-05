@@ -18,5 +18,6 @@ public static class GlobalValue
 
     public static ILaser? GlobalLaser;
 
-    public static XLight? GlobalSpin;
+    //public static XLight? GlobalSpin;//静态类
+
 }

@@ -1,0 +1,230 @@
+﻿<Window
+    x:Class="Simscop.Spindisk.WPF.Views.MultiChannelSave"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:Simscop.Spindisk.Core.Models;assembly=Simscop.Spindisk.Core"
+    xmlns:vm="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
+    Title="MultiChannelSave"
+    Width="500"
+    Height="350"
+    d:DataContext="{d:DesignInstance vm:MultiChannelSaveViewModel}"
+    Style="{StaticResource BlankWindow}"
+    mc:Ignorable="d">
+
+    <StackPanel>
+        <StackPanel>
+            <Grid Margin="5,30,10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    FontSize="13"
+                    FontWeight="Bold"
+                    Foreground="#FFFBF8F8"
+                    Text="是否存图" />
+                <TextBlock
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    FontSize="13"
+                    FontWeight="Bold"
+                    Foreground="#FFFBF4F4"
+                    Text="是否添加颜色" />
+                <TextBlock
+                    Grid.Column="2"
+                    HorizontalAlignment="Center"
+                    FontSize="13"
+                    FontWeight="Bold"
+                    Foreground="#FFF7F2F2"
+                    Text="伪彩选择" />
+            </Grid>
+        </StackPanel>
+        <Separator Margin="10,0,10,0" Background="{DynamicResource Region01}" />
+
+        <UniformGrid
+            Height="240"
+            Margin="5"
+            Rows="4">
+            <StackPanel>
+                <TextBlock
+                    Margin="10,0,0,5"
+                    HorizontalAlignment="Left"
+                    FontSize="10"
+                    Foreground="#FFFBFAFA"
+                    Text="DAPI-405nm" />
+
+                <Grid Margin="5,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelASave}"
+                        IsEnabled="True"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelAColored}"
+                        IsEnabled="{Binding IsChannelASave}"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <ComboBox
+                        Grid.Column="2"
+                        IsEnabled="{Binding IsChannelAColored}"
+                        ItemsSource="{x:Static models:MatExtension.Colors}"
+                        SelectedIndex="{Binding ColorModeA}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock
+                    Margin="10,0,0,5"
+                    HorizontalAlignment="Left"
+                    FontSize="10"
+                    Foreground="#FFFBFAFA"
+                    Text="FITC-488nm" />
+
+                <Grid Margin="5,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelBSave}"
+                        IsEnabled="True"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelBColored}"
+                        IsEnabled="{Binding IsChannelBSave}"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <ComboBox
+                        Grid.Column="2"
+                        IsEnabled="{Binding IsChannelBColored}"
+                        ItemsSource="{x:Static models:MatExtension.Colors}"
+                        SelectedIndex="{Binding ColorModeB}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock
+                    Margin="10,0,0,5"
+                    HorizontalAlignment="Left"
+                    FontSize="10"
+                    Foreground="#FFFBF6F6"
+                    Text="TRITC-561nm" />
+
+                <Grid Margin="5,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelCSave}"
+                        IsEnabled="True"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelCColored}"
+                        IsEnabled="{Binding IsChannelCSave}"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <ComboBox
+                        Grid.Column="2"
+                        IsEnabled="{Binding IsChannelCColored}"
+                        ItemsSource="{x:Static models:MatExtension.Colors}"
+                        SelectedIndex="{Binding ColorModeC}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock
+                    Margin="10,0,0,5"
+                    HorizontalAlignment="Left"
+                    FontSize="10"
+                    Foreground="#FFF9F9F9"
+                    Text="CY5-640nm" />
+
+                <Grid Margin="5,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelDSave}"
+                        IsEnabled="True"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChannelDColored}"
+                        IsEnabled="{Binding IsChannelDSave}"
+                        Style="{StaticResource SwitchCheckBox}" />
+                    <ComboBox
+                        Grid.Column="2"
+                        IsEnabled="{Binding IsChannelDColored}"
+                        ItemsSource="{x:Static models:MatExtension.Colors}"
+                        SelectedIndex="{Binding ColorModeD}" />
+                </Grid>
+            </StackPanel>
+
+        </UniformGrid>
+
+        <StackPanel>
+            <Grid Margin="5,0,10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Command="{Binding OpenFileDialogCommand}"
+                    Content="选择文件夹"
+                    DockPanel.Dock="Right" />
+                <TextBox
+                    Grid.Column="1"
+                    Margin="2,0,2,0"
+                    FontSize="12"
+                    Text="{Binding Root}" />
+                <Button
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Command="{Binding SaveMultiChannelCommand}"
+                    Content="保存"
+                    DockPanel.Dock="Right" />
+            </Grid>
+        </StackPanel>
+    </StackPanel>
+
+</Window>

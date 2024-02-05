@@ -41,7 +41,7 @@
                         FontSize="14"
                         IsEnabled="{Binding XEnable}"
                         PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
-                        Text="{Binding X,StringFormat={}{0:F2}}" />
+                        Text="{Binding X, StringFormat={}{0:F2}}" />
                     <TextBlock
                         Margin="5,5,0,0"
                         HorizontalAlignment="Left"
@@ -58,7 +58,7 @@
                         FontSize="14"
                         IsEnabled="{Binding YEnable}"
                         PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
-                        Text="{Binding Y,StringFormat={}{0:F2}}" />
+                        Text="{Binding Y, StringFormat={}{0:F2}}" />
                     <TextBlock
                         Margin="5,5,0,0"
                         HorizontalAlignment="Left"
@@ -75,7 +75,7 @@
                         FontSize="14"
                         IsEnabled="{Binding ZEnable}"
                         PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
-                        Text="{Binding Z,StringFormat={}{0:F1}}" />
+                        Text="{Binding Z, StringFormat={}{0:F1}}" />
                     <TextBlock
                         Margin="5,5,0,0"
                         HorizontalAlignment="Left"
@@ -167,7 +167,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalContentAlignment="Center"
                         FontSize="14"
-                        Text="{Binding XyStep,StringFormat={}{0:F1}}" />
+                        Text="{Binding XyStep, StringFormat={}{0:F1}}" />
                     <TextBlock
                         HorizontalAlignment="Left"
                         FontSize="11"
@@ -183,7 +183,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalContentAlignment="Center"
                         FontSize="14"
-                        Text="{Binding ZStep,StringFormat={}{0:F2}}" />
+                        Text="{Binding ZStep, StringFormat={}{0:F2}}" />
                     <TextBlock
                         HorizontalAlignment="Left"
                         FontSize="11"

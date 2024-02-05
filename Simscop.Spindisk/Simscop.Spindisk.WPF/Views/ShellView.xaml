@@ -42,6 +42,15 @@
                 <Image Source="../Image/logo.png" />
             </Viewbox>-->
 
+            <Menu>
+                <!--  主菜单项  -->
+                <MenuItem Header="文件">
+                    <!--  子菜单项1  -->
+                    <MenuItem Click="MultiChannelSave_OnClick" Header="多通道采图--导出" />
+                    <!--  子菜单项2  -->
+                    <MenuItem Click="MultiChannelPreview_OnClick" Header="多通道采图--预览" />
+                </MenuItem>
+            </Menu>
 
             <Button
                 Margin="5,0"
@@ -85,8 +94,6 @@
                 WindowChrome.IsHitTestVisibleInChrome="False" />
 
         </StackPanel>
-
-
 
         <!--  客户区  -->
         <Grid Grid.Row="1">

@@ -30,7 +30,7 @@
                 Content="O 连接"
                 DockPanel.Dock="Right"
                 IsChecked="{Binding IsConnected}"
-                IsEnabled="{Binding IsConnecting}"
+                IsEnabled="{Binding IsConnectEnable}"
                 Style="{StaticResource CheckBoxAsButton}" />
 
             <Viewbox>
