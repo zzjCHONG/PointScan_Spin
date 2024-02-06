@@ -37,19 +37,19 @@ namespace Simscop.Spindisk.Core.ViewModels
             });
             WeakReferenceMessenger.Default.Register<LaserConnectMessage>(this, (o, m) =>
             {
-                _isLaserConnected = m.isConnected;
+                IsLaserConnected = m.isConnected;
                 IsLaserConnecting = m.isConnecting;
                 LaserText();
             });
             WeakReferenceMessenger.Default.Register<SteerConnectMessage>(this, (o, m) =>
             {
-                _isSteerConnected = m.isConnected;
+                IsSteerConnected = m.isConnected;
                 IsSteerConnecting = m.isConnecting;
                 SteerText();
             });
             WeakReferenceMessenger.Default.Register<SpinConnectMessage>(this, (o, m) =>
             {
-                _isSpinConnected = m.isConnected;
+                IsSpinConnected = m.isConnected;
                 IsSpinConnecting = m.isConnecting;
                 SpinText();
             });

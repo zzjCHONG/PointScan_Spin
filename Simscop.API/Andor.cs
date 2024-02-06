@@ -237,6 +237,20 @@ namespace Simscop.API
         }
 
         /// <summary>
+        /// 设置灵敏度与动态范围 
+        /// Sensitivity/Dynamic Range；追求高动态范围请选 16-bit/追求采集速度请选 12-bit
+        /// </summary>
+        /// <param name="simplePreAmpGainControl"></param>
+        /// <returns></returns>
+        private bool SetSimplePreAmpGainControl(SimplePreAmpGainControlEnum simplePreAmpGainControl)
+        {
+            //AcqStopCommand();
+            if (!AssertRet(AndorAPI.SetEnumIndex(Hndl, "SimplePreAmpGainControl", (int)simplePreAmpGainControl))) return false;
+            //AcqStartCommand();
+            return true;
+        }
+
+        /// <summary>
         /// 设置噪声滤波
         /// </summary>
         /// <returns></returns>
@@ -500,6 +514,8 @@ namespace Simscop.API
                 matImg = new Mat(ImageHeight, ImageWidth, matType);
                 Marshal.Copy(GlobalFramePtr, imageBytes, 0, imageBytes.Length);
                 Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
+
+                matImg.Flip(FlipMode.Y);
 
                 //4-Re-queue the buffers
                 if (AlignedBuffers == null)
