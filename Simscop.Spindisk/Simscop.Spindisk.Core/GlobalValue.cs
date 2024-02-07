@@ -1,5 +1,6 @@
 ﻿using OpenCvSharp;
 using Simscop.API;
+using Simscop.Spindisk.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,9 @@ public static class GlobalValue
 
     public static ILaser? GlobalLaser;
 
-    //public static XLight? GlobalSpin;//静态类
+    public static XLight? GlobalSpin;
 
+    public static AutoFocus? GeneralFocus;
+
+    public static AutoFocus? CustomFocus;
 }

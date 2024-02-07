@@ -30,8 +30,8 @@ public class TestCamera : ICamera
     {
         var paths = new List<string>()
         {
-            @"C:\Users\Administrator\Pictures\Camera Roll\1.jpg",
-
+            //"C:/Users/DELL/Desktop/Y_-15800_X_-1800.TIF",
+            @"C:\\Users\\Administrator\\Pictures\\Camera Roll\\1.jpg"
         };
 
         Total = paths.Count;
@@ -129,11 +129,9 @@ public partial class CameraViewModel : ObservableObject
         "NONE"
     };
 
-    //private Mat? CurrentFrameforSaving { get; set; }
-
     public CameraViewModel()
     {
-        Camera = new TestCamera();
+        Camera = new Andor();
         GlobalValue.GlobalCamera = Camera;
 
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture, (s, e) =>
@@ -142,7 +140,6 @@ public partial class CameraViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.SaveACapture, (s, e) =>
         {
             if (IsCapture)
-                //CurrentFrameforSaving?.SaveImage(e);
                 GlobalValue.CurrentFrame?.SaveImage(e);
         });
 
@@ -172,7 +169,7 @@ public partial class CameraViewModel : ObservableObject
             WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value));
     }
 
-    bool CameraInit()
+    bool CameraInit()//初始化
     {
         IsConnecting = true;
         IsInit = Camera.Init();
@@ -187,21 +184,24 @@ public partial class CameraViewModel : ObservableObject
         }
         else
         {
+            IsNoBusy = false;//初始化不成功
             return false;
         }
     }
 
     [RelayCommand]
-    void Init()
+    void Init()//按键
     {      
         IsNoBusy = false;
         if (!IsInit)
         {
             Task.Run(() =>
             {
-                if (!CameraInit()) return;
-                IsCapture = Camera.StartCapture();
-                IsStartAcquisition = true;
+                if (CameraInit())
+                {
+                    IsCapture = Camera.StartCapture();
+                    IsStartAcquisition = true;
+                }
                 IsNoBusy = true;
             });
         }
@@ -223,7 +223,7 @@ public partial class CameraViewModel : ObservableObject
     [ObservableProperty]
     private bool _isStartAcquisition = false;
 
-    partial void OnIsStartAcquisitionChanged(bool value)
+    partial void OnIsStartAcquisitionChanged(bool value)//显示
     {
         if (IsStartAcquisition)
         {
@@ -235,9 +235,7 @@ public partial class CameraViewModel : ObservableObject
                     {
                         if (Camera.Capture(out var mat))
                         {
-                            //CurrentFrameforSaving = mat.Clone();
                             GlobalValue.CurrentFrame = mat.Clone();
-
                             WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
                             {
                                 Image = mat,
@@ -259,12 +257,21 @@ public partial class CameraViewModel : ObservableObject
 
     partial void OnExposureChanged(double value)
     {
-        Camera.SetExposure(value);
-        Camera.GetFrameRate(out _frameRate);
+
     }
 
+    [ObservableProperty]
+    private bool isExposureSettingEnable=true;
+
     [RelayCommand]
-    void SetExposure() => Camera.SetExposure(Exposure);//未绑定
+    void SetExposure()
+    {
+        IsExposureSettingEnable = false;
+        Camera.SetExposure(Exposure);
+        Camera.GetFrameRate(out var rate);
+        FrameRate = rate;
+        IsExposureSettingEnable = true;
+    }       
 
     #region File
 

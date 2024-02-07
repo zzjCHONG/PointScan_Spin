@@ -1,17 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using Lift.Core.Autofocus;
 using Lift.Core.Autofocus.Drivers;
 using Lift.Core.ImageArray.Extensions;
 using OpenCvSharp;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Simscop.Spindisk.Core.Models
 {
@@ -29,23 +24,20 @@ namespace Simscop.Spindisk.Core.Models
                     if (focus == null)
                     {
                         focus = new AutoFocus();
+                        GlobalValue.GeneralFocus = focus;
+                        GlobalValue.CustomFocus = focus;
 
                         WeakReferenceMessenger.Default.Send<string>(SteerMessage.MotorReceive);
-
-
                     }
                 }
             }
             return focus;
         }
 
-        Andor _andor = new Andor();
-
         ASIMotor _motor;
 
         private AutoFocus()
-        {
-            
+        {            
             WeakReferenceMessenger.Default.Register<ASIMotor, string>(this, SteerMessage.Motor, (s, e) =>
             {
                 _motor = e;
@@ -77,8 +69,6 @@ namespace Simscop.Spindisk.Core.Models
             z = _motor.Z;
             return true;
         }
-
-
 
         public override bool SetPosition(double z)
         {

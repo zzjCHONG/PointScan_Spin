@@ -1,6 +1,9 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Simscop.Spindisk.Core.Messages;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +32,29 @@ namespace Simscop.Spindisk.WPF.Views
         {
             this.Hide();
             e.Cancel = true;
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TabItem selectedTabItem = ScanTabControl.SelectedItem as TabItem;
+
+            if (selectedTabItem != null)
+            {
+                if (selectedTabItem.Name == "XYScanItem")
+                {
+                    this.Height = 390; 
+                }
+                else if (selectedTabItem.Name == "ZScanItem")
+                {
+                    this.Height = 320;
+                }
+            }
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("@#$#%^^&%^*%@#$!@$&&^(&($$#@#%#$^%*&^(*)*())%^*&%^");
+            WeakReferenceMessenger.Default.Send<string>(SteerMessage.Setting);
         }
     }
 }

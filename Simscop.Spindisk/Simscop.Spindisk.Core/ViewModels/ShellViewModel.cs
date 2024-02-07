@@ -2,15 +2,11 @@
 
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using OpenCvSharp.WpfExtensions;
-using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.Models;
 
@@ -106,13 +102,14 @@ public partial class ShellViewModel : ObservableObject
             });
         });
 
-        WeakReferenceMessenger.Default.Register<MultiChannelSaveMessage>(this, (s, m) =>
+        WeakReferenceMessenger.Default.Register<MultiChannelSaveShellMessage>(this, (s, m) =>
         {
             DisplayCurrent.ColorMode = m.codeModel;//多通道采图传来的伪彩通道
         });
 
         WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.DisplayFrame, (s, m) =>
         {
+            if (File.Exists(m)) File.Delete(m);//覆盖
             if (DisplayCurrent.Frame != null)
                 DisplayCurrent.Frame.Clone().ToMat().SaveImage(m);//多通道存图
         });

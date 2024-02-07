@@ -182,6 +182,7 @@
                                 Margin="5,0,10,10"
                                 HorizontalAlignment="Stretch"
                                 Command="{Binding SetExposureCommand}"
+                                IsEnabled="{Binding IsExposureSettingEnable}"
                                 Content="设置曝光"
                                 DockPanel.Dock="Right" />
                         </UniformGrid>

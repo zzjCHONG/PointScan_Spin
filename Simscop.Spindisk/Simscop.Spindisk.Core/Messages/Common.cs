@@ -48,6 +48,8 @@ public static class SteerMessage
 
     public const string MotorReceive = "MotorReceiveMessage";
 
+    public const string Setting = "SettingMessage";
+
     public static string? GetValue(string name)
     {
         var type = typeof(SteerMessage);
@@ -95,5 +97,12 @@ public record SpinConnectMessage(bool isConnected, bool isConnecting);
 /// 多通道采集-伪彩通道
 /// </summary>
 /// <param name="codeModel"></param>
-public record MultiChannelSaveMessage(int codeModel);
+public record MultiChannelSaveShellMessage(int codeModel);
+
+/// <summary>
+/// 多通道采集-激光通道触发
+/// </summary>
+/// <param name="channel"></param>
+/// <param name="isEnable"></param>
+public record MultiChannelSaveLaserMessage(int channel,bool isEnable);
 

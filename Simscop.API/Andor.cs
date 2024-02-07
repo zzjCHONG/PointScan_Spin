@@ -108,7 +108,7 @@ namespace Simscop.API
         /// <returns></returns>
         public bool InitializeCamera(int cameraId = 0)
         {
-            if (Hndl != 0) return true;//已经成功获得相机句柄
+            if (Hndl > 0) return true;//已经成功获得相机句柄
 
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
@@ -515,7 +515,7 @@ namespace Simscop.API
                 Marshal.Copy(GlobalFramePtr, imageBytes, 0, imageBytes.Length);
                 Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
 
-                matImg.Flip(FlipMode.Y);
+                matImg.Flip(FlipMode.X);
 
                 //4-Re-queue the buffers
                 if (AlignedBuffers == null)

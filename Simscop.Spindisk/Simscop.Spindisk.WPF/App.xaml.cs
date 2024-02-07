@@ -17,25 +17,13 @@ namespace Simscop.Spindisk.WPF
 
         public App()
         {
-            DispatcherUnhandledException += App_DispatcherUnhandledException;
-            
+            DispatcherUnhandledException += App_DispatcherUnhandledException;         
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             Debug.WriteLine($"ERROR: {e}");
         }
-
-        protected override void OnActivated(EventArgs e)
-        {
-
-        }
-
-        protected override void OnLoadCompleted(NavigationEventArgs e)
-        {
-
-        }
-
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -50,10 +38,9 @@ namespace Simscop.Spindisk.WPF
             }
 
             var conView = new ConnectStateView();
-            var ConVm = new ConnectStateViewModel();
-            conView.DataContext = ConVm;
+            var conVm = new ConnectStateViewModel();
+            conView.DataContext = conVm;
             conView.Show();
-
         }
 
     }

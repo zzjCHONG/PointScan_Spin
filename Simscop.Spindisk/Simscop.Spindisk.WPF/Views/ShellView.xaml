@@ -57,7 +57,7 @@
                 Background="{DynamicResource Region02}"
                 BorderThickness="0"
                 Click="ButtonBase_OnClick"
-                Content="相机"
+                Content="设置"
                 FontFamily="{StaticResource Harmony}"
                 FontSize="14" />
 
@@ -236,6 +236,8 @@
 
                             <GroupBox Header="归一化">
                                 <ToggleButton
+                                    Width="40"
+                                    Margin="0,0,328,0"
                                     DockPanel.Dock="Right"
                                     IsChecked="{Binding DisplayCurrent.Norm}"
                                     Style="{DynamicResource ToggleButtonSwitch}" />
@@ -243,65 +245,82 @@
 
                             <GroupBox Header="色阶">
                                 <DockPanel>
-                                    <TextBlock Width="40" Text="{Binding ElementName=LevelSlider, Path=StartValue}" />
-                                    <TextBlock
-                                        Width="40"
+                                    <liftui:NumericUpDown
+                                        x:Name="leftLevel"
+                                        Width="80"
+                                        Height="20"
+                                        Value="{Binding ElementName=LevelSlider, Path=StartValue}" />
+                                    <liftui:NumericUpDown
+                                        x:Name="rightLevel"
+                                        Width="80"
+                                        Height="20"
                                         DockPanel.Dock="Right"
-                                        Text="{Binding ElementName=LevelSlider, Path=EndValue}" />
+                                        Value="{Binding ElementName=LevelSlider, Path=EndValue}" />
                                     <controls:RangeSlider
                                         x:Name="LevelSlider"
                                         Margin="20,0"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Center"
-                                        EndValue="{Binding DisplayCurrent.Max}"
+                                        EndValue="{Binding DisplayCurrent.Max, Mode=TwoWay}"
                                         Maximum="{Binding DisplayCurrent.Threshold}"
                                         Minimum="0"
-                                        StartValue="{Binding DisplayCurrent.Min}" />
+                                        StartValue="{Binding DisplayCurrent.Min, Mode=TwoWay}" />
+
                                 </DockPanel>
                             </GroupBox>
 
                             <GroupBox Header="亮度">
                                 <DockPanel>
-                                    <TextBlock
-                                        Width="40"
+                                    <liftui:NumericUpDown
+                                        Width="60"
+                                        Height="30"
+                                        Padding="8,7,5,5"
+                                        HorizontalAlignment="Center"
                                         DockPanel.Dock="Right"
-                                        Text="{Binding ElementName=BrightnessSlider, Path=Value, StringFormat=N0}" />
+                                        FontSize="12"
+                                        Value="{Binding ElementName=BrightnessSlider, Path=Value, StringFormat=N0}" />
                                     <Slider
                                         x:Name="BrightnessSlider"
                                         VerticalAlignment="Center"
                                         Maximum="{Binding DisplayCurrent.ContrastThreshold}"
                                         Minimum="0"
-                                        Value="{Binding DisplayCurrent.Brightness}" />
+                                        Value="{Binding DisplayCurrent.Brightness, Mode=TwoWay}" />
                                 </DockPanel>
                             </GroupBox>
 
                             <GroupBox Header="对比度">
                                 <DockPanel>
-                                    <TextBlock
-                                        Width="40"
+                                    <liftui:NumericUpDown
+                                        Width="60"
+                                        Height="30"
+                                        Padding="8,7,5,5"
                                         DockPanel.Dock="Right"
-                                        Text="{Binding ElementName=ContrastSlider, Path=Value, StringFormat=N2}" />
+                                        FontSize="12"
+                                        Value="{Binding ElementName=ContrastSlider, Path=Value, StringFormat=N2}" />
                                     <Slider
                                         x:Name="ContrastSlider"
                                         VerticalAlignment="Center"
                                         Maximum="10"
                                         Minimum="0.1"
-                                        Value="{Binding DisplayCurrent.Contrast}" />
+                                        Value="{Binding DisplayCurrent.Contrast, Mode=TwoWay}" />
                                 </DockPanel>
                             </GroupBox>
 
                             <GroupBox Header="Gamma">
                                 <DockPanel>
-                                    <TextBlock
-                                        Width="40"
+                                    <liftui:NumericUpDown
+                                        Width="60"
+                                        Height="30"
+                                        Padding="8,7,5,5"
                                         DockPanel.Dock="Right"
-                                        Text="{Binding ElementName=GammaSlider, Path=Value, StringFormat=N2}" />
+                                        FontSize="12"
+                                        Value="{Binding ElementName=GammaSlider, Path=Value, StringFormat=N2}" />
                                     <Slider
                                         x:Name="GammaSlider"
                                         VerticalAlignment="Center"
                                         Maximum="10"
                                         Minimum="0.1"
-                                        Value="{Binding DisplayCurrent.Gamma}" />
+                                        Value="{Binding DisplayCurrent.Gamma, Mode=TwoWay}" />
                                 </DockPanel>
                             </GroupBox>
 

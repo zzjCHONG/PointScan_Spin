@@ -93,7 +93,7 @@
                         Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        IsChecked="{Binding IsSteerConnect}"
+                        IsChecked="{Binding IsSteerConnected}"
                         IsEnabled="False"
                         Style="{StaticResource SwitchCheckBox}" />
 
@@ -132,7 +132,7 @@
                         Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        IsChecked="{Binding IsLaserConnect}"
+                        IsChecked="{Binding IsLaserConnected}"
                         IsEnabled="False"
                         Style="{StaticResource SwitchCheckBox}" />
 
@@ -171,7 +171,7 @@
                         Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        IsChecked="{Binding IsSpinConnect}"
+                        IsChecked="{Binding IsSpinConnected}"
                         IsEnabled="False"
                         Style="{StaticResource SwitchCheckBox}" />
 

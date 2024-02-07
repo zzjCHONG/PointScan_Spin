@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using OpenCvSharp;
 using Simscop.API;
 using Simscop.API.ASI;
+using Simscop.API.Native.Mshot;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.Models;
 using System;
@@ -37,7 +38,10 @@ public partial class ScanViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private double _span = 0.1;
+    private double _xYSpan = 0.5;
+
+    [ObservableProperty]
+    private double _zSpan = 0.1;
 
     [ObservableProperty]
     private double _xStart = 0;
@@ -46,7 +50,7 @@ public partial class ScanViewModel : ObservableObject
     private double _xEnd = 0;
 
     [ObservableProperty]
-    private double _xStep = 0;
+    private double _xYStep = 0;
 
     [ObservableProperty]
     private bool _xYEnable = true;
@@ -56,9 +60,6 @@ public partial class ScanViewModel : ObservableObject
 
     [ObservableProperty]
     private double _yEnd = 0;
-
-    [ObservableProperty]
-    private double _yStep = 0;
 
     [ObservableProperty]
     private double _zStart = 0;
@@ -74,6 +75,20 @@ public partial class ScanViewModel : ObservableObject
 
     [ObservableProperty]
     private double _percent = 0;
+
+    [ObservableProperty]
+    private bool _isFocus = false;
+
+    partial void OnIsFocusChanged(bool value)
+    {
+        Debug.WriteLine("IsFouce =" +value);
+    }
+
+    [ObservableProperty]
+    private String _isXYStart = "开始扫描";
+
+    [ObservableProperty]
+    private String _isZStart = "开始扫描";
 
     partial void OnPercentChanged(double value)
     {
@@ -107,11 +122,10 @@ public partial class ScanViewModel : ObservableObject
 
         var xStartValue = (double)GetType().GetProperty("XStart")!.GetValue(this)!;
         var xEndValue = (double)GetType().GetProperty("XEnd")!.GetValue(this)!;
-        var xStepValue = (double)GetType().GetProperty("XStep")!.GetValue(this)!;
 
         var yStartValue = (double)GetType().GetProperty("YStart")!.GetValue(this)!;
         var yEndValue = (double)GetType().GetProperty("YEnd")!.GetValue(this)!;
-        var yStepValue = (double)GetType().GetProperty("YStep")!.GetValue(this)!;
+        var stepValue = (double)GetType().GetProperty("XYStep")!.GetValue(this)!;
 
         var xMessage = SteerMessage.GetValue($"Move{flags[0]}")!;
 
@@ -125,17 +139,15 @@ public partial class ScanViewModel : ObservableObject
         {
             EnableAction(false);
             Percent = 0;
+            IsXYStart = "停止采集";
 
             // 同号满足条件
-            if (xStepValue * (xEndValue - xStartValue) <= 0 | xStepValue == 0 | yStepValue * (yEndValue - yStartValue) <= 0 | yStepValue == 0)
+            if (stepValue * (xEndValue - xStartValue) <= 0 | stepValue == 0 | stepValue * (yEndValue - yStartValue) <= 0 | stepValue == 0)
             {
                 EnableAction(true);
                 MessageBox.Show("参数设置有误");
                 return;
             }
-
-
-
 
             var yPos = yStartValue;
 
@@ -143,9 +155,9 @@ public partial class ScanViewModel : ObservableObject
 
             var xReversePos = xEndValue;
 
-            var xCount = (int)Math.Ceiling((xEndValue - xStartValue) / xStepValue);
+            var xCount = (int)Math.Ceiling((xEndValue - xStartValue) / stepValue);
 
-            var yCount = (int)Math.Ceiling((yEndValue - yStartValue) / yStepValue);
+            var yCount = (int)Math.Ceiling((yEndValue - yStartValue) / stepValue);
 
             double value = 1;
 
@@ -167,15 +179,18 @@ public partial class ScanViewModel : ObservableObject
                             Debug.WriteLine($"[INFO] {flags[0]} -> {xReversePos}");
                             WeakReferenceMessenger.Default.Send<string, string>(xReversePos.ToString(CultureInfo.InvariantCulture), xMessage);
 
-                            Thread.Sleep((int)(Span * 1000));
+                            Thread.Sleep((int)(XYSpan * 1000));
 
-                            await MicroFocus();
+                            if (IsFocus)
+                            {
+                                await CustomFocus();
+                            };
 
                             var xPath = System.IO.Path.Join(Root, $"{flags[1]}_{yPos}_{flags[0]}_{xReversePos}.TIF");
                             WeakReferenceMessenger.Default
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
 
-                            xReversePos -= xStepValue;
+                            xReversePos -= stepValue;
                             if(_cancelToken.IsCancellationRequested) break;
                         }
                         value++;
@@ -189,60 +204,40 @@ public partial class ScanViewModel : ObservableObject
                             Debug.WriteLine($"[INFO] {flags[0]} -> {xForwardPos}");
                             WeakReferenceMessenger.Default.Send<string, string>(xForwardPos.ToString(CultureInfo.InvariantCulture), xMessage);
                             
-                            Thread.Sleep((int)(Span * 1000));
+                            Thread.Sleep((int)(XYSpan * 1000));
 
-                            await MicroFocus();
+                            if (IsFocus)
+                            {
+                                await CustomFocus();
+                            }
 
                             var xPath = System.IO.Path.Join(Root, $"{flags[1]}_{yPos}_{flags[0]}_{xForwardPos}.TIF");
                             WeakReferenceMessenger.Default
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
-                            xForwardPos += xStepValue;
+                            xForwardPos += stepValue;
                             if (_cancelToken.IsCancellationRequested) break;
                         }
-                        result = xForwardPos - xStepValue;
+                        result = xForwardPos - stepValue;
                         value++;
                         xForwardPos = xStartValue;
                     }
-                    yPos += yStepValue;
+                    yPos += stepValue;
                 }
                 if (_cancelToken.IsCancellationRequested) break;
             } while (value < yCount);
  
             EnableAction(true);
+            IsXYStart = "开始采集";
         });
     }
 
-    async Task Focus()
+    async Task CustomFocus()
     {
         Thread.Sleep(100);
 
         await Task.Run(() =>
         {
-            focus = AutoFocus.Create();
-            focus.FirstCount = 5;
-            focus.FirstStep = 10;
-            focus.SeccondCount = 5;
-            focus.SecondStep = 1;
-            focus.Threshold = 0.02;
-            focus.CropSize = 0.5;
-            focus.Focus();
-        });
-    }
-
-    async Task MicroFocus()
-    {
-        Thread.Sleep(100);
-
-        await Task.Run(() =>
-        {
-            focus = AutoFocus.Create();
-            focus.FirstCount = 0;
-            focus.FirstStep = 5;
-            focus.SeccondCount = 3;
-            focus.SecondStep = 1;
-            focus.Threshold = 0.02;
-            focus.CropSize = 0.2;
-            focus.Focus();
+            GlobalValue.CustomFocus.Focus();
         });
     }
 
@@ -280,6 +275,7 @@ public partial class ScanViewModel : ObservableObject
         {
             EnableAction(false);
             Percent = 0;
+            IsZStart = "停止采集";
 
             // 同号满足条件
             if (stepValue * (endValue - startValue) <= 0 | stepValue == 0)
@@ -301,7 +297,7 @@ public partial class ScanViewModel : ObservableObject
                 Debug.WriteLine($"[INFO] {flag} -> {pos}");
                 WeakReferenceMessenger.Default.Send<string, string>(pos.ToString(CultureInfo.InvariantCulture), message);
 
-                Thread.Sleep((int)(Span * 1000));
+                Thread.Sleep((int)(ZSpan * 1000));
 
                 var path = System.IO.Path.Join(Root, $"{flag}_{pos}.TIF");
                 WeakReferenceMessenger.Default.Send<string, string>(path, MessageManage.SaveACapture);
@@ -328,15 +324,52 @@ public partial class ScanViewModel : ObservableObject
                 Percent = 0;
 
             EnableAction(true);
+            IsZStart = "开始采集";
         });
     }
 
-    [RelayCommand]
-    public void StartScanX()
-        => StartScanXY();
+    void SetStartPos(uint mode)
+    {
+        var flags = new string[]
+        {
+        "XY","Z"
+        };
+
+        var flag = flags[mode];
+
+        if (flag == "XY")
+        {
+            XStart = GlobalValue.GlobalMotor.X;
+            YStart = GlobalValue.GlobalMotor.Y;
+        }
+        else if (flag == "Z")
+        {
+            ZStart = GlobalValue.GlobalMotor.Z;
+        }
+    }
+
+    void SetEndPos(uint mode)
+    {
+        var flags = new string[]
+        {
+        "XY","Z"
+        };
+
+        var flag = flags[mode];
+
+        if (flag == "XY")
+        {
+            XEnd = GlobalValue.GlobalMotor.X;
+            YEnd = GlobalValue.GlobalMotor.Y;
+        }
+        else if (flag == "Z")
+        {
+            ZEnd = GlobalValue.GlobalMotor.Z;
+        }
+    }
 
     [RelayCommand]
-    public void StartScanY()
+    public void StartScan()
         => StartScanXY();
 
     [RelayCommand]
@@ -346,4 +379,16 @@ public partial class ScanViewModel : ObservableObject
     [RelayCommand]
     void StopScan()
         => _cancelToken?.Cancel();
+
+    [RelayCommand]
+    void SetXYStartPoint() => SetStartPos(0);
+
+    [RelayCommand]
+    void SetZStartPoint() => SetStartPos(1);
+
+    [RelayCommand]
+    void SetXYEndPoint() => SetEndPos(0);
+
+    [RelayCommand]
+    void SetZEndPoint() => SetEndPos(1);
 }

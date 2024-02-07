@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,7 +20,7 @@ namespace Simscop.Spindisk.WPF.Views
 
         private CameraViewModel cameraVM;
         private SpinViewModel spinVM;
-        private ShellViewModel shellVM;
+        private readonly ShellViewModel shellVM;
         private SteerViewModel steerVM;
         private LaserViewModel laserVM;
         private ExampleViewModel exampleVM;
@@ -27,6 +28,7 @@ namespace Simscop.Spindisk.WPF.Views
         private MultiChannelPreviewViewModel multiChannelPreviewVM;
         private MultiChannelSaveViewModel multiChannelSaveVM;
         private CameraView cameraView;
+        private SettingView settingView;
         private ExampleView exampleView;
         private MultiChannelSave multiChannelSaveView;
         private MultiChannelPreview multiChannelPreview;
@@ -56,8 +58,8 @@ namespace Simscop.Spindisk.WPF.Views
             cameraVM = new CameraViewModel();
             shellVM = new ShellViewModel();
             spinVM = new SpinViewModel();
-            scanVM = new ScanViewModel();
             steerVM = new SteerViewModel();
+            scanVM = new ScanViewModel();
             laserVM = new LaserViewModel();
             multiChannelPreviewVM = new MultiChannelPreviewViewModel();
             multiChannelSaveVM= new MultiChannelSaveViewModel();
@@ -67,9 +69,9 @@ namespace Simscop.Spindisk.WPF.Views
                 SteerVM = steerVM
             };
 
-            cameraView = new()
+            settingView = new()
             {
-                DataContext = cameraVM,
+                DataContext = steerVM,
             };
             exampleView = new()
             {
@@ -92,6 +94,11 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 RemotePicDown(m.Index);
             });
+
+            //WeakReferenceMessenger.Default.Register<string>(SteerMessage.Setting, (s, e) =>
+            //{
+            //    settingView.Show();
+            //});//temp
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -170,9 +177,8 @@ namespace Simscop.Spindisk.WPF.Views
         // TODO 这里的卡顿问题已经定位了，原因就是在给datacontext的时候数据变化和赋值原因，解决办法挺简单的，单个窗口重复利用就行，但是这里目前就卡着吧，有空再改
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            cameraView.Show();
-            cameraView.Topmost = true;
-            cameraView.Topmost = false;
+            settingView.Show();
+            settingView.Topmost = true;
         }
 
         protected override void OnClosed(EventArgs e)
@@ -200,6 +206,11 @@ namespace Simscop.Spindisk.WPF.Views
             exampleView.Topmost = false;
         }
 
+        private void LevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<UI.Controls.RangeValue> e)
+        {
+
+        }
+    
         private void MultiChannelSave_OnClick(object sender, RoutedEventArgs e)
         {
             multiChannelSaveView.Show();

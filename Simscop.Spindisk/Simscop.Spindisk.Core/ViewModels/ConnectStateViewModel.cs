@@ -4,7 +4,9 @@ using CommunityToolkit.Mvvm.Messaging;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Simscop.Spindisk.Core.ViewModels
 {
@@ -87,12 +89,12 @@ namespace Simscop.Spindisk.Core.ViewModels
 
         void Init()
         {
-            Task.Run(() => 
+            Task.Run(() =>
             {
                 WeakReferenceMessenger.Default.Send<LaserInitMessage>(new LaserInitMessage(true));
             });
 
-            Task.Run(() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 WeakReferenceMessenger.Default.Send<SteerInitMessage>(new SteerInitMessage(true));
             });
@@ -106,7 +108,7 @@ namespace Simscop.Spindisk.Core.ViewModels
             {
                 WeakReferenceMessenger.Default.Send<CameraInitMessage>(new CameraInitMessage(true));
             });
-           
+
         }
     }
 }

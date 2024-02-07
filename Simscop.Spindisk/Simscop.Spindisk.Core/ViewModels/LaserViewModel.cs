@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using OpenCvSharp;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
-using Simscop.Spindisk.Core.Models;
 
 namespace Simscop.Spindisk.Core.ViewModels;
 
@@ -70,6 +63,27 @@ public partial class LaserViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) => 
         { 
             if (m.isPreInit) LaserInit(); 
+        });
+
+        WeakReferenceMessenger.Default.Register<MultiChannelSaveLaserMessage>(this, (o, m) =>
+        {
+            switch (m.channel)
+            {
+                case 0:
+                    ChannelAEnable = m.isEnable; 
+                    break;
+                case 1:
+                    ChannelBEnable = m.isEnable;
+                    break;
+                case 2:
+                    ChannelCEnable = m.isEnable;
+                    break;
+                case 3:
+                    ChannelDEnable = m.isEnable;
+                    break;
+                default:
+                    break;
+            }
         });
     }
 

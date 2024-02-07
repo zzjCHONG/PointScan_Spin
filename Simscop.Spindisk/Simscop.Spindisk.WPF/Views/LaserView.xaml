@@ -21,6 +21,7 @@
         <UniformGrid
             Height="240"
             Margin="5"
+            IsEnabled="{Binding IsConnected}"
             Rows="4">
             <StackPanel>
                 <TextBlock
@@ -191,7 +192,6 @@
                             </Slider.Resources>
                         </Slider>
                     </Viewbox>
-
 
                     <TextBlock
                         Grid.Column="1"

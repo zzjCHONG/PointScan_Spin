@@ -24,16 +24,13 @@ public partial class SpinViewModel : ObservableObject
     public SpinViewModel()
     {
         ComList = Simscop.API.Helper.SerialHelper.GetAllCom();
-        WeakReferenceMessenger.Default.Register<SpindiskMessage, string>(this, 
-            nameof(SpindiskMessage), (r, m) => SetMode(m.Mode));
-
+        WeakReferenceMessenger.Default.Register<SpindiskMessage, string>(this, nameof(SpindiskMessage), (r, m) =>SetMode(m.Mode));
         WeakReferenceMessenger.Default.Register<SpinInitMessage>(this, (o, m) =>
         {
             if (ComList == null || !ComList.Contains(ComName))
             {
                 WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(false, false));
                 //MessageBox.Show($"转盘连接：端口号为空或端口{ComName}不存在");
-
                 return;
             }
             if (m.isPreInit) ConnectCom();
@@ -228,8 +225,8 @@ public partial class SpinViewModel : ObservableObject
 
     void SetMode(int mode)
     {
-        if (!IsConnected)return;
-        
+        if (!IsConnected) return;
+
         switch (mode)
         {
             case 0:
@@ -238,17 +235,17 @@ public partial class SpinViewModel : ObservableObject
                 ExcitationIndex = 0;
                 break;
             case 1:
-                DichroicIndex = 2;
+                DichroicIndex = 0;
                 EmissionIndex = 2;
                 ExcitationIndex = 2;
                 break;
             case 2:
                 DichroicIndex = 1;
-                EmissionIndex = 5;
+                EmissionIndex = 3;
                 ExcitationIndex = 3;
                 break;
             case 3:
-                DichroicIndex = 2;
+                DichroicIndex = 3;
                 EmissionIndex = 4;
                 ExcitationIndex = 5;
                 break;
@@ -257,4 +254,36 @@ public partial class SpinViewModel : ObservableObject
 
         }
     }
+
+    //void SetMode(int mode)
+    //{
+    //    if (!IsConnected)return;
+        
+    //    switch (mode)
+    //    {
+    //        case 0:
+    //            DichroicIndex = 4;
+    //            EmissionIndex = 0;
+    //            ExcitationIndex = 0;
+    //            break;
+    //        case 1:
+    //            DichroicIndex = 2;
+    //            EmissionIndex = 2;
+    //            ExcitationIndex = 2;
+    //            break;
+    //        case 2:
+    //            DichroicIndex = 1;
+    //            EmissionIndex = 5;
+    //            ExcitationIndex = 3;
+    //            break;
+    //        case 3:
+    //            DichroicIndex = 2;
+    //            EmissionIndex = 4;
+    //            ExcitationIndex = 5;
+    //            break;
+    //        default:
+    //            break;
+
+    //    }
+    //}
 }
