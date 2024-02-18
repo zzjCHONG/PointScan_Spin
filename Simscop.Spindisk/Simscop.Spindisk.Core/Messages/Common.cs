@@ -17,17 +17,17 @@ public static class MessageManage
     /// <summary>
     /// 保存当前的capture
     /// </summary>
-    public const string SaveCurrentCapture = "SaveCurrentCaptureMessage";
+    public const string SaveCurrentCapture = "SaveCurrentCaptureMessage";//存储，暂未使用
 
     /// <summary>
     /// 只保存一个，只支持TIF
     /// </summary>
-    public const string SaveACapture = "SaveACaptureMessage";//原图
+    public const string SaveACapture = "SaveACaptureMessage";//实时原图
 
     /// <summary>
     /// 当前显示frame数据
     /// </summary>
-    public const string DisplayFrame = "DisplayFrameMessage";
+    public const string DisplayFrame = "DisplayFrameMessage";//实时处理图像
 }
 
 public static class SteerMessage
@@ -72,37 +72,45 @@ public record SpindiskMessage(int Mode);
 /// <param name="Index"></param>
 public record MainDisplayMessage(int Index);
 
+
+public record CameraInitMessage(bool IsPreInit);
+
+public record LaserInitMessage(bool IsPreInit);
+
+public record SteerInitMessage(bool IsPreInit);
+
+public record SpinInitMessage(bool IsPreInit);
+
+public record CameraConnectMessage(bool IsConnected, bool IsConnecting);
+
+public record LaserConnectMessage(bool IsConnected, bool IsConnecting);
+
+public record SteerConnectMessage(bool IsConnected, bool IsConnecting);
+
+public record SpinConnectMessage(bool IsConnected, bool IsConnecting);
+
 /// <summary>
-/// 设备初始化
-/// 相机
+/// 存图
+/// 非实时画面
 /// </summary>
-/// <param name="isPreInit"></param>
-public record CameraInitMessage(bool isPreInit);
-
-public record LaserInitMessage(bool isPreInit);
-
-public record SteerInitMessage(bool isPreInit);
-
-public record SpinInitMessage(bool isPreInit);
-
-public record CameraConnectMessage(bool isConnected, bool isConnecting);
-
-public record LaserConnectMessage(bool isConnected, bool isConnecting);
-
-public record SteerConnectMessage(bool isConnected, bool isConnecting);
-
-public record SpinConnectMessage(bool isConnected, bool isConnecting);
+/// <param name="channel"></param>
+/// <param name="isOriginalImage"></param>
+public record CameraSaveMessage(int channel, bool isOriginalImage,string filename);
 
 /// <summary>
 /// 多通道采集-伪彩通道
 /// </summary>
 /// <param name="codeModel"></param>
-public record MultiChannelSaveShellMessage(int codeModel);
+public record MultiChannelColorMessage(int codeModel);
 
 /// <summary>
 /// 多通道采集-激光通道触发
 /// </summary>
 /// <param name="channel"></param>
 /// <param name="isEnable"></param>
-public record MultiChannelSaveLaserMessage(int channel,bool isEnable);
+public record MultiChannelLaserMessage(int channel,bool isEnable);
+
+public record MultiChannelMergeMessage();
+
+
 

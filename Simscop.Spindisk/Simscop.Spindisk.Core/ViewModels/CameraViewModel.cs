@@ -131,7 +131,7 @@ public partial class CameraViewModel : ObservableObject
 
     public CameraViewModel()
     {
-        Camera = new Andor();
+        Camera = new TestCamera();
         GlobalValue.GlobalCamera = Camera;
 
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture, (s, e) =>
@@ -145,7 +145,7 @@ public partial class CameraViewModel : ObservableObject
 
         WeakReferenceMessenger.Default.Register<CameraInitMessage>(this, (o, m) =>
         {
-            if (m.isPreInit) CameraInit();      
+            if (m.IsPreInit) CameraInit();      
         });
     }
 
@@ -298,8 +298,7 @@ public partial class CameraViewModel : ObservableObject
             Filter = "TIF|*.tif",
             DefaultExt = ".tif",
         };
-
-        
+     
         if (dlg.ShowDialog() == DialogResult.OK)
             WeakReferenceMessenger.Default
                 .Send<string, string>(dlg.FileName, MessageManage.SaveACapture);

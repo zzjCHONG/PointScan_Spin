@@ -10,118 +10,94 @@ using System.Windows.Forms;
 
 namespace Simscop.Spindisk.Core.ViewModels
 {
-    public partial class MultiChannelSaveViewModel: ObservableObject
+    public partial class MultiChannelViewModel: ObservableObject
     {
         [ObservableProperty]
         private bool _isChannelASave=false;
-        [ObservableProperty]
-        private bool _isChannelAColored = false;
         [ObservableProperty]
         private int _colorModeA = 0;
         partial void OnIsChannelASaveChanged(bool value)
         {
             if (!value)
             {
-                IsChannelAColored = false;
+                ColorModeA = 0;
             }
             else
             {
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(0, true));
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(0, true));
             }
-        }
-        partial void OnIsChannelAColoredChanged(bool value)
-        {
-            if (!value) ColorModeA = 0;
         }
         partial void OnColorModeAChanged(int value)
         {
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(0, true));
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeA));      
+            WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(0, true));//激光通道开启
+            WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeA));//选中的伪彩      
         }
 
         [ObservableProperty]
         private bool _isChannelBSave = false;
-        [ObservableProperty]
-        private bool _isChannelBColored = false;
         [ObservableProperty]
         private int _colorModeB = 0;
         partial void OnIsChannelBSaveChanged(bool value)
         {
             if (!value)
             {
-                IsChannelBColored = false;
+                ColorModeB = 0;
             }
             else
             { 
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(1, true));
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(1, true));
             }
-        }
-        partial void OnIsChannelBColoredChanged(bool value)
-        {
-            if (!value) ColorModeB = 0;
         }
         partial void OnColorModeBChanged(int value)
         {
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(1, true));
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeB));
+            WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(1, true));
+            WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeB));
         }
 
         [ObservableProperty]
         private bool _isChannelCSave = false;
-        [ObservableProperty]
-        private bool _isChannelCColored = false;
         [ObservableProperty]
         private int _colorModeC = 0;
         partial void OnIsChannelCSaveChanged(bool value)
         {
             if (!value)
             {
-                IsChannelCColored = false;
+                ColorModeC = 0;
             }
             else
             {
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(2, true));
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(2, true));
             }
-        }
-        partial void OnIsChannelCColoredChanged(bool value)
-        {
-            if (!value) ColorModeC = 0;
         }
         partial void OnColorModeCChanged(int value)
         {
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(2, true));
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeC));
+            WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(2, true));
+            WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeC));
         }
 
         [ObservableProperty]
         private bool _isChannelDSave = false;
-        [ObservableProperty]
-        private bool _isChannelDColored = false;
         [ObservableProperty]
         private int _colorModeD = 0;
         partial void OnIsChannelDSaveChanged(bool value)
         {
             if (!value)
             {
-                IsChannelDColored = false;
+                ColorModeD = 0;
             }
             else
             {
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(3, true));
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(3, true));
             }
-        }
-        partial void OnIsChannelDColoredChanged(bool value)
-        {
-            if (!value) ColorModeD = 0;
         }
         partial void OnColorModeDChanged(int value)
         {
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(3, true));
-            WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeD));
+            WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(3, true));
+            WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeD));
         }
 
         [ObservableProperty]
-        private string _root = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        private string _root =Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),"MultiChannelCapture") ;//默认路径
 
         [RelayCommand]
         void OpenFileDialog()
@@ -132,9 +108,7 @@ namespace Simscop.Spindisk.Core.ViewModels
             folderBrowserDialog.SelectedPath = Root;
             DialogResult result = folderBrowserDialog.ShowDialog();
             if (result == DialogResult.OK)
-            {
                 Root = folderBrowserDialog.SelectedPath;
-            }
         }
 
         string GetFilename(int channelID)
@@ -173,28 +147,34 @@ namespace Simscop.Spindisk.Core.ViewModels
 
             if (IsChannelASave)
             {
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(0, true));//通道切换
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeA));//伪彩设置
-                WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(0)), MessageManage.DisplayFrame);//存图
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(0, true));//通道切换
+                WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeA));//伪彩设置
+                //WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(0)), MessageManage.DisplayFrame);//存实时处理图
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, true, Path.Combine(filepath, GetFilename(0))));//存实时原图
             }
             if (IsChannelBSave)
             {
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(1, true));
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeB));
-                WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(1)), MessageManage.DisplayFrame);
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(1, true));
+                WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeB));
+                //WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(1)), MessageManage.DisplayFrame);
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(1, true, Path.Combine(filepath, GetFilename(1))));
             }
             if (IsChannelCSave)
             {
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(2, true));
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeC));
-                WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(2)), MessageManage.DisplayFrame);
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(2, true));
+                WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeC));
+                //WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(2)), MessageManage.DisplayFrame);
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(2, true, Path.Combine(filepath, GetFilename(2))));
             }
             if (IsChannelDSave)
             {
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveLaserMessage>(new MultiChannelSaveLaserMessage(3, true));
-                WeakReferenceMessenger.Default.Send<MultiChannelSaveShellMessage>(new MultiChannelSaveShellMessage(ColorModeD));
-                WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(3)), MessageManage.DisplayFrame);
+                WeakReferenceMessenger.Default.Send<MultiChannelLaserMessage>(new MultiChannelLaserMessage(3, true));
+                WeakReferenceMessenger.Default.Send<MultiChannelColorMessage>(new MultiChannelColorMessage(ColorModeD));
+                //WeakReferenceMessenger.Default.Send<string, string>(Path.Combine(filepath, GetFilename(3)), MessageManage.DisplayFrame);
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(3, true, Path.Combine(filepath, GetFilename(3))));
             }
+
+            WeakReferenceMessenger.Default.Send<MultiChannelMergeMessage>();
 
             OpenFolderAndSelectFile(filepath);
             IsChannelASave = false;

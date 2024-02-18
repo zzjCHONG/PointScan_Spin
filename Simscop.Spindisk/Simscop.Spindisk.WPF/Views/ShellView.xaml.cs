@@ -25,13 +25,14 @@ namespace Simscop.Spindisk.WPF.Views
         private LaserViewModel laserVM;
         private ExampleViewModel exampleVM;
         private ScanViewModel scanVM;
-        private MultiChannelPreviewViewModel multiChannelPreviewVM;
-        private MultiChannelSaveViewModel multiChannelSaveVM;
+        private MultiChannelViewModel multiChannelSaveVM;
+        private CameraSaveViewModel cameraSaveVM;
+
         private CameraView cameraView;
         private SettingView settingView;
         private ExampleView exampleView;
-        private MultiChannelSave multiChannelSaveView;
-        private MultiChannelPreview multiChannelPreview;
+        private MultiChannelView multiChannelView;
+        private CameraSaveView cameraSaveView;
 
         public static ShellView Instance
         {
@@ -61,8 +62,8 @@ namespace Simscop.Spindisk.WPF.Views
             steerVM = new SteerViewModel();
             scanVM = new ScanViewModel();
             laserVM = new LaserViewModel();
-            multiChannelPreviewVM = new MultiChannelPreviewViewModel();
-            multiChannelSaveVM= new MultiChannelSaveViewModel();
+            cameraSaveVM = new CameraSaveViewModel();
+            multiChannelSaveVM= new MultiChannelViewModel();
             exampleVM = new ExampleViewModel()
             {
                 CameraVM = cameraVM,
@@ -77,11 +78,11 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 DataContext = exampleVM,
             };
-            multiChannelPreview = new ()
+            cameraSaveView = new ()
             {
-                DataContext= multiChannelPreviewVM,
+                DataContext= cameraSaveVM,
             };
-            multiChannelSaveView = new()
+            multiChannelView = new()
             {
                 DataContext = multiChannelSaveVM,
             };
@@ -211,19 +212,18 @@ namespace Simscop.Spindisk.WPF.Views
 
         }
     
-        private void MultiChannelSave_OnClick(object sender, RoutedEventArgs e)
+        private void MultiChannel_OnClick(object sender, RoutedEventArgs e)
         {
-            multiChannelSaveView.Show();
-            multiChannelSaveView.Topmost = true;
-            multiChannelSaveView.Topmost = false;
+            multiChannelView.Show();
+            multiChannelView.Topmost = true;
+            multiChannelView.Topmost = false;
         }
 
-
-        private void MultiChannelPreview_OnClick(object sender, RoutedEventArgs e)
+        private void CameraSave_OnClick(object sender, RoutedEventArgs e)
         {
-            multiChannelPreview.Show();
-            multiChannelPreview.Topmost = true;
-            multiChannelPreview.Topmost = false;
+            cameraSaveView.Show();
+            cameraSaveView.Topmost = true;
+            cameraSaveView.Topmost = false;
         }
 
     }

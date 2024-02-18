@@ -1,11 +1,13 @@
 ﻿// https://blog.walterlv.com/post/wpf-high-performance-bitmap-rendering.html
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.Models;
@@ -71,6 +73,7 @@ public partial class ShellViewModel : ObservableObject
 
     public ShellViewModel()
     {
+        //切换页面
         WeakReferenceMessenger.Default.Register<LaserMessage, string>(this, nameof(LaserMessage), (s, m) =>
         {
             switch (m.Index)
@@ -91,6 +94,7 @@ public partial class ShellViewModel : ObservableObject
             Debug.WriteLine($"ShellViewModel {m.Index} - {m.Status}");
         });
 
+        //接收原图
         WeakReferenceMessenger.Default.Register<DisplayFrame, string>(this, "Display", (s, m) =>
         {
             Application.Current?.Dispatcher.Invoke(() =>
@@ -102,16 +106,87 @@ public partial class ShellViewModel : ObservableObject
             });
         });
 
-        WeakReferenceMessenger.Default.Register<MultiChannelSaveShellMessage>(this, (s, m) =>
+        //存图
+        WeakReferenceMessenger.Default.Register<CameraSaveMessage>(this, (s, m) =>
         {
-            DisplayCurrent.ColorMode = m.codeModel;//多通道采图传来的伪彩通道
+            if (File.Exists(m.filename)) File.Delete(m.filename);//覆盖
+
+            if (m.isOriginalImage)
+            {
+                switch (m.channel)
+                {
+                    case 0:
+                        
+                        if (!DisplayFirst.Original.Empty())
+                            DisplayFirst.Original.SaveImage(m.filename);
+                        break;
+                    case 1:
+                        if (!DisplaySecond.Original.Empty())
+                            DisplaySecond.Original.SaveImage(m.filename);
+                        break;
+                    case 2:
+                        if (!DisplayThird.Original.Empty())
+                            DisplayThird.Original.SaveImage(m.filename);
+                        break;
+                    case 3:
+                        if (!DisplayFourth.Original.Empty())
+                            DisplayFourth.Original.SaveImage(m.filename);
+                        break;
+                    default: break;
+                }
+            }
+            else
+            {
+                switch (m.channel)
+                {
+                    case 0:
+                        if (DisplayFirst.Frame != null)
+                            DisplayFirst.Frame.Clone().ToMat().SaveImage(m.filename);
+                        break;
+                    case 1:
+                        if (DisplaySecond.Frame != null)
+                            DisplaySecond.Frame.Clone().ToMat().SaveImage(m.filename);
+                        break;
+                    case 2:
+                        if (DisplayThird.Frame != null)
+                            DisplayThird.Frame.Clone().ToMat().SaveImage(m.filename);
+                        break;
+                    case 3:
+                        if (DisplayFourth.Frame != null)
+                            DisplayFourth.Frame.Clone().ToMat().SaveImage(m.filename);
+                        break;
+                    default: break;
+                }
+            }    
         });
 
-        WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.DisplayFrame, (s, m) =>
+
+        //伪彩通道修改
+        WeakReferenceMessenger.Default.Register<MultiChannelColorMessage>(this, (s, m) =>
         {
-            if (File.Exists(m)) File.Delete(m);//覆盖
-            if (DisplayCurrent.Frame != null)
-                DisplayCurrent.Frame.Clone().ToMat().SaveImage(m);//多通道存图
+            DisplayCurrent.ColorMode = m.codeModel;
+        });
+
+        //WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.DisplayFrame, (s, m) =>
+        //{
+        //    if (File.Exists(m)) File.Delete(m);//覆盖
+        //    if (DisplayCurrent.Frame != null)
+        //        DisplayCurrent.Frame.Clone().ToMat().SaveImage(m);//多通道存图
+        //});
+
+        WeakReferenceMessenger.Default.Register<MultiChannelMergeMessage>(this, (s, m) =>
+        {
+            List<Mat> mats = new List<Mat>();
+            if (DisplayFirst.Frame != null)
+                mats.Add(DisplayFirst.Frame.Clone().ToMat());
+            if (DisplaySecond.Frame != null)
+                mats.Add(DisplaySecond.Frame.Clone().ToMat());
+            if (DisplayThird.Frame != null)
+                mats.Add(DisplayThird.Frame.Clone().ToMat());
+            if (DisplayFourth.Frame != null)
+                mats.Add(DisplayFourth.Frame.Clone().ToMat());
+
+            //DisplayModel.MergeChannel3();
         });
 
     }

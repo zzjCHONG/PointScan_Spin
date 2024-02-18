@@ -62,10 +62,10 @@ public partial class LaserViewModel : ObservableObject
 
         WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) => 
         { 
-            if (m.isPreInit) LaserInit(); 
+            if (m.IsPreInit) LaserInit(); 
         });
 
-        WeakReferenceMessenger.Default.Register<MultiChannelSaveLaserMessage>(this, (o, m) =>
+        WeakReferenceMessenger.Default.Register<MultiChannelLaserMessage>(this, (o, m) =>
         {
             switch (m.channel)
             {

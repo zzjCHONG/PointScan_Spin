@@ -33,26 +33,26 @@ namespace Simscop.Spindisk.Core.ViewModels
         {
             WeakReferenceMessenger.Default.Register<CameraConnectMessage>(this, (o, m) =>
             {
-                IsCameraConnected = m.isConnected;
-                IsCameraConnecting = m.isConnecting;
+                IsCameraConnected = m.IsConnected;
+                IsCameraConnecting = m.IsConnecting;
                 CameraText();
             });
             WeakReferenceMessenger.Default.Register<LaserConnectMessage>(this, (o, m) =>
             {
-                IsLaserConnected = m.isConnected;
-                IsLaserConnecting = m.isConnecting;
+                IsLaserConnected = m.IsConnected;
+                IsLaserConnecting = m.IsConnecting;
                 LaserText();
             });
             WeakReferenceMessenger.Default.Register<SteerConnectMessage>(this, (o, m) =>
             {
-                IsSteerConnected = m.isConnected;
-                IsSteerConnecting = m.isConnecting;
+                IsSteerConnected = m.IsConnected;
+                IsSteerConnecting = m.IsConnecting;
                 SteerText();
             });
             WeakReferenceMessenger.Default.Register<SpinConnectMessage>(this, (o, m) =>
             {
-                IsSpinConnected = m.isConnected;
-                IsSpinConnecting = m.isConnecting;
+                IsSpinConnected = m.IsConnected;
+                IsSpinConnecting = m.IsConnecting;
                 SpinText();
             });
 

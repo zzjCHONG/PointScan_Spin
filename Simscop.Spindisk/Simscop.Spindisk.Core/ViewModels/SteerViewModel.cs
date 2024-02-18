@@ -37,7 +37,7 @@ public partial class SteerViewModel : ObservableObject
         //SteerInit();
         WeakReferenceMessenger.Default.Register<SteerInitMessage>(this, (o, m) =>
         {
-            if (m.isPreInit) SteerInit();
+            if (m.IsPreInit) SteerInit();
         });
     }
 

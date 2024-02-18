@@ -33,7 +33,7 @@ public partial class SpinViewModel : ObservableObject
                 //MessageBox.Show($"转盘连接：端口号为空或端口{ComName}不存在");
                 return;
             }
-            if (m.isPreInit) ConnectCom();
+            if (m.IsPreInit) ConnectCom();
         });
     }
 
