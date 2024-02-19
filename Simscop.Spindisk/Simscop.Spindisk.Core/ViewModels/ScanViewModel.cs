@@ -79,6 +79,11 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty]
     private bool _isFocus = false;
 
+    partial void OnIsFocusChanged(bool value)
+    {
+        Debug.WriteLine("IsFouce =" +value);
+    }
+
     [ObservableProperty]
     private String _isXYStart = "开始扫描";
 

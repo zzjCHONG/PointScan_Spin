@@ -37,8 +37,7 @@
             <StackPanel Orientation="Vertical">
                 <Expander
                     Margin="8"
-                    Header="对焦设置"
-                    IsEnabled="{Binding IsCapture}">
+                    Header="对焦设置">
                     <TabControl Margin="5" SelectionChanged="TabControl_SelectionChanged" x:Name="TabControl">
                         <TabItem Width="140" Header="常规对焦">
                             <StackPanel>

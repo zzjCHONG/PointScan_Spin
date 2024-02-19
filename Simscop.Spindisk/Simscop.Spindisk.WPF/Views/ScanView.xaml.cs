@@ -3,6 +3,7 @@ using Simscop.Spindisk.Core.Messages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,6 +53,7 @@ namespace Simscop.Spindisk.WPF.Views
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine("@#$#%^^&%^*%@#$!@$&&^(&($$#@#%#$^%*&^(*)*())%^*&%^");
             WeakReferenceMessenger.Default.Send<string>(SteerMessage.Setting);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,13 +16,18 @@ using System.Windows.Shapes;
 namespace Simscop.Spindisk.WPF.Views
 {
     /// <summary>
-    /// ConnectState.xaml 的交互逻辑
+    /// CameraSave.xaml 的交互逻辑
     /// </summary>
-    public partial class ConnectState : Window
+    public partial class CameraSaveView : Window
     {
-        public ConnectState()
+        public CameraSaveView()
         {
             InitializeComponent();
+        }
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            this.Hide();
+            e.Cancel = true;
         }
     }
 }

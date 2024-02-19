@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using OpenCvSharp;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
-using Simscop.Spindisk.Core.Models;
 
 namespace Simscop.Spindisk.Core.ViewModels;
 
@@ -66,12 +59,51 @@ public partial class LaserViewModel : ObservableObject
         // todo 这里初始化laser并且准备好Laser本身的数据
         Laser = new BogaoLaser();
         GlobalValue.GlobalLaser = Laser;
-        Init();
+
+        WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) => 
+        { 
+            if (m.IsPreInit) LaserInit(); 
+        });
+
+        WeakReferenceMessenger.Default.Register<MultiChannelLaserMessage>(this, (o, m) =>
+        {
+            switch (m.channel)
+            {
+                case 0:
+                    ChannelAEnable = m.isEnable; 
+                    break;
+                case 1:
+                    ChannelBEnable = m.isEnable;
+                    break;
+                case 2:
+                    ChannelCEnable = m.isEnable;
+                    break;
+                case 3:
+                    ChannelDEnable = m.isEnable;
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
-    void Init()
+    [ObservableProperty]
+    private bool _isConnected=false;
+
+    [ObservableProperty]
+    private bool _isConnecting=true;
+
+    partial void OnIsConnectingChanged(bool value)
     {
-        Laser.Init();
+        if (!value)
+            WeakReferenceMessenger.Default.Send<LaserConnectMessage>(new LaserConnectMessage(IsConnected, value));
+    }
+
+    void LaserInit()
+    {
+        IsConnecting = true;
+        IsConnected= Laser.Init();
+        IsConnecting = false;
 
         if (Laser.GetStatus(0, out var aStatus) &&
             Laser.GetStatus(1, out var bStatus) &&

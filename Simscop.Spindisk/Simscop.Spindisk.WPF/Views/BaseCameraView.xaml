@@ -34,62 +34,58 @@
                 Background="{DynamicResource Region01}" />
         </StackPanel>
 
-        <UniformGrid
-            Grid.Row="1"
-            Margin="10,5,10,2"
-            Columns="3">
-            <Button
-                Width="auto"
-                Margin="0,0,5,0"
-                Padding="0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Content="扫描"
-                 IsEnabled="{Binding IsCapture}"
-                Click="Button_Click"/>
-            <!--IsEnabled="{Binding IsCapture}" />-->
+        <StackPanel Grid.Row="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1.5*" />
+                </Grid.ColumnDefinitions>
 
-            <Button
-                Width="auto"
-                Margin="5,0"
-                Padding="0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Command="{Binding QuickSaveFileCommand}"
-                Content="存储图片"
-                IsEnabled="{Binding IsCapture}" />
+                <Button
+                    Grid.Column="0"
+                    Width="auto"
+                    Margin="0,0,5,0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Click="Button_Click"
+                    Content="扫描"
+                    IsEnabled="{Binding IsCapture}" />
 
-            <StackPanel>
+                <Button
+                    Grid.Column="1"
+                    Width="auto"
+                    Margin="5,0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Command="{Binding QuickSaveFileCommand}"
+                    Content="存储图片"
+                    IsEnabled="{Binding IsCapture}" />
+                <Button
+                    Grid.Column="3"
+                    Margin="5,0,0,0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Command="{Binding SetExposureCommand}"
+                    Content="设置曝光"
+                    IsEnabled="{Binding IsCapture}" />
+                <TextBox
+                    x:Name="ExposureTextBox"
+                    Grid.Column="2"
+                    Margin="0,4,0,0"
+                    Padding="0,5,0,0"
+                    FontSize="10"
+                    IsEnabled="{Binding IsCapture}"
+                    LostFocus="ExposureTextBox_LostFocus"
+                    Text="{Binding Exposure}"
+                    TextAlignment="Center" />
 
-                <Grid Height="28" Margin="0,0,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="45*" />
-                        <ColumnDefinition Width="15*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Column="1"
-                        Width="auto"
-                        Margin="3,-3,0,0"
-                        FontSize="9"
-                        FontWeight="Bold"
-                        Foreground="{DynamicResource TextBrush03}"
-                        IsEnabled="{Binding IsCapture}"
-                        Text="曝光" />
-                    <TextBox
-                        x:Name="ExposureTextBox"
-                        Grid.Column="0"
-                        Width="auto"
-                        Margin="5,0,0,0"
-                        Padding="15,6,0,0"
-                        FontSize="15"
-                        IsEnabled="{Binding IsCapture}"
-                        LostFocus="ExposureTextBox_LostFocus"
-                        Text="{Binding Exposure, StringFormat={}{0:F2}, Delay=200}" />
-                </Grid>
-            </StackPanel>
-
-
-        </UniformGrid>
+            </Grid>
+        </StackPanel>
 
         <UniformGrid
             Grid.Row="2"

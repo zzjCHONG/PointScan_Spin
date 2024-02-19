@@ -12,7 +12,7 @@
     Height="700"
     MaxWidth="520"
     d:DataContext="{d:DesignInstance vm:CameraViewModel}"
-    ResizeMode="CanResize"
+    ResizeMode="NoResize"
     Style="{StaticResource TipWindow}"
     Topmost="True"
     mc:Ignorable="d">
@@ -182,6 +182,7 @@
                                 Margin="5,0,10,10"
                                 HorizontalAlignment="Stretch"
                                 Command="{Binding SetExposureCommand}"
+                                IsEnabled="{Binding IsExposureSettingEnable}"
                                 Content="设置曝光"
                                 DockPanel.Dock="Right" />
                         </UniformGrid>

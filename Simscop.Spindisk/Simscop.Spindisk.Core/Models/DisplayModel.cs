@@ -19,10 +19,10 @@ namespace Simscop.Spindisk.Core.Models;
 public partial class DisplayModel : ObservableObject
 {
     [ObservableProperty]
-    private BitmapFrame? _frame;
+    private BitmapFrame? _frame;//处理后图像（显示）
 
     [ObservableProperty]
-    private Mat _original = new();
+    private Mat _original = new();//原图（相机直接获取）
 
     /// <summary>
     /// gamma等处理对象
@@ -162,7 +162,7 @@ public partial class DisplayModel : ObservableObject
 
     void TempFrameDo()
     {
-        if(ValidMat(Display))
+        if (ValidMat(Display))
             Frame = BitmapFrame.Create(Display.ApplyColor(ColorMode).ToBitmapSource());
     }
 

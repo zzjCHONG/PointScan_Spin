@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Permissions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -34,8 +30,8 @@ public class TestCamera : ICamera
     {
         var paths = new List<string>()
         {
-            "C:/Users/DELL/Desktop/Y_-15800_X_-1800.TIF",
-
+            //"C:/Users/DELL/Desktop/Y_-15800_X_-1800.TIF",
+            @"C:\\Users\\Administrator\\Pictures\\Camera Roll\\1.jpg"
         };
 
         Total = paths.Count;
@@ -85,7 +81,7 @@ public class TestCamera : ICamera
     {
         Debug.WriteLine($"-> TestCamera.GetExposure");
 
-        exposure = 100;
+        exposure =0.1;
         return true;
     }
 
@@ -133,68 +129,24 @@ public partial class CameraViewModel : ObservableObject
         "NONE"
     };
 
-    private Mat? CurrentFrameforSaving { get; set; }
-
     public CameraViewModel()
     {
-        Camera = new Andor();
-        //Camera = new TestCamera();
+        Camera = new TestCamera();
         GlobalValue.GlobalCamera = Camera;
 
-        WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture,
-            (s, e) => throw new Exception("当前方法不准使用了"));
+        WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture, (s, e) =>
+        throw new Exception("当前方法不准使用了"));
 
         WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.SaveACapture, (s, e) =>
         {
             if (IsCapture)
-                CurrentFrameforSaving?.SaveImage(e);
+                GlobalValue.CurrentFrame?.SaveImage(e);
         });
-    }
 
-    [ObservableProperty]
-    private double _exposure = 0;//[10,30000]，ms
-
-    [ObservableProperty]
-    private double _frameRate = 0;//随曝光&采样率实时变化
-
-    partial void OnExposureChanged(double value)
-    {
-        Camera.SetExposure(value);
-        Camera.GetFrameRate(out _frameRate);
-    }
-
-    [RelayCommand]
-    void SetExposure() => Camera.SetExposure(Exposure);//未绑定
-
-    [ObservableProperty]
-    private bool _isStartAcquisition = false;
-
-    partial void OnIsStartAcquisitionChanged(bool value)
-    {
-        if (IsStartAcquisition)
+        WeakReferenceMessenger.Default.Register<CameraInitMessage>(this, (o, m) =>
         {
-            Task.Run(() =>
-            {
-                while (IsStartAcquisition)
-                {
-                    try
-                    {
-                        if (Camera.Capture(out var mat))
-                        {
-                            CurrentFrameforSaving = mat.Clone();
-                            GlobalValue.CurrentFrame = mat.Clone();
-
-                            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
-                            {
-                                Image = mat,
-                            }, "Display");
-                        }
-                    }
-                    catch (Exception)
-                    { }
-                }
-            });
-        }
+            if (m.IsPreInit) CameraInit();      
+        });
     }
 
     [ObservableProperty]
@@ -206,24 +158,50 @@ public partial class CameraViewModel : ObservableObject
     private bool _isCapture = false;
 
     [ObservableProperty]
+    private bool _isConnecting = true;
+
+    [ObservableProperty]
     private bool _isNoBusy = true;
 
-    [RelayCommand]
-    void Init()
+    partial void OnIsConnectingChanged(bool value)
     {
-        IsNoBusy = false;
+        if (!value)
+            WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value));
+    }
 
+    bool CameraInit()//初始化
+    {
+        IsConnecting = true;
+        IsInit = Camera.Init();
+        IsConnecting = false;
+        if (IsInit)
+        {       
+            Camera.GetExposure(out var exposure);
+            Exposure = Math.Floor(exposure * 1000.0);
+            Camera.GetFrameRate(out var frameRate);
+            FrameRate = frameRate;
+            return true;
+        }
+        else
+        {
+            IsNoBusy = false;//初始化不成功
+            return false;
+        }
+    }
+
+    [RelayCommand]
+    void Init()//按键
+    {      
+        IsNoBusy = false;
         if (!IsInit)
         {
             Task.Run(() =>
             {
-                IsInit = Camera.Init();
-                IsCapture = Camera.StartCapture();
-                Camera.GetExposure(out var exposure);
-                Exposure = Math.Floor(exposure * 1000.0);
-                Camera.GetFrameRate(out var frameRate);
-                FrameRate = frameRate;
-                IsStartAcquisition = true;
+                if (CameraInit())
+                {
+                    IsCapture = Camera.StartCapture();
+                    IsStartAcquisition = true;
+                }
                 IsNoBusy = true;
             });
         }
@@ -241,6 +219,59 @@ public partial class CameraViewModel : ObservableObject
         }
         else { }
     }
+
+    [ObservableProperty]
+    private bool _isStartAcquisition = false;
+
+    partial void OnIsStartAcquisitionChanged(bool value)//显示
+    {
+        if (IsStartAcquisition)
+        {
+            Task.Run(() =>
+            {
+                while (IsStartAcquisition)
+                {
+                    try
+                    {
+                        if (Camera.Capture(out var mat))
+                        {
+                            GlobalValue.CurrentFrame = mat.Clone();
+                            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+                            {
+                                Image = mat,
+                            }, "Display");
+                        }
+                    }
+                    catch (Exception)
+                    { }
+                }
+            });
+        }
+    }
+
+    [ObservableProperty]
+    private double _exposure = 0;//[10,30000]，ms
+
+    [ObservableProperty]
+    private double _frameRate = 0;//随曝光&采样率实时变化
+
+    partial void OnExposureChanged(double value)
+    {
+
+    }
+
+    [ObservableProperty]
+    private bool isExposureSettingEnable=true;
+
+    [RelayCommand]
+    void SetExposure()
+    {
+        IsExposureSettingEnable = false;
+        Camera.SetExposure(Exposure);
+        Camera.GetFrameRate(out var rate);
+        FrameRate = rate;
+        IsExposureSettingEnable = true;
+    }       
 
     #region File
 
@@ -267,7 +298,7 @@ public partial class CameraViewModel : ObservableObject
             Filter = "TIF|*.tif",
             DefaultExt = ".tif",
         };
-
+     
         if (dlg.ShowDialog() == DialogResult.OK)
             WeakReferenceMessenger.Default
                 .Send<string, string>(dlg.FileName, MessageManage.SaveACapture);

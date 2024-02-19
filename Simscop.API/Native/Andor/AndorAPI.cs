@@ -502,4 +502,11 @@ namespace Simscop.API
         TwoHundredMHz,
         TwoHundredandEightyMHz,
     }
+
+    public enum SimplePreAmpGainControlEnum
+    {
+        HighWellCapacity,
+        LowNoise,
+        LowNoiseandHighWellCapacity,
+    }
 }

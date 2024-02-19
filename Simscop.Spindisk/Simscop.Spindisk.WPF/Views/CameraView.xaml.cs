@@ -26,7 +26,6 @@ namespace Simscop.Spindisk.WPF.Views
             InitializeComponent();
         }
 
-
         protected override void OnClosing(CancelEventArgs e)
         {
             this.Hide();
@@ -35,17 +34,16 @@ namespace Simscop.Spindisk.WPF.Views
 
         private void ExposureTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            double value;
 
-            if (double.TryParse(ExposureTextBox.Text, out value))
+            if (int.TryParse(ExposureTextBox.Text, out int value))
             {
-                if (value < 10.00)
+                if (value <= 20)
                 {
-                    ExposureTextBox.Text = "20.00";
+                    ExposureTextBox.Text = "20";
                 }
-                else if (value > 1000.00)
+                else if (value >= 1000)
                 {
-                    ExposureTextBox.Text = "1000.00";
+                    ExposureTextBox.Text = "1000";
                 }
             }
             else

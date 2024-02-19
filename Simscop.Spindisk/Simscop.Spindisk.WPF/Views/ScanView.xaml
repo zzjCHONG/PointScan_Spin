@@ -198,6 +198,7 @@
                             <DockPanel Grid.Column="0">
                                 <CheckBox
                                     Margin="10,5,0,5"
+                                    x:Name="FocusCheck"
                                     Checked="CheckBox_Checked"
                                     IsChecked="{Binding IsFocus}">
                                     <CheckBox.ToolTip>

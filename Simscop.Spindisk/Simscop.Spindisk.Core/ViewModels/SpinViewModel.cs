@@ -1,13 +1,8 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
-using System.Xml;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -29,11 +24,17 @@ public partial class SpinViewModel : ObservableObject
     public SpinViewModel()
     {
         ComList = Simscop.API.Helper.SerialHelper.GetAllCom();
-
-        GlobalValue.GlobalSpin = new XLight();
-
-        WeakReferenceMessenger.Default.Register<SpindiskMessage, string>(this, 
-            nameof(SpindiskMessage), (r, m) => SetMode(m.Mode));
+        WeakReferenceMessenger.Default.Register<SpindiskMessage, string>(this, nameof(SpindiskMessage), (r, m) =>SetMode(m.Mode));
+        WeakReferenceMessenger.Default.Register<SpinInitMessage>(this, (o, m) =>
+        {
+            if (ComList == null || !ComList.Contains(ComName))
+            {
+                WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(false, false));
+                //MessageBox.Show($"转盘连接：端口号为空或端口{ComName}不存在");
+                return;
+            }
+            if (m.IsPreInit) ConnectCom();
+        });
     }
 
     [ObservableProperty]
@@ -49,6 +50,17 @@ public partial class SpinViewModel : ObservableObject
         });
     }
 
+    partial void OnIsConnectedChanged(bool value)
+    {
+        WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(value, IsConnecting));
+    }
+
+    partial void OnIsConnectingChanged(bool value)
+    {
+        if (!IsConnected)
+            WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(IsConnected, value));
+    }
+
     [ObservableProperty]
     private bool _spinControlEnabled = false;
 
@@ -61,19 +73,24 @@ public partial class SpinViewModel : ObservableObject
     private bool _isConnected = false;
 
     [ObservableProperty]
+    private bool _isConnectEnable = true;
+
+    [ObservableProperty]
     private bool _isConnecting = true;
 
     [RelayCommand]
-    async void ConnectCom()
+     async void ConnectCom()
     {
-        IsConnecting = false;
+        IsConnectEnable = false;
         SpinControlEnabled = false;
         try
         {
-            if (IsConnected)
+            if (!IsConnected)
             {
+                IsConnecting= true;
                 IsConnected = await XLight.Connect(ComName);
-
+                IsConnecting = false;
+               
                 if (IsConnected)
                 {
                     XLight.LoadAllFlag();
@@ -87,7 +104,7 @@ public partial class SpinViewModel : ObservableObject
                     SpinControlEnabled = true;
                 }
 
-                IsConnecting = true;
+                IsConnectEnable = true;
             }
             else
             {
@@ -98,14 +115,14 @@ public partial class SpinViewModel : ObservableObject
         }
         catch (Exception e)
         {
-            IsConnecting = true;
+            IsConnectEnable = true;
             IsConnected = false;
             SpinControlEnabled = false;
             MessageBox.Show("接口出现错误，连接失败");
         }
         finally
         {
-            IsConnecting = true;
+            IsConnectEnable = true;
         }
 
     }
@@ -208,8 +225,8 @@ public partial class SpinViewModel : ObservableObject
 
     void SetMode(int mode)
     {
-        if (!IsConnected)return;
-        
+        if (!IsConnected) return;
+
         switch (mode)
         {
             case 0:
@@ -218,17 +235,17 @@ public partial class SpinViewModel : ObservableObject
                 ExcitationIndex = 0;
                 break;
             case 1:
-                DichroicIndex = 2;
+                DichroicIndex = 0;
                 EmissionIndex = 2;
                 ExcitationIndex = 2;
                 break;
             case 2:
                 DichroicIndex = 1;
-                EmissionIndex = 5;
+                EmissionIndex = 3;
                 ExcitationIndex = 3;
                 break;
             case 3:
-                DichroicIndex = 2;
+                DichroicIndex = 3;
                 EmissionIndex = 4;
                 ExcitationIndex = 5;
                 break;
@@ -237,4 +254,36 @@ public partial class SpinViewModel : ObservableObject
 
         }
     }
+
+    //void SetMode(int mode)
+    //{
+    //    if (!IsConnected)return;
+        
+    //    switch (mode)
+    //    {
+    //        case 0:
+    //            DichroicIndex = 4;
+    //            EmissionIndex = 0;
+    //            ExcitationIndex = 0;
+    //            break;
+    //        case 1:
+    //            DichroicIndex = 2;
+    //            EmissionIndex = 2;
+    //            ExcitationIndex = 2;
+    //            break;
+    //        case 2:
+    //            DichroicIndex = 1;
+    //            EmissionIndex = 5;
+    //            ExcitationIndex = 3;
+    //            break;
+    //        case 3:
+    //            DichroicIndex = 2;
+    //            EmissionIndex = 4;
+    //            ExcitationIndex = 5;
+    //            break;
+    //        default:
+    //            break;
+
+    //    }
+    //}
 }

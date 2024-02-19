@@ -6,9 +6,6 @@ using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.Models;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -31,20 +28,35 @@ public partial class SteerViewModel : ObservableObject
     public SteerViewModel()
     {
         _motor = new();
-
         GlobalValue.GlobalMotor = _motor;
-
-        _timer = new DispatcherTimer(priority: DispatcherPriority.Background)
+        _timer = new DispatcherTimer(priority: DispatcherPriority.Background) 
         {
-            Interval = TimeSpan.FromSeconds(0.1),
+            Interval = TimeSpan.FromSeconds(0.1), 
         };
-        Task.Run(() =>
-        {
-            IsConnected = _motor.InitializeMotor();
-            _timer.Tick += _timer_Tick;
-            if (IsConnected) _timer.Start();
 
+        //SteerInit();
+        WeakReferenceMessenger.Default.Register<SteerInitMessage>(this, (o, m) =>
+        {
+            if (m.IsPreInit) SteerInit();
         });
+    }
+
+    [ObservableProperty]
+    private bool _isConnecting = true;
+
+    partial void OnIsConnectingChanged(bool value)
+    {
+        if (!value)
+            WeakReferenceMessenger.Default.Send<SteerConnectMessage>(new SteerConnectMessage(IsConnected, value));
+    }
+
+    private void SteerInit()
+    {
+        IsConnecting = true;
+        IsConnected = _motor.InitializeMotor();
+        _timer.Tick += _timer_Tick;
+        if (IsConnected) _timer.Start();
+        IsConnecting = false;
 
         WeakReferenceMessenger.Default.Register<string, string>(this, SteerMessage.MoveX, (s, e) =>
         {
@@ -68,7 +80,6 @@ public partial class SteerViewModel : ObservableObject
         {
             WeakReferenceMessenger.Default.Send<ASIMotor, string>(_motor, SteerMessage.Motor);
         });
-
 
         ReSetFocus();
 
@@ -191,6 +202,7 @@ public partial class SteerViewModel : ObservableObject
     [RelayCommand]
     void ReSetFocus()
     {
+        //Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
         GlobalValue.GeneralFocus = AutoFocus.Create();
         FirstCount = 5;
         FirstStep = 10;

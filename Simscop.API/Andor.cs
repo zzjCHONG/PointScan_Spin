@@ -108,7 +108,7 @@ namespace Simscop.API
         /// <returns></returns>
         public bool InitializeCamera(int cameraId = 0)
         {
-            if (Hndl != 0) return true;//已经成功获得相机句柄
+            if (Hndl > 0) return true;//已经成功获得相机句柄
 
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
@@ -233,6 +233,20 @@ namespace Simscop.API
             //AcqStartCommand();
             if (!AssertRet(AndorAPI.SetEnumString(Hndl, "CycleMode", cycleMode.ToString()))) return false;
             //AcqStopCommand();
+            return true;
+        }
+
+        /// <summary>
+        /// 设置灵敏度与动态范围 
+        /// Sensitivity/Dynamic Range；追求高动态范围请选 16-bit/追求采集速度请选 12-bit
+        /// </summary>
+        /// <param name="simplePreAmpGainControl"></param>
+        /// <returns></returns>
+        private bool SetSimplePreAmpGainControl(SimplePreAmpGainControlEnum simplePreAmpGainControl)
+        {
+            //AcqStopCommand();
+            if (!AssertRet(AndorAPI.SetEnumIndex(Hndl, "SimplePreAmpGainControl", (int)simplePreAmpGainControl))) return false;
+            //AcqStartCommand();
             return true;
         }
 
@@ -500,6 +514,8 @@ namespace Simscop.API
                 matImg = new Mat(ImageHeight, ImageWidth, matType);
                 Marshal.Copy(GlobalFramePtr, imageBytes, 0, imageBytes.Length);
                 Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
+
+                //matImg.Flip(FlipMode.X);
 
                 //4-Re-queue the buffers
                 if (AlignedBuffers == null)
