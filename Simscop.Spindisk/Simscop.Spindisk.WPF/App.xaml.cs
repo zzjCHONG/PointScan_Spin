@@ -40,7 +40,7 @@ namespace Simscop.Spindisk.WPF
             var conView = new ConnectStateView();
             var conVm = new ConnectStateViewModel();
             conView.DataContext = conVm;
-            conView.Show();
+            conView.ShowDialog();
         }
 
     }
