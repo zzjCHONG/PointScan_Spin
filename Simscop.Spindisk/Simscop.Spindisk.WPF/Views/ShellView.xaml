@@ -51,16 +51,7 @@
                     <MenuItem Click="CameraSave_OnClick" Header="相机存图" />
                 </MenuItem>
             </Menu>
-
-            <Button
-                Margin="5,0"
-                Background="{DynamicResource Region02}"
-                BorderThickness="0"
-                Click="ButtonBase_OnClick"
-                Content="设置"
-                FontFamily="{StaticResource Harmony}"
-                FontSize="14" />
-
+            
             <Button
                 Margin="5,0"
                 Background="{DynamicResource Region02}"
@@ -149,6 +140,17 @@
                         BorderThickness="1"
                         CornerRadius="8">
                         <local:ObjectiveLensView />
+                    </Border>
+
+                    <Border
+                        Height="Auto"
+                        Margin="0,2,0,0"
+                        Padding="0,0,0,10"
+                        Background="{StaticResource Region02}"
+                        BorderBrush="{DynamicResource Region01}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <local:SettingView x:Name="SettingControl" />
                     </Border>
 
                     <Border

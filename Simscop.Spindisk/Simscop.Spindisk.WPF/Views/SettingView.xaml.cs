@@ -18,17 +18,11 @@ namespace Simscop.Spindisk.WPF.Views
     /// <summary>
     /// SettingView.xaml 的交互逻辑
     /// </summary>
-    public partial class SettingView : Window
+    public partial class SettingView : UserControl
     {
         public SettingView()
         {
             InitializeComponent();
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            this.Hide();
-            e.Cancel = true;
         }
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -51,5 +45,6 @@ namespace Simscop.Spindisk.WPF.Views
                 }
             }
         }
+
     }
 }

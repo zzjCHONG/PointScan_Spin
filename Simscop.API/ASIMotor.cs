@@ -116,8 +116,9 @@ public class ASIMotor
         _motor.Home();
     }
 
-    ~ASIMotor()
+    public bool UnInitializeMotor()
     {
-        _motor.CloseCom();
+        if (!_motor.CloseCom()) return false;
+        return true;
     }
 }

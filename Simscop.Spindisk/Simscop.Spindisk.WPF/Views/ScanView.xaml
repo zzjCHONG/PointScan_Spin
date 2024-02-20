@@ -7,8 +7,8 @@
     xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{Binding Title}"
-    Width="400"
-    Height="320"
+    Width="390"
+    Height="520"
     ResizeMode="NoResize"
     Style="{StaticResource BlankWindow}"
     Topmost="True"
@@ -26,11 +26,11 @@
         <StackPanel
             Grid.Row="0"
             Height="32"
-            Margin="0,0,39,0"
+            Margin="5,0,130,0"
             Background="{DynamicResource Region02}"
             Orientation="Horizontal">
             <TextBlock
-                Margin="10,0,30,0"
+                Margin="10,0,10,0"
                 VerticalAlignment="Center"
                 FontSize="12"
                 Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}" />
@@ -80,7 +80,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="X起始位置" />
+                                        Text="X起始位置(μm)" />
 
                                     <TextBox
                                         Height="32"
@@ -100,7 +100,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="X终止位置" />
+                                        Text="X终止位置(μm)" />
                                     <TextBox
                                         Height="32"
                                         Margin="5,0"
@@ -120,7 +120,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="Y起始位置" />
+                                        Text="Y起始位置(μm)" />
 
                                     <TextBox
                                         Height="32"
@@ -138,7 +138,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="Y终止位置" />
+                                        Text="Y终止位置(μm)" />
                                     <TextBox
                                         Height="32"
                                         Margin="5,0"
@@ -157,7 +157,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="步长" />
+                                        Text="步长(μm)" />
 
                                     <TextBox
                                         Height="32"
@@ -175,7 +175,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text=" 间隔时间 " />
+                                        Text=" 间隔时间(s) " />
                                     <TextBox
                                         Height="32"
                                         Margin="5,0"
@@ -188,25 +188,8 @@
                             </DockPanel>
 
                         </UniformGrid>
-                        <Grid Margin="0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="3*" />
-                            </Grid.ColumnDefinitions>
-                            <DockPanel Grid.Column="0">
-                                <CheckBox
-                                    Margin="10,5,0,5"
-                                    x:Name="FocusCheck"
-                                    Checked="CheckBox_Checked"
-                                    IsChecked="{Binding IsFocus}">
-                                    <CheckBox.ToolTip>
-                                        <ToolTip Content="是否进行自动对焦" />
-                                    </CheckBox.ToolTip>
-                                </CheckBox>
-                            </DockPanel>
-                            <DockPanel Grid.Column="1">
+                        <UniformGrid Margin="0,10" Columns="3">
+                            <DockPanel Grid.Column="2">
                                 <Button
                                     Width="Auto"
                                     Height="32"
@@ -216,7 +199,7 @@
                                     Content="设为起点"
                                     FontSize="12" />
                             </DockPanel>
-                            <DockPanel Grid.Column="2">
+                            <DockPanel Grid.Column="3">
                                 <Button
                                     Width="Auto"
                                     Height="32"
@@ -226,7 +209,7 @@
                                     Content="设为终点"
                                     FontSize="12" />
                             </DockPanel>
-                            <DockPanel Grid.Column="3">
+                            <DockPanel Grid.Column="4">
                                 <Button
                                     Width="Auto"
                                     Height="32"
@@ -237,9 +220,69 @@
                                     FontSize="12"
                                     IsEnabled="True" />
                             </DockPanel>
-                        </Grid>
+                        </UniformGrid>
+                        <UniformGrid Margin="0,10" Columns="2">
+                            <DockPanel Grid.Column="0">
+                                <TextBlock Margin="30,0,5,0" Text="自动对焦" />
+                                <CheckBox
+                                    Margin="32.5,5,0,5"
+                                    Checked="CheckBox_Checked"
+                                    IsChecked="{Binding IsFocus}" />
+                            </DockPanel>
+                            <DockPanel Grid.Column="0">
+                                <TextBlock Margin="30,0,5,0" Text="图像拼接" />
+                                <CheckBox
+                                    Margin="32.5,5,0,5"
+                                    Checked="CheckBox_Checked"
+                                    IsChecked="{Binding IsSplice}" />
+                            </DockPanel>
+                        </UniformGrid>
+                        <UniformGrid
+                            Margin="0,10"
+                            Columns="2"
+                            IsEnabled="{Binding IsFocus}">
+                            <DockPanel>
+                                <StackPanel>
+                                    <TextBlock
+                                        Margin="5,0,0,5"
+                                        HorizontalAlignment="Left"
+                                        FontSize="12"
+                                        Text="Z上限(μm)" />
+
+                                    <TextBox
+                                        Height="32"
+                                        Margin="5,0"
+                                        Padding="10,0,0,0"
+                                        VerticalContentAlignment="Center"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding ZTop}"
+                                        TextAlignment="Left" />
+                                </StackPanel>
+
+                            </DockPanel>
+
+                            <DockPanel>
+                                <StackPanel>
+                                    <TextBlock
+                                        Margin="5,0,0,5"
+                                        HorizontalAlignment="Left"
+                                        FontSize="12"
+                                        Text="Z下限(μm)" />
+                                    <TextBox
+                                        Height="32"
+                                        Margin="5,0"
+                                        Padding="10,0,0,0"
+                                        VerticalContentAlignment="Center"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding ZBottom}"
+                                        TextAlignment="Left" />
+                                </StackPanel>
+
+                            </DockPanel>
+                        </UniformGrid>
                     </StackPanel>
                 </TabItem>
+
                 <TabItem
                     x:Name="ZScanItem"
                     Width="185"
@@ -252,7 +295,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="Z起始位置" />
+                                        Text="Z起始位置(μm)" />
 
                                     <TextBox
                                         Height="32"
@@ -270,7 +313,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="Z终止位置" />
+                                        Text="Z终止位置(μm)" />
                                     <TextBox
                                         Height="32"
                                         Margin="5,0"
@@ -289,7 +332,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text="步长" />
+                                        Text="步长(μm)" />
 
                                     <TextBox
                                         Height="32"
@@ -307,7 +350,7 @@
                                         Margin="5,0,0,5"
                                         HorizontalAlignment="Left"
                                         FontSize="12"
-                                        Text=" 间隔时间 " />
+                                        Text=" 间隔时间(s) " />
                                     <TextBox
                                         Height="32"
                                         Margin="5,0"

@@ -74,15 +74,26 @@ public partial class ScanViewModel : ObservableObject
     private bool _zEnable = true;
 
     [ObservableProperty]
+    private double _zTop = 0;
+
+    [ObservableProperty]
+    private double _zBottom = 0;
+
+    partial void OnZBottomChanged(double value)
+    {
+        GlobalValue.CustomFocus.SeccondCount = (int)((ZTop - ZBottom) / 2);
+    }
+
+    [ObservableProperty]
     private double _percent = 0;
 
     [ObservableProperty]
     private bool _isFocus = false;
 
-    partial void OnIsFocusChanged(bool value)
-    {
-        Debug.WriteLine("IsFouce =" +value);
-    }
+    [ObservableProperty]
+    private bool _isSplice = false;
+
+
 
     [ObservableProperty]
     private String _isXYStart = "开始扫描";
@@ -131,7 +142,7 @@ public partial class ScanViewModel : ObservableObject
 
         var yMessage = SteerMessage.GetValue($"Move{flags[1]}")!;
 
-        
+
 
         _cancelToken = new CancellationTokenSource();
 
@@ -173,8 +184,8 @@ public partial class ScanViewModel : ObservableObject
                     WeakReferenceMessenger.Default.Send<string, string>(yPos.ToString(CultureInfo.InvariantCulture), yMessage);
                     if (value % 2 == 0)
                     {
-                        xReversePos = result; 
-                        for(int i = xCount; i >= 0; i --)
+                        xReversePos = result;
+                        for (int i = xCount; i >= 0; i--)
                         {
                             Debug.WriteLine($"[INFO] {flags[0]} -> {xReversePos}");
                             WeakReferenceMessenger.Default.Send<string, string>(xReversePos.ToString(CultureInfo.InvariantCulture), xMessage);
@@ -191,7 +202,7 @@ public partial class ScanViewModel : ObservableObject
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
 
                             xReversePos -= stepValue;
-                            if(_cancelToken.IsCancellationRequested) break;
+                            if (_cancelToken.IsCancellationRequested) break;
                         }
                         value++;
                         xReversePos = result;
@@ -200,10 +211,10 @@ public partial class ScanViewModel : ObservableObject
                     {
                         for (int i = 0; i <= xCount; i++)
                         {
-                            
+
                             Debug.WriteLine($"[INFO] {flags[0]} -> {xForwardPos}");
                             WeakReferenceMessenger.Default.Send<string, string>(xForwardPos.ToString(CultureInfo.InvariantCulture), xMessage);
-                            
+
                             Thread.Sleep((int)(XYSpan * 1000));
 
                             if (IsFocus)
@@ -225,7 +236,7 @@ public partial class ScanViewModel : ObservableObject
                 }
                 if (_cancelToken.IsCancellationRequested) break;
             } while (value < yCount);
- 
+
             EnableAction(true);
             IsXYStart = "开始采集";
         });
@@ -317,7 +328,7 @@ public partial class ScanViewModel : ObservableObject
             } while (step <= count && !_cancelToken.IsCancellationRequested);
 
             var route = Path.Join(Root, $"Start_{startValue}_End_{endValue}_Step_{stepValue}.TIF");
-            if(stack!=null) Cv2.ImWrite(route, stack);
+            if (stack != null) Cv2.ImWrite(route, stack);
 
 
             if (_cancelToken.IsCancellationRequested)
