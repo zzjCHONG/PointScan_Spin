@@ -6,6 +6,9 @@ using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.Models;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -28,10 +31,12 @@ public partial class SteerViewModel : ObservableObject
     public SteerViewModel()
     {
         _motor = new();
+
         GlobalValue.GlobalMotor = _motor;
-        _timer = new DispatcherTimer(priority: DispatcherPriority.Background) 
+
+        _timer = new DispatcherTimer(priority: DispatcherPriority.Background)
         {
-            Interval = TimeSpan.FromSeconds(0.1), 
+            Interval = TimeSpan.FromSeconds(0.1),
         };
 
         WeakReferenceMessenger.Default.Register<SteerInitMessage>(this, (o, m) =>
@@ -81,6 +86,7 @@ public partial class SteerViewModel : ObservableObject
         {
             WeakReferenceMessenger.Default.Send<ASIMotor, string>(_motor, SteerMessage.Motor);
         });
+
 
         ReSetFocus();
 
@@ -202,7 +208,6 @@ public partial class SteerViewModel : ObservableObject
     [RelayCommand]
     void ReSetFocus()
     {
-        //Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
         GlobalValue.GeneralFocus = AutoFocus.Create();
         FirstCount = 5;
         FirstStep = 10;
@@ -269,7 +274,7 @@ public partial class SteerViewModel : ObservableObject
 
         Task.Run(() =>
         {
-            GlobalValue.CustomFocus.Focus() ;
+            GlobalValue.CustomFocus.Focus();
         });
     }
 
@@ -295,5 +300,9 @@ public partial class SteerViewModel : ObservableObject
 
 
     //private BlockingCollection<object> queue = new BlockingCollection<object>();
+    ~SteerViewModel()
+    {
+        _motor.UnInitializeMotor();
+    }
 
 }
