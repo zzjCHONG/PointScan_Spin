@@ -35,56 +35,60 @@ namespace Simscop.Spindisk.Core.ViewModels
             {
                 IsCameraConnected = m.IsConnected;
                 IsCameraConnecting = m.IsConnecting;
-                CameraText();
+                CameraText(m.ConnectState);
             });
             WeakReferenceMessenger.Default.Register<LaserConnectMessage>(this, (o, m) =>
             {
                 IsLaserConnected = m.IsConnected;
                 IsLaserConnecting = m.IsConnecting;
-                LaserText();
+                LaserText(m.ConnectState);
             });
             WeakReferenceMessenger.Default.Register<SteerConnectMessage>(this, (o, m) =>
             {
                 IsSteerConnected = m.IsConnected;
                 IsSteerConnecting = m.IsConnecting;
-                SteerText();
+                SteerText(m.ConnectState);
             });
             WeakReferenceMessenger.Default.Register<SpinConnectMessage>(this, (o, m) =>
             {
                 IsSpinConnected = m.IsConnected;
                 IsSpinConnecting = m.IsConnecting;
-                SpinText();
+                SpinText(m.ConnectState);
             });
 
-            Task.Run(Init);          
+            Task.Run(Init);
         }
 
         [ObservableProperty]
-        private string _cameraTextContext = "连接中...";
-        private string CameraText()
+        private string _cameraTextContext = "Connecting...";
+        private string CameraText(string connectState)
         {
-           return CameraTextContext= IsCameraConnected ? "连接完成！" : "初始化失败！";
+            //return CameraTextContext= IsCameraConnected ? "连接完成！" : "初始化失败！";
+            return CameraTextContext = connectState;
         }
 
         [ObservableProperty]
-        private string _laserTextContext = "连接中...";
-        private string LaserText()
+        private string _laserTextContext = "Connecting...";
+        private string LaserText(string connectState)
         {
-            return LaserTextContext = IsLaserConnected ? "连接完成！" : "初始化失败！";
+            //return LaserTextContext = IsLaserConnected ? "连接完成！" : "初始化失败！";
+            return LaserTextContext = connectState;
         }
 
         [ObservableProperty]
-        private string _steerTextContext = "连接中...";
-        private string SteerText()
+        private string _steerTextContext = "Connecting...";
+        private string SteerText(string connectState)
         {
-            return SteerTextContext = IsSteerConnected ? "连接完成！" : "初始化失败！";
+            //return SteerTextContext = IsSteerConnected ? "连接完成！" : "初始化失败！";
+            return SteerTextContext = connectState;
         }
 
         [ObservableProperty]
-        private string _spinTextContext = "连接中...";
-        private string SpinText()
+        private string _spinTextContext = "Connecting...";
+        private string SpinText(string connectState)
         {
-            return SpinTextContext = IsSpinConnected ? "连接完成！" : "初始化失败！";
+            //return SpinTextContext = IsSpinConnected ? "连接完成！" : "初始化失败！";
+            return SpinTextContext = connectState;
         }
 
         void Init()

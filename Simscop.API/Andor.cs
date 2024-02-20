@@ -1,11 +1,9 @@
 ﻿using OpenCvSharp;
-using OpenCvSharp.Flann;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Simscop.API
 {
@@ -13,6 +11,9 @@ namespace Simscop.API
     public class Andor : ICamera
     {
         AndorImplemented _andor = new AndorImplemented();
+
+        public string GetConnectState() => _andor.ConnectState;
+
         public bool Capture(out Mat mat) => _andor.Capture(out mat);
 
         public bool GetExposure(out double exposure) => _andor.GetExpose(out exposure);
@@ -38,6 +39,7 @@ namespace Simscop.API
 
     class AndorImplemented
     {
+        internal string ConnectState = string.Empty;
         private static int Hndl = 0;
         private static int NumberDevices = 0;
         private static int ImageSizeBytes;
@@ -53,7 +55,8 @@ namespace Simscop.API
             msg = Enum.IsDefined(typeof(AndorErrorCodeEnum), ret) ? (AndorErrorCodeEnum)ret : AndorErrorCodeEnum.NO_DEFINE;
             if (ret != (int)AndorErrorCodeEnum.AT_SUCCESS)
             {
-                Debug.WriteLine($"[ERROR] [{st?.GetFrame(1)?.GetMethod()?.Name}] {ret}-{msg}");
+                ConnectState = $"{ret}-{msg}";
+                Debug.WriteLine($"[ERROR] [{st?.GetFrame(1)?.GetMethod()?.Name}]{ConnectState}");
                 return false;
             }
             return true;
@@ -62,7 +65,8 @@ namespace Simscop.API
         private bool IsInitialized()
         {
             if (NumberDevices != 0) return true;
-            Debug.WriteLine("No camera found");
+            ConnectState = "No camera found";
+            Debug.WriteLine(ConnectState);
             return false;
         }
 
@@ -70,7 +74,8 @@ namespace Simscop.API
         {
             if (Hndl == 0 || ImageSizeBytes == 0)
             {
-                Debug.WriteLine("No camera connected");
+                ConnectState = "No camera connected";
+                Debug.WriteLine(ConnectState);
                 return false;
             }
             return true;
@@ -90,7 +95,8 @@ namespace Simscop.API
                 return false;
             }
             if (!AssertRet(AndorAPI.GetInt(1, "Device Count", ref NumberDevices), false, false)) return false;
-            Debug.WriteLine("InitializeSdk completed!");
+            ConnectState = "InitializeSdk completed!";
+            Debug.WriteLine(ConnectState);
             return true;
         }
 
@@ -128,7 +134,8 @@ namespace Simscop.API
             SetCycleMode(CycleModeEnum.Continuous);//采集方式-连续触发
             SetExposure(50);//曝光
 
-            Debug.WriteLine("InitializeCamera completed!");
+            ConnectState = "Initialize camera completed!";
+            Debug.WriteLine(ConnectState);
             return true;
         }
 
@@ -478,7 +485,7 @@ namespace Simscop.API
                 int bufferSize = 0;
                 //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
                 //stopwatch.Start();
-                if (!AssertRet(AndorAPI.WaitBuffer(Hndl, ref GlobalFramePtr, ref bufferSize, interval)))
+                if (!AssertRet(AndorAPI.WaitBuffer(Hndl, ref GlobalFramePtr, ref bufferSize, interval)))//断联，超时，连续多次触发
                 {
                     Debug.WriteLine("Camera recontect...");
                     AcqStopCommand();
@@ -574,10 +581,25 @@ namespace Simscop.API
         /// <returns></returns>
         public bool StopAcquisition()
         {
-            AcqStopCommand();
-            if (!AssertRet(AndorAPI.Flush(Hndl))) return false;
-            AlignedBuffers = null;
-            return true;
+            try
+            {
+                if (!AcqStopCommand())
+                {
+                    Debug.WriteLine("StopAcquisition failed. ");
+                    return false;
+                }                   
+                if (!AssertRet(AndorAPI.Flush(Hndl))) return false;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                AlignedBuffers = null;
+                
+            }
         }
 
         /// <summary>

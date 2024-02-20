@@ -114,47 +114,47 @@ public partial class ShellViewModel : ObservableObject
         {
             if (m.isOriginalImage)
             {
-                switch (m.channel)
+                switch (m.Channel)
                 {
                     case 0:
                         
                         if (!DisplayFirst.Original.Empty())
-                            DisplayFirst.Original.SaveImage(m.filename);//原图
+                            DisplayFirst.Original.SaveImage(m.Filename);//原图
                         break;
                     case 1:
                         if (!DisplaySecond.Original.Empty())
-                            DisplaySecond.Original.SaveImage(m.filename);
+                            DisplaySecond.Original.SaveImage(m.Filename);
                         break;
                     case 2:
                         if (!DisplayThird.Original.Empty())
-                            DisplayThird.Original.SaveImage(m.filename);
+                            DisplayThird.Original.SaveImage(m.Filename);
                         break;
                     case 3:
                         if (!DisplayFourth.Original.Empty())
-                            DisplayFourth.Original.SaveImage(m.filename);
+                            DisplayFourth.Original.SaveImage(m.Filename);
                         break;
                     default: break;
                 }
             }
             else
             {
-                switch (m.channel)
+                switch (m.Channel)
                 {
                     case 0:
                         if (DisplayFirst.Frame != null)
-                            DisplayFirst.Frame.Clone().ToMat().SaveImage(m.filename);//处理图
+                            DisplayFirst.Frame.Clone().ToMat().SaveImage(m.Filename);//处理图
                         break;
                     case 1:
                         if (DisplaySecond.Frame != null)
-                            DisplaySecond.Frame.Clone().ToMat().SaveImage(m.filename);
+                            DisplaySecond.Frame.Clone().ToMat().SaveImage(m.Filename);
                         break;
                     case 2:
                         if (DisplayThird.Frame != null)
-                            DisplayThird.Frame.Clone().ToMat().SaveImage(m.filename);
+                            DisplayThird.Frame.Clone().ToMat().SaveImage(m.Filename);
                         break;
                     case 3:
                         if (DisplayFourth.Frame != null)
-                            DisplayFourth.Frame.Clone().ToMat().SaveImage(m.filename);
+                            DisplayFourth.Frame.Clone().ToMat().SaveImage(m.Filename);
                         break;
                     default: break;
                 }
@@ -194,7 +194,7 @@ public partial class ShellViewModel : ObservableObject
                 matList.Add(mat4);
             }
             var merge = MatsExtension.MergeChannelAsMax(matList);
-            merge.SaveImage(m.filename);
+            merge.SaveImage(m.Filename);
 
         });
 

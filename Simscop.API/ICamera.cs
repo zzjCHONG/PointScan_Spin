@@ -8,8 +8,13 @@ namespace Simscop.API;
 public interface ICamera
 {
     /// <summary>
+    /// 输出连接状态
+    /// </summary>
+    /// <returns></returns>
+    public string GetConnectState();
+
+    /// <summary>
     /// 相机初始化
-    ///
     /// note: Deinit的代码写到析构函数中
     /// </summary>
     /// <returns></returns>

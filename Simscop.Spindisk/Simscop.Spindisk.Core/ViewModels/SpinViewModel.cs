@@ -21,6 +21,8 @@ namespace Simscop.Spindisk.Core.ViewModels;
 /// </summary>
 public partial class SpinViewModel : ObservableObject
 {
+    private string ConnectState=string.Empty;
+
     public SpinViewModel()
     {
         ComList = Simscop.API.Helper.SerialHelper.GetAllCom();
@@ -29,8 +31,9 @@ public partial class SpinViewModel : ObservableObject
         {
             if (ComList == null || !ComList.Contains(ComName))
             {
-                WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(false, false));
-                //MessageBox.Show($"转盘连接：端口号为空或端口{ComName}不存在");
+                ConnectState = $"The serial port {ComName} is not found";
+                //MessageBox.Show(ConnectState);
+                WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(false, false, ConnectState));
                 return;
             }
             if (m.IsPreInit) ConnectCom();
@@ -52,13 +55,18 @@ public partial class SpinViewModel : ObservableObject
 
     partial void OnIsConnectedChanged(bool value)
     {
-        WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(value, IsConnecting));
+        if (value)
+            ConnectState = "Initialize spin completed!";
+        WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(value, IsConnecting, ConnectState));
     }
 
     partial void OnIsConnectingChanged(bool value)
-    {
+    {   
         if (!IsConnected)
-            WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(IsConnected, value));
+        {
+            ConnectState = $"The serial port {ComName} is disconnected or in use.";
+            WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(IsConnected, value, ConnectState));
+        }         
     }
 
     [ObservableProperty]
@@ -92,9 +100,8 @@ public partial class SpinViewModel : ObservableObject
                 IsConnecting = false;
                
                 if (IsConnected)
-                {
+                {                
                     XLight.LoadAllFlag();
-
                     SpiningIndex = XLight.FlagD;
                     DichroicIndex = XLight.FlagC - 1;
                     EmissionIndex = XLight.FlagB - 1;
@@ -118,7 +125,7 @@ public partial class SpinViewModel : ObservableObject
             IsConnectEnable = true;
             IsConnected = false;
             SpinControlEnabled = false;
-            MessageBox.Show("接口出现错误，连接失败");
+            MessageBox.Show("旋转台：接口出现错误，连接失败");
         }
         finally
         {

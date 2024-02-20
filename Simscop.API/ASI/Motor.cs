@@ -35,27 +35,31 @@ namespace Simscop.API.ASI
             StopBits = StopBits.One,
         };
 
-        public bool OpenCom()
+        public bool OpenCom(out string errMsg)
         {
-            if (Valid())
-                serialPort.PortName = _portName;
-            else return false;
+            errMsg = string.Empty;   
             try
             {
-                if (_portName != null && !serialPort.IsOpen)
+                if (Valid())
                 {
-                    serialPort.Open();
+                    serialPort.PortName = _portName;
                 }
+                else
+                {
+                    errMsg = "The serial port is disconnected or in use.";
+                    return false;
+                }
+                if (_portName != null && !serialPort.IsOpen)
+                    serialPort.Open();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.WriteLine("串口已开启或已被占用", "Error");
+                errMsg = "The serial port is enabled or in use.";
+                Debug.WriteLine($"{errMsg}:{ex.Message}", "Error");
                 serialPort.Close();
                 return false;
             }
-
             return true;
-
         }
 
         public bool CloseCom()
@@ -207,8 +211,6 @@ namespace Simscop.API.ASI
 
                 foreach (string portName in portNames)
                 {
-
-
                     try
                     {
                         serialPort.PortName = portName;
@@ -218,7 +220,6 @@ namespace Simscop.API.ASI
 
                         Thread.Sleep(100);
                         var value = serialPort.ReadExisting();
-
 
                         if (value == ":A ASI-MS2000-XYBR-ZFR-USB \r\n")
                         {

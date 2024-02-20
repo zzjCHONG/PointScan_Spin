@@ -19,23 +19,40 @@ namespace Simscop.API.Bogao
 
         public string? _portName;
 
+        internal string ConnectState = string.Empty;
 
         public bool OpenCom()
         {
-            if (Valid())
-                _port.PortName = _portName;
-            else return false;
-
-            if (!_port.IsOpen)
+            try
             {
-                _port.Open();
-                return true;
+                if (Valid())
+                {
+                    _port.PortName = _portName;
+                }
+                else
+                {
+                    ConnectState = "No available laser serial port found";
+                    return false;
+                }
+                if (!_port.IsOpen)
+                {
+                    _port.Open();
+                    ConnectState = "Initialize laser completed!";
+                    return true;
+                }
+                else
+                {
+                    ConnectState = $"Failed to connect to port {_portName}";
+                    Console.WriteLine(ConnectState);
+                    return false;
+                }
             }
-            else
+            catch (Exception)
             {
-                Console.WriteLine($"Failed to connect to port {_portName}");
+                ConnectState = $"Failed to connect to port {_portName}";
+                Console.WriteLine(ConnectState);
                 return false;
-            }
+            } 
         }
 
         public bool CloseCom()

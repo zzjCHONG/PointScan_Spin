@@ -1,12 +1,17 @@
-﻿using Simscop.Spindisk.Core.ViewModels;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Simscop.Spindisk.Core.Messages;
+using Simscop.Spindisk.Core.ViewModels;
 using Simscop.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Printing.IndexedProperties;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
+using static OpenCvSharp.Stitcher;
 
 namespace Simscop.Spindisk.WPF.Views
 {
@@ -33,6 +38,8 @@ namespace Simscop.Spindisk.WPF.Views
         public BaseSteerView()
         {
             InitializeComponent();
+            InitializeTimer();
+
             this.DataContext = null;
 
             _rightTimer = new DispatcherTimer(priority: DispatcherPriority.Render)
@@ -156,12 +163,68 @@ namespace Simscop.Spindisk.WPF.Views
             DownMoveBt.PreviewMouseDown += (s, e) => _downTimer.Start();
             DownMoveBt.PreviewMouseUp += (s, e) => _downTimer.Stop();
             DownMoveBt.Click += (s, e) => Vm?.MoveZ(-Vm.ZStep);
-
         }
 
         private void UIElement_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
         }
+
+        #region 自动对焦按键动画
+        private DispatcherTimer _animationTimer;
+        private static int ProgressMode = 0;
+        private void InitializeTimer()
+        {
+            _animationTimer = new DispatcherTimer();
+            _animationTimer.Interval = TimeSpan.FromMilliseconds(300); // 设置闪烁的间隔
+            _animationTimer.Tick += Timer_Tick;
+        }
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            switch (ProgressMode)
+            {
+                case -1://未进行或中止
+                    FocusButton.Background = Brushes.Transparent;
+                    WeakReferenceMessenger.Default.Unregister<SteerAnimationStateMessage>(this);//取消注册
+                    _animationTimer.Stop();
+                    break;
+                case 1://运行中
+                    FocusButton.Background = (FocusButton.Background == Brushes.Red) ? Brushes.Transparent : Brushes.Red;
+                    break;
+                case 2://完成
+                    FocusButton.Background = Brushes.Green;
+                    _animationTimer.Stop();
+                    break;
+                default:
+                    break;
+            }
+        }
+        private void FocusButton_Click(object sender, RoutedEventArgs e)
+        {
+            WeakReferenceMessenger.Default.Register<SteerAnimationStateMessage>(this, (s, m) =>
+            {
+                ProgressMode = m.Mode;
+            });
+            ProgressMode = 1;
+            _animationTimer.Start();
+
+            //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));//对焦中止（轴移动情况）未添加
+
+            ////Test
+            //if (ProgressMode == 0)
+            //{
+            //    ProgressMode = 1;        
+            //}
+            //else if (ProgressMode == 1)
+            //{
+            //    ProgressMode = 2;
+            //}
+            //else if (ProgressMode == 2)
+            //{
+            //    ProgressMode = 0;
+            //}
+            //_animationTimer.Start();//开启定时器
+        }
+        #endregion
     }
 }

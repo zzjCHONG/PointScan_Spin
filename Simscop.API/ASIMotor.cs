@@ -6,13 +6,13 @@ public class ASIMotor
 {
     Motor _motor;
 
-    public bool InitializeMotor()
+    public bool InitializeMotor(out string errMsg)
     {
         _motor = new Motor();
 
-        if (!_motor.OpenCom()) return false;
+        if (!_motor.OpenCom(out errMsg)) return false;
+        errMsg = "Initialize steer completed!";
         return true;
-
     }
 
     public void ReadPosition()

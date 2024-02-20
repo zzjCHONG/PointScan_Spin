@@ -86,7 +86,6 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 DataContext = multiChannelSaveVM,
             };
-
             SetDataContext();
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;

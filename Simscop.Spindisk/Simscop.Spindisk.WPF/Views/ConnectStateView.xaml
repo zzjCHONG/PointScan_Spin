@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
     Title="ConnectState"
     Width="596"
-    Height="350"
+    Height="330"
     d:DataContext="{d:DesignInstance vm:ConnectStateViewModel}"
     ResizeMode="NoResize"
     Style="{StaticResource BlankWindow}"
@@ -19,10 +19,10 @@
         <TextBlock
             Margin="20,10,0,10"
             HorizontalAlignment="Left"
-            FontSize="30"
+            FontSize="25"
             FontWeight="Bold"
             Foreground="#FFFBF4F4"
-            Text="硬件连接状态" />
+            Text="Hardware connection status" />
         <Separator Margin="10,0,10,10" Background="{DynamicResource Region01}" />
 
         <UniformGrid
@@ -33,25 +33,21 @@
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="135" />
-                        <ColumnDefinition Width="302" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="5*" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
-                        Width="80"
-                        Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontSize="30"
+                        FontSize="25"
                         Foreground="#FFF7F3F3"
-                        Text="相机"
+                        Text="Camera"
                         TextAlignment="Center" />
 
                     <CheckBox
                         Grid.Column="1"
-                        Width="62"
-                        Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         IsChecked="{Binding IsCameraConnected}"
@@ -60,37 +56,31 @@
 
                     <TextBox
                         Grid.Column="2"
-                        Width="250"
+                        Width="350"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontSize="20"
+                        FontSize="15"
                         Text="{Binding CameraTextContext}"
                         TextAlignment="Center" />
-
-
                 </Grid>
             </StackPanel>
 
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="135" />
-                        <ColumnDefinition Width="302" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="5*" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
-                        Width="100"
-                        Height="40"
-                        FontSize="30"
+                        FontSize="25"
                         Foreground="#FFFBF6F6"
-                        Text="电动台"
+                        Text="Steer"
                         TextAlignment="Center" />
 
                     <CheckBox
                         Grid.Column="1"
-                        Width="62"
-                        Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         IsChecked="{Binding IsSteerConnected}"
@@ -99,10 +89,10 @@
 
                     <TextBox
                         Grid.Column="2"
-                        Width="250"
+                        Width="350"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontSize="20"
+                        FontSize="15"
                         Text="{Binding SteerTextContext}"
                         TextAlignment="Center" />
 
@@ -113,23 +103,19 @@
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="135" />
-                        <ColumnDefinition Width="302" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="5*" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
-                        Width="100"
-                        Height="40"
-                        FontSize="30"
+                        FontSize="25"
                         Foreground="#FFFBF7F7"
-                        Text="激光器"
+                        Text="Laser"
                         TextAlignment="Center" />
 
                     <CheckBox
                         Grid.Column="1"
-                        Width="62"
-                        Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         IsChecked="{Binding IsLaserConnected}"
@@ -138,10 +124,10 @@
 
                     <TextBox
                         Grid.Column="2"
-                        Width="250"
+                        Width="350"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontSize="20"
+                        FontSize="15"
                         Text="{Binding LaserTextContext}"
                         TextAlignment="Center" />
 
@@ -152,23 +138,19 @@
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="135" />
-                        <ColumnDefinition Width="302" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="5*" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
-                        Width="100"
-                        Height="40"
-                        FontSize="30"
+                        FontSize="25"
                         Foreground="#FFF9F6F6"
-                        Text="旋转台"
+                        Text="Spin"
                         TextAlignment="Center" />
 
                     <CheckBox
                         Grid.Column="1"
-                        Width="62"
-                        Height="40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         IsChecked="{Binding IsSpinConnected}"
@@ -177,10 +159,10 @@
 
                     <TextBox
                         Grid.Column="2"
-                        Width="250"
+                        Width="350"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontSize="20"
+                        FontSize="15"
                         Text="{Binding SpinTextContext}"
                         TextAlignment="Center" />
 

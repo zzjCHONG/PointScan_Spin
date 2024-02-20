@@ -34,7 +34,6 @@ public partial class SteerViewModel : ObservableObject
             Interval = TimeSpan.FromSeconds(0.1), 
         };
 
-        //SteerInit();
         WeakReferenceMessenger.Default.Register<SteerInitMessage>(this, (o, m) =>
         {
             if (m.IsPreInit) SteerInit();
@@ -47,13 +46,15 @@ public partial class SteerViewModel : ObservableObject
     partial void OnIsConnectingChanged(bool value)
     {
         if (!value)
-            WeakReferenceMessenger.Default.Send<SteerConnectMessage>(new SteerConnectMessage(IsConnected, value));
+            WeakReferenceMessenger.Default.Send<SteerConnectMessage>(new SteerConnectMessage(IsConnected, value, ConnectState));
     }
+
+    private string ConnectState = string.Empty;
 
     private void SteerInit()
     {
         IsConnecting = true;
-        IsConnected = _motor.InitializeMotor();
+        IsConnected = _motor.InitializeMotor(out ConnectState);
         _timer.Tick += _timer_Tick;
         if (IsConnected) _timer.Start();
         IsConnecting = false;
@@ -118,7 +119,6 @@ public partial class SteerViewModel : ObservableObject
                 await Task.Delay(100);
             }
         });
-
     }
 
     [ObservableProperty]
@@ -148,7 +148,7 @@ public partial class SteerViewModel : ObservableObject
     [ObservableProperty]
     private bool _isConnected = false;
 
-    #region 自动对焦餐宿
+    #region 自动对焦参数
     [ObservableProperty]
     private int _firstCount = 5;
 
