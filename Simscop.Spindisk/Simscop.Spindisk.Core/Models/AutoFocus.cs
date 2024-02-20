@@ -1,12 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using Lift.Core.Autofocus;
 using Lift.Core.Autofocus.Drivers;
 using Lift.Core.ImageArray.Extensions;
 using OpenCvSharp;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Simscop.Spindisk.Core.Models
 {
@@ -25,19 +31,23 @@ namespace Simscop.Spindisk.Core.Models
                     {
                         focus = new AutoFocus();
                         GlobalValue.GeneralFocus = focus;
-                        GlobalValue.CustomFocus = focus;
+                        GlobalValue.GeneralFocus = focus;
 
                         WeakReferenceMessenger.Default.Send<string>(SteerMessage.MotorReceive);
+
+
                     }
                 }
             }
             return focus;
         }
 
+
         ASIMotor _motor;
 
         private AutoFocus()
-        {            
+        {
+
             WeakReferenceMessenger.Default.Register<ASIMotor, string>(this, SteerMessage.Motor, (s, e) =>
             {
                 _motor = e;
@@ -70,14 +80,37 @@ namespace Simscop.Spindisk.Core.Models
             return true;
         }
 
+
+
         public override bool SetPosition(double z)
         {
             var value = Math.Round(z, 2);
             _motor.SetZPosition(value);
             _motor.ReadPosition();
-            while (Math.Abs(_motor.Z - value) > 0.1)
-                Thread.Sleep(10);
-            return true;
+
+            int timeoutMilliseconds = 2000;
+
+            DateTime startTime = DateTime.Now;
+
+            try
+            {
+                while (Math.Abs(_motor.Z - value) > 0.1)
+                {
+                    if ((DateTime.Now - startTime).TotalMilliseconds > timeoutMilliseconds)
+                    {
+                        throw new TimeoutException("SetPosition operation timed out");
+                    }
+
+                    Thread.Sleep(10);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("位移台出现错误，停止对焦");
+                return false;
+            }
         }
 
         public override void Focus()
@@ -93,14 +126,15 @@ namespace Simscop.Spindisk.Core.Models
             num4 = num4 > MaxZ ? MaxZ : num4;
             num4 = num4 < MinZ ? MinZ : num4;
 
-            SetPosition(num4);
+            if (!SetPosition(num4)) return;
+
             Thread.Sleep(300);
             for (int i = 0; i < 2 * FirstCount + 1; i++)
             {
                 double num5 = num4 + (double)i * FirstStep;
                 if (!(num5 <= MinZ) && !(num5 >= MaxZ))
                 {
-                    SetPosition(num5);
+                    if (!SetPosition(num5)) break;
                     GetPosition(out z);
                     Capture(out var mat);
                     num3 = Score(mat);
@@ -121,7 +155,7 @@ namespace Simscop.Spindisk.Core.Models
             num4 = num4 < MinZ ? MinZ : num4;
 
 
-            SetPosition(num4);
+            if (!SetPosition(num4)) return;
             Thread.Sleep(100);
             num2 = 0.0;
             for (int j = 0; j < 2 * SeccondCount + 1; j++)
@@ -129,7 +163,7 @@ namespace Simscop.Spindisk.Core.Models
                 double num6 = num4 + (double)j * SecondStep;
                 if (!(num6 <= MinZ) && !(num6 >= MaxZ))
                 {
-                    SetPosition(num4 + (double)j * SecondStep);
+                    if (!SetPosition(num4 + (double)j * SecondStep)) break;
                     GetPosition(out z);
                     Capture(out var mat2);
                     num3 = Score(mat2);

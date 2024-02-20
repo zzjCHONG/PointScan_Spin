@@ -47,9 +47,9 @@ namespace Simscop.API.ASI
                     serialPort.Open();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.WriteLine("串口已开启或已被占用", "Error");
+                Debug.WriteLine(ex);
                 serialPort.Close();
                 return false;
             }

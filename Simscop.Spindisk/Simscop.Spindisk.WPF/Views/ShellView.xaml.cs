@@ -125,6 +125,7 @@ namespace Simscop.Spindisk.WPF.Views
             this.BaseCameraControl.DataContext = cameraVM;
             this.SpinControl.DataContext = spinVM;
             this.SteerControl.DataContext = steerVM;
+            this.SettingControl.DataContext = steerVM;
             this.LaserControl.DataContext = laserVM;
         }
 
@@ -175,13 +176,7 @@ namespace Simscop.Spindisk.WPF.Views
             }
         }
 
-        // TODO 这里的卡顿问题已经定位了，原因就是在给datacontext的时候数据变化和赋值原因，解决办法挺简单的，单个窗口重复利用就行，但是这里目前就卡着吧，有空再改
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            settingView.Show();
-            settingView.Topmost = true;
-        }
-
+    
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
