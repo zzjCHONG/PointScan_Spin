@@ -98,19 +98,13 @@ public record SpinConnectMessage(bool IsConnected, bool IsConnecting);
 public record CameraSaveMessage(int channel, bool isOriginalImage,string filename);
 
 /// <summary>
-/// 多通道采集-伪彩通道
-/// </summary>
-/// <param name="codeModel"></param>
-public record MultiChannelColorMessage(int codeModel);
-
-/// <summary>
 /// 多通道采集-激光通道触发
 /// </summary>
 /// <param name="channel"></param>
 /// <param name="isEnable"></param>
 public record MultiChannelLaserMessage(int channel,bool isEnable);
 
-public record MultiChannelMergeMessage();
-
-
-
+/// <summary>
+/// 大图拼接
+/// </summary>
+public record MultiChannelMergeMessage(string filename);

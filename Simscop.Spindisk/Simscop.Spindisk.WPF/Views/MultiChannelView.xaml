@@ -8,7 +8,7 @@
     xmlns:models="clr-namespace:Simscop.Spindisk.Core.Models;assembly=Simscop.Spindisk.Core"
     xmlns:vm="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
     Title="MultiChannelView"
-    Width="400"
+    Width="380"
     Height="350"
     d:DataContext="{d:DesignInstance vm:MultiChannelViewModel}"
     Style="{StaticResource BlankWindow}"
@@ -26,8 +26,7 @@
         <StackPanel>
             <Grid Margin="5,10,10,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.5*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.8*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock
@@ -44,27 +43,16 @@
                     FontWeight="Bold"
                     Foreground="#FFFBF4F4"
                     Text="是否激发" />
-                <TextBlock
-                    Grid.Column="2"
-                    HorizontalAlignment="Center"
-                    FontSize="13"
-                    FontWeight="Bold"
-                    Foreground="#FFF7F2F2"
-                    Text="伪彩选择" />
             </Grid>
         </StackPanel>
 
         <Separator Margin="10,0,10,0" Background="{DynamicResource Region01}" />
 
-        <UniformGrid
-            Height="240"
-            Margin="5"
-            Rows="4">
+        <UniformGrid Height="240" Rows="4">
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <CheckBox
@@ -81,20 +69,15 @@
                         FontSize="12"
                         Foreground="#FFFBFAFA"
                         Text="DAPI-405nm" />
-                    <ComboBox
-                        Grid.Column="2"
-                        IsEnabled="{Binding IsChannelASave}"
-                        ItemsSource="{x:Static models:MatExtension.Colors}"
-                        SelectedIndex="{Binding ColorModeA}" />
                 </Grid>
             </StackPanel>
 
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+
                     </Grid.ColumnDefinitions>
                     <CheckBox
                         Grid.Column="1"
@@ -110,20 +93,16 @@
                         FontSize="12"
                         Foreground="#FFFBFAFA"
                         Text="FITC-488nm" />
-                    <ComboBox
-                        Grid.Column="2"
-                        IsEnabled="{Binding IsChannelBSave}"
-                        ItemsSource="{x:Static models:MatExtension.Colors}"
-                        SelectedIndex="{Binding ColorModeB}" />
+
                 </Grid>
             </StackPanel>
 
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+
                     </Grid.ColumnDefinitions>
                     <CheckBox
                         Grid.Column="1"
@@ -139,20 +118,15 @@
                         FontSize="12"
                         Foreground="#FFFBFAFA"
                         Text="TRITC-561nm" />
-                    <ComboBox
-                        Grid.Column="2"
-                        IsEnabled="{Binding IsChannelCSave}"
-                        ItemsSource="{x:Static models:MatExtension.Colors}"
-                        SelectedIndex="{Binding ColorModeC}" />
                 </Grid>
             </StackPanel>
 
             <StackPanel>
                 <Grid Margin="5,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+
                     </Grid.ColumnDefinitions>
                     <CheckBox
                         Grid.Column="1"
@@ -168,11 +142,6 @@
                         FontSize="12"
                         Foreground="#FFFBFAFA"
                         Text="CY5-640nm" />
-                    <ComboBox
-                        Grid.Column="2"
-                        IsEnabled="{Binding IsChannelDSave}"
-                        ItemsSource="{x:Static models:MatExtension.Colors}"
-                        SelectedIndex="{Binding ColorModeD}" />
                 </Grid>
             </StackPanel>
 
@@ -181,24 +150,24 @@
         <StackPanel>
             <Grid Margin="5,0,10,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80" />
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button
-                    Grid.Column="0"
+                    Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     Command="{Binding OpenFileDialogCommand}"
                     Content="选择路径"
                     DockPanel.Dock="Right" />
                 <TextBox
-                    Grid.Column="1"
+                    Grid.Column="2"
                     Margin="2,0,2,0"
                     FontSize="10"
                     Text="{Binding Root}" />
                 <Button
-                    Grid.Column="2"
+                    Grid.Column="0"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     Command="{Binding SaveMultiChannelCommand}"
