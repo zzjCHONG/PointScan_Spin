@@ -3,10 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using Lift.Core.ImageArray.Extensions;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using Simscop.Spindisk.Core.Messages;
@@ -102,15 +102,16 @@ public partial class ShellViewModel : ObservableObject
                 if (m.Image is not { } img) return;
                 if (!(EnableFirst || EnableSecond || EnableThird || EnableFourth)) return;
 
+                //Cv2.Rotate(img, img, RotateFlags.Rotate180);
+                Cv2.Flip(img, img, FlipMode.X);
                 DisplayCurrent.Original = img.Clone();
+                
             });
         });
 
-        //存图
+        //非实时画面存图--存图界面使用
         WeakReferenceMessenger.Default.Register<CameraSaveMessage>(this, (s, m) =>
         {
-            if (File.Exists(m.filename)) File.Delete(m.filename);//覆盖
-
             if (m.isOriginalImage)
             {
                 switch (m.channel)
@@ -118,7 +119,7 @@ public partial class ShellViewModel : ObservableObject
                     case 0:
                         
                         if (!DisplayFirst.Original.Empty())
-                            DisplayFirst.Original.SaveImage(m.filename);
+                            DisplayFirst.Original.SaveImage(m.filename);//原图
                         break;
                     case 1:
                         if (!DisplaySecond.Original.Empty())
@@ -141,7 +142,7 @@ public partial class ShellViewModel : ObservableObject
                 {
                     case 0:
                         if (DisplayFirst.Frame != null)
-                            DisplayFirst.Frame.Clone().ToMat().SaveImage(m.filename);
+                            DisplayFirst.Frame.Clone().ToMat().SaveImage(m.filename);//处理图
                         break;
                     case 1:
                         if (DisplaySecond.Frame != null)
@@ -160,34 +161,45 @@ public partial class ShellViewModel : ObservableObject
             }    
         });
 
-
-        //伪彩通道修改
-        WeakReferenceMessenger.Default.Register<MultiChannelColorMessage>(this, (s, m) =>
-        {
-            DisplayCurrent.ColorMode = m.codeModel;
-        });
-
-        //WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.DisplayFrame, (s, m) =>
-        //{
-        //    if (File.Exists(m)) File.Delete(m);//覆盖
-        //    if (DisplayCurrent.Frame != null)
-        //        DisplayCurrent.Frame.Clone().ToMat().SaveImage(m);//多通道存图
-        //});
-
+        //多通道N+1合并
         WeakReferenceMessenger.Default.Register<MultiChannelMergeMessage>(this, (s, m) =>
         {
-            List<Mat> mats = new List<Mat>();
+            List<Mat> matList = new List<Mat>();
             if (DisplayFirst.Frame != null)
-                mats.Add(DisplayFirst.Frame.Clone().ToMat());
+            {
+                var mat1 = DisplayFirst.Frame.Clone().ToMat();
+                if (mat1.Channels() != 3)
+                    Cv2.CvtColor(mat1, mat1, ColorConversionCodes.GRAY2BGR);
+                matList.Add(mat1);
+            }
             if (DisplaySecond.Frame != null)
-                mats.Add(DisplaySecond.Frame.Clone().ToMat());
+            {
+                var mat2 = DisplaySecond.Frame.Clone().ToMat();
+                if (mat2.Channels() != 3)
+                    Cv2.CvtColor(mat2, mat2, ColorConversionCodes.GRAY2BGR);
+                matList.Add(mat2);
+            }
             if (DisplayThird.Frame != null)
-                mats.Add(DisplayThird.Frame.Clone().ToMat());
+            {
+                var mat3 = DisplayThird.Frame.Clone().ToMat();
+                if (mat3.Channels() != 3)
+                    Cv2.CvtColor(mat3, mat3, ColorConversionCodes.GRAY2BGR);
+                matList.Add(mat3);
+            }
             if (DisplayFourth.Frame != null)
-                mats.Add(DisplayFourth.Frame.Clone().ToMat());
+            {
+                var mat4 = DisplayFourth.Frame.Clone().ToMat();
+                if (mat4.Channels() != 3)
+                    Cv2.CvtColor(mat4, mat4, ColorConversionCodes.GRAY2BGR);
+                matList.Add(mat4);
+            }
+            var merge = MatsExtension.MergeChannelAsMax(matList);
+            merge.SaveImage(m.filename);
 
-            //DisplayModel.MergeChannel3();
         });
 
+
+
     }
+
 }
