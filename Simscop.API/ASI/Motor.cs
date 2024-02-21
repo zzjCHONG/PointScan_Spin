@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Simscop.API.ASI
 {
-    
+
     public class Motor
     {
         public bool isBusy = false;
@@ -102,26 +102,31 @@ namespace Simscop.API.ASI
         public bool MoveRelative(Axis axis, double value)
         {
             string text = "";
-            if(serialPort.IsOpen)
-            switch (axis)
-            {
-                case Axis.X:
+            if (serialPort.IsOpen)
+                switch (axis)
+                {
+                    case Axis.X:
                         text = $"R X={value * 10}\r\n";
-                    serialPort.WriteLine(text);
+                        serialPort.WriteLine(text);
                         Debug.WriteLine(x);
-                    break;
-                case Axis.Y:
+                        break;
+                    case Axis.Y:
                         text = $"R Y={value * 10}\r\n";
                         serialPort.Write(text);
-                    break;
-                case Axis.Z:
+                        break;
+                    case Axis.Z:
+                        if ((value + z) < 25)
+                        {
+                            value = Math.Round(25 - z, 1);
+                        }
                         text = $"R Z={value * 10}\r\n";
                         serialPort.Write(text);
-                    break;
-            }
+                        Thread.Sleep(200);
+                        break;
+                }
             else return false;
             return true;
-           
+
         }
 
         /// <summary>
@@ -140,6 +145,7 @@ namespace Simscop.API.ASI
                     serialPort.Write($"M Y={value * 10}\r\n");
                     break;
                 case Axis.Z:
+                    if (value < 25) value = 25;
                     serialPort.Write($"M Z={value * 10.0}\r\n");
                     break;
             }

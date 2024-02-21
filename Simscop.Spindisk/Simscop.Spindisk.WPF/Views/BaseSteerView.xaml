@@ -203,7 +203,7 @@
                         Command="{Binding FocusCommand}"
                         Content="自动对焦"
                         FontSize="12"
-                        IsEnabled="True" />
+                        IsEnabled="{Binding IsUnFocusing}" />
                     <Button
                         Width="60"
                         Height="28"

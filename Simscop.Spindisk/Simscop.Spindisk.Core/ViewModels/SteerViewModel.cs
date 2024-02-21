@@ -154,12 +154,15 @@ public partial class SteerViewModel : ObservableObject
     [ObservableProperty]
     private bool _isConnected = false;
 
+    [ObservableProperty]
+    private bool _isUnFocusing = true;
+    
     #region 自动对焦参数
     [ObservableProperty]
     private int _firstCount = 5;
 
     [ObservableProperty]
-    private int _firstStep = 10;
+    private int _firstStep = 5;
 
     [ObservableProperty]
     private int _seccondCount = 5;
@@ -210,7 +213,7 @@ public partial class SteerViewModel : ObservableObject
     {
         GlobalValue.GeneralFocus = AutoFocus.Create();
         FirstCount = 5;
-        FirstStep = 10;
+        FirstStep = 5;
         SeccondCount = 5;
         SecondStep = 1;
         Threshold = 0.02;
@@ -258,14 +261,17 @@ public partial class SteerViewModel : ObservableObject
         => _motor.ResetPosition();
 
     [RelayCommand]
-    void Focus()
+    async Task Focus()
     {
         Thread.Sleep(100);
+        IsUnFocusing = false;
 
-        Task.Run(() =>
+        await Task.Run(() =>
         {
             GlobalValue.GeneralFocus.Focus();
         });
+
+        IsUnFocusing = true;
     }
 
     void CustomFocus()

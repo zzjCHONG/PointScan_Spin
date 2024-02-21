@@ -30,8 +30,9 @@ namespace Simscop.Spindisk.Core.Models
                     if (focus == null)
                     {
                         focus = new AutoFocus();
+                        focus.MinZ = 25;
                         GlobalValue.GeneralFocus = focus;
-                        GlobalValue.GeneralFocus = focus;
+                        GlobalValue.CustomFocus = focus;
 
                         WeakReferenceMessenger.Default.Send<string>(SteerMessage.MotorReceive);
 
