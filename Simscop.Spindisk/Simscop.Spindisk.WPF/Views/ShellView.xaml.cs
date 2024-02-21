@@ -95,10 +95,6 @@ namespace Simscop.Spindisk.WPF.Views
                 RemotePicDown(m.Index);
             });
 
-            //WeakReferenceMessenger.Default.Register<string>(SteerMessage.Setting, (s, e) =>
-            //{
-            //    settingView.Show();
-            //});//temp
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
