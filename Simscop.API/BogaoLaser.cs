@@ -16,6 +16,8 @@ public class BogaoLaser : ILaser
         _laser = new Laser();
     }
 
+    public string GetConnectState() => _laser._connectState;
+
     public bool GetPower(int count, out int value) => _laser.GetPower(count + 1, out value);
 
     public bool GetStatus(int count, out bool status) => _laser.GetStatus(count + 1,out status);

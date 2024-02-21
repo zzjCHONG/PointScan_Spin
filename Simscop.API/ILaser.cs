@@ -7,6 +7,12 @@ namespace Simscop.API;
 public interface ILaser
 {
     /// <summary>
+    /// 输出连接状态
+    /// </summary>
+    /// <returns></returns>
+    public string GetConnectState();
+
+    /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>

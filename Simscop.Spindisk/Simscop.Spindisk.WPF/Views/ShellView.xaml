@@ -51,7 +51,7 @@
                     <MenuItem Click="CameraSave_OnClick" Header="相机存图" />
                 </MenuItem>
             </Menu>
-            
+
             <Button
                 Margin="5,0"
                 Background="{DynamicResource Region02}"

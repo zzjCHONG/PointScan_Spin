@@ -34,6 +34,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Converters\**" />
+	  <EmbeddedResource Remove="Converters\**" />
+	  <None Remove="Converters\**" />
+	  <Page Remove="Converters\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="Image\3d.png" />
 		<None Remove="Image\blue.jpg" />
 		<None Remove="Image\camera.png" />
@@ -79,10 +86,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Simscop.UI\Simscop.UI\Simscop.UI.csproj" />
 		<ProjectReference Include="..\Simscop.Spindisk.Core\Simscop.Spindisk.Core.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Converters\" />
 	</ItemGroup>
 
 	<ItemGroup>

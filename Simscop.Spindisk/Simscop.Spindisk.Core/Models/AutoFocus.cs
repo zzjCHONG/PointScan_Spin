@@ -175,6 +175,7 @@ namespace Simscop.Spindisk.Core.Models
                     }
                     else if (num2 - num3 > Threshold * num2)
                     {
+                        WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(2));//对焦完成
                         break;
                     }
                 }

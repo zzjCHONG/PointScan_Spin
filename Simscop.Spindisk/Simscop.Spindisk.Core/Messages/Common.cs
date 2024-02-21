@@ -65,6 +65,62 @@ public record LaserMessage(int Index, bool Status);
 
 public record SpindiskMessage(int Mode);
 
+#region 初始化
+/// <summary>
+/// 相机初始化
+/// </summary>
+/// <param name="IsPreInit"></param>
+public record CameraInitMessage(bool IsPreInit);
+
+/// <summary>
+/// 激光初始化
+/// </summary>
+/// <param name="IsPreInit"></param>
+public record LaserInitMessage(bool IsPreInit);
+
+/// <summary>
+/// 电动台初始化
+/// </summary>
+/// <param name="IsPreInit"></param>
+public record SteerInitMessage(bool IsPreInit);
+
+/// <summary>
+/// 旋转台初始化
+/// </summary>
+/// <param name="IsPreInit"></param>
+public record SpinInitMessage(bool IsPreInit);
+#endregion
+
+#region 连接状态
+/// <summary>
+/// 相机连接状态
+/// </summary>
+/// <param name="IsConnected"></param>
+/// <param name="IsConnecting"></param>
+/// <param name="ConnectState"></param>
+public record CameraConnectMessage(bool IsConnected, bool IsConnecting, string ConnectState);
+
+/// <summary>
+/// 激光连接状态
+/// </summary>
+/// <param name="IsConnected"></param>
+/// <param name="IsConnecting"></param>
+public record LaserConnectMessage(bool IsConnected, bool IsConnecting, string ConnectState);
+
+/// <summary>
+/// 电动台连接状态
+/// </summary>
+/// <param name="IsConnected"></param>
+/// <param name="IsConnecting"></param>
+public record SteerConnectMessage(bool IsConnected, bool IsConnecting, string ConnectState);
+
+/// <summary>
+/// 旋转台连接状态
+/// </summary>
+/// <param name="IsConnected"></param>
+/// <param name="IsConnecting"></param>
+public record SpinConnectMessage(bool IsConnected, bool IsConnecting, string ConnectState);
+#endregion
 
 /// <summary>
 /// 双击全屏相关逻辑
@@ -72,39 +128,20 @@ public record SpindiskMessage(int Mode);
 /// <param name="Index"></param>
 public record MainDisplayMessage(int Index);
 
-
-public record CameraInitMessage(bool IsPreInit);
-
-public record LaserInitMessage(bool IsPreInit);
-
-public record SteerInitMessage(bool IsPreInit);
-
-public record SpinInitMessage(bool IsPreInit);
-
-public record CameraConnectMessage(bool IsConnected, bool IsConnecting);
-
-public record LaserConnectMessage(bool IsConnected, bool IsConnecting);
-
-public record SteerConnectMessage(bool IsConnected, bool IsConnecting);
-
-public record SpinConnectMessage(bool IsConnected, bool IsConnecting);
-
 /// <summary>
 /// 存图
 /// 非实时画面
 /// </summary>
-/// <param name="channel"></param>
+/// <param name="Channel"></param>
 /// <param name="isOriginalImage"></param>
-public record CameraSaveMessage(int channel, bool isOriginalImage,string filename);
+public record CameraSaveMessage(int Channel, bool isOriginalImage,string Filename);
 
 /// <summary>
-/// 多通道采集-激光通道触发
+/// 多通道采集-多通道合并
 /// </summary>
-/// <param name="channel"></param>
-/// <param name="isEnable"></param>
-public record MultiChannelLaserMessage(int channel,bool isEnable);
+public record MultiChannelMergeMessage(string Filename);
 
 /// <summary>
-/// 大图拼接
+/// 电动台对焦动画状态
 /// </summary>
-public record MultiChannelMergeMessage(string filename);
+public record SteerAnimationStateMessage(int Mode);

@@ -46,11 +46,11 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 if (value < 10.00)
                 {
-                    ExposureTextBox.Text = "10.00";
+                    ExposureTextBox.Text = "10";
                 }
                 else if (value > 1000.00)
                 {
-                    ExposureTextBox.Text = "1000.00";
+                    ExposureTextBox.Text = "1000";
                 }
             }
             else

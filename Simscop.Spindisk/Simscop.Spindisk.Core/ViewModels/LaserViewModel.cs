@@ -45,6 +45,13 @@ public class TestLaser : ILaser
         Debug.WriteLine($"LASER: -> GetPower:{count} - {value}");
         return true;
     }
+
+    public string GetConnectState()
+    {
+        Debug.WriteLine($"LASER:-> TestLaser.GetConnectState");
+
+        return "TestLaser init completed!";
+    }
 }
 
 /// <summary>
@@ -64,27 +71,6 @@ public partial class LaserViewModel : ObservableObject
         { 
             if (m.IsPreInit) LaserInit(); 
         });
-
-        WeakReferenceMessenger.Default.Register<MultiChannelLaserMessage>(this, (o, m) =>
-        {
-            switch (m.channel)
-            {
-                case 0:
-                    ChannelAEnable = m.isEnable; 
-                    break;
-                case 1:
-                    ChannelBEnable = m.isEnable;
-                    break;
-                case 2:
-                    ChannelCEnable = m.isEnable;
-                    break;
-                case 3:
-                    ChannelDEnable = m.isEnable;
-                    break;
-                default:
-                    break;
-            }
-        });
     }
 
     [ObservableProperty]
@@ -96,7 +82,7 @@ public partial class LaserViewModel : ObservableObject
     partial void OnIsConnectingChanged(bool value)
     {
         if (!value)
-            WeakReferenceMessenger.Default.Send<LaserConnectMessage>(new LaserConnectMessage(IsConnected, value));
+            WeakReferenceMessenger.Default.Send<LaserConnectMessage>(new LaserConnectMessage(IsConnected, value, Laser.GetConnectState()));
     }
 
     void LaserInit()

@@ -21,7 +21,7 @@
         <UniformGrid
             Height="240"
             Margin="5"
-            IsEnabled="True"
+            IsEnabled="{Binding IsConnected}"
             Rows="4">
             <StackPanel>
                 <TextBlock

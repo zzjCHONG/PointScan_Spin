@@ -53,14 +53,14 @@ public class TestCamera : ICamera
 
     public bool Init()
     {
-        Debug.WriteLine($"-> TestCamera.Init");
+        Debug.WriteLine($"Camera-> TestCamera.Init");
         Thread.Sleep(1);
         return true;
     }
 
     public bool StartCapture()
     {
-        Debug.WriteLine($"-> TestCamera.StartCapture");
+        Debug.WriteLine($"Camera-> TestCamera.StartCapture");
         return true;
     }
 
@@ -73,13 +73,13 @@ public class TestCamera : ICamera
 
     public bool SaveCapture(string path)
     {
-        Debug.WriteLine($"-> TestCamera.SaveCapture {path}");
+        Debug.WriteLine($"Camera-> TestCamera.SaveCapture {path}");
         return true;
     }
 
     public bool GetExposure(out double exposure)
     {
-        Debug.WriteLine($"-> TestCamera.GetExposure");
+        Debug.WriteLine($"Camera-> TestCamera.GetExposure");
 
         exposure =0.1;
         return true;
@@ -87,7 +87,7 @@ public class TestCamera : ICamera
 
     public bool SetExposure(double exposure)
     {
-        Debug.WriteLine($"-> TestCamera.SetExposure");
+        Debug.WriteLine($"Camera-> TestCamera.SetExposure");
 
         exposure = 100;
         return true;
@@ -95,7 +95,7 @@ public class TestCamera : ICamera
 
     public bool StopCapture()
     {
-        Debug.WriteLine($"-> TestCamera.StopCapture");
+        Debug.WriteLine($"Camera-> TestCamera.StopCapture");
         return true;
     }
 
@@ -105,6 +105,13 @@ public class TestCamera : ICamera
 
         frameRate = 100;
         return true;
+    }
+
+    public string GetConnectState()
+    {
+        Debug.WriteLine($"Camera-> TestCamera.GetConnectState");
+
+        return "TestCamera init completed!";
     }
 }
 
@@ -131,6 +138,7 @@ public partial class CameraViewModel : ObservableObject
 
     public CameraViewModel()
     {
+    
         //Camera = new TestCamera();
         Camera = new Andor();
         GlobalValue.GlobalCamera = Camera;
@@ -167,7 +175,7 @@ public partial class CameraViewModel : ObservableObject
     partial void OnIsConnectingChanged(bool value)
     {
         if (!value)
-            WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value));
+            WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value, Camera.GetConnectState()));
     }
 
     bool CameraInit()//初始化
@@ -192,33 +200,33 @@ public partial class CameraViewModel : ObservableObject
 
     [RelayCommand]
     void Init()//按键
-    {      
-        IsNoBusy = false;
-        if (!IsInit)
-        {
-            Task.Run(() =>
+    {
+            IsNoBusy = false;
+            if (!IsInit)
             {
-                if (CameraInit())
+                Task.Run(() =>
                 {
-                    IsCapture = Camera.StartCapture();
-                    IsStartAcquisition = true;
-                }
+                    if (CameraInit())
+                    {
+                        IsCapture = Camera.StartCapture();
+                        IsStartAcquisition = true;
+                    }
+                    IsNoBusy = true;
+                });
+            }
+            else if (IsInit && !IsCapture)
+            {
+                IsCapture = Camera.StartCapture();
+                IsStartAcquisition = true;
                 IsNoBusy = true;
-            });
-        }
-        else if (IsInit && !IsCapture)
-        {
-            IsCapture = Camera.StartCapture();
-            IsStartAcquisition = true;
-            IsNoBusy = true;
-        }
-        else if (IsCapture)
-        {
-            IsCapture = !Camera.StopCapture();
-            IsStartAcquisition = false;
-            IsNoBusy = true;
-        }
-        else { }
+            }
+            else if (IsCapture)
+            {
+                IsCapture = !Camera.StopCapture();
+                IsStartAcquisition = false;
+                IsNoBusy = true;
+            }
+            else { }   
     }
 
     [ObservableProperty]
