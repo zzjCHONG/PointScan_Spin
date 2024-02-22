@@ -4,6 +4,7 @@ using Simscop.Spindisk.Core.ViewModels;
 using Simscop.UI.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Printing.IndexedProperties;
 using System.Threading;
 using System.Windows;
@@ -38,7 +39,13 @@ namespace Simscop.Spindisk.WPF.Views
         public BaseSteerView()
         {
             InitializeComponent();
+
             InitializeTimer();
+            WeakReferenceMessenger.Default.Register<SteerAnimationStateMessage>(this, (s, m) =>
+            {
+                ProgressMode = m.Mode;
+                Debug.WriteLine("SteerAnimationStateMessage:" + m.Mode);
+            });
 
             this.DataContext = null;
 
@@ -184,16 +191,17 @@ namespace Simscop.Spindisk.WPF.Views
             switch (ProgressMode)
             {
                 case -1://未进行或中止
+                    if (FocusButton.Background == Brushes.Green) Thread.Sleep(1000);
                     FocusButton.Background = Brushes.Transparent;
-                    WeakReferenceMessenger.Default.Unregister<SteerAnimationStateMessage>(this);//取消注册
-                    _animationTimer.Stop();
+                    //FocusButton.Foreground = Brushes.LightGray;
                     break;
                 case 1://运行中
                     FocusButton.Background = (FocusButton.Background == Brushes.Red) ? Brushes.Transparent : Brushes.Red;
+                    //FocusButton.Foreground = (FocusButton.Foreground == Brushes.Red) ? Brushes.LightGray : Brushes.Red;
                     break;
                 case 2://完成
                     FocusButton.Background = Brushes.Green;
-                    _animationTimer.Stop();
+                    //FocusButton.Foreground = Brushes.Green;
                     break;
                 default:
                     break;
@@ -201,29 +209,8 @@ namespace Simscop.Spindisk.WPF.Views
         }
         private void FocusButton_Click(object sender, RoutedEventArgs e)
         {
-            WeakReferenceMessenger.Default.Register<SteerAnimationStateMessage>(this, (s, m) =>
-            {
-                ProgressMode = m.Mode;
-            });
             ProgressMode = 1;
             _animationTimer.Start();
-
-            //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));//对焦中止（轴移动情况）未添加
-
-            ////Test
-            //if (ProgressMode == 0)
-            //{
-            //    ProgressMode = 1;        
-            //}
-            //else if (ProgressMode == 1)
-            //{
-            //    ProgressMode = 2;
-            //}
-            //else if (ProgressMode == 2)
-            //{
-            //    ProgressMode = 0;
-            //}
-            //_animationTimer.Start();//开启定时器
         }
         #endregion
     }

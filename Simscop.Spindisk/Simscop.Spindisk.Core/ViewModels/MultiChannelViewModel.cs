@@ -35,29 +35,6 @@ namespace Simscop.Spindisk.Core.ViewModels
                 Root = folderBrowserDialog.SelectedPath;
         }
 
-        string GetFilename(int channelID)
-        {
-            string channelName = string.Empty;        
-            switch (channelID)
-            {
-                case 0:
-                    channelName = "DAPI-405nm";
-                    break;
-                case 1:
-                    channelName = "FITC-488nm";
-                    break;
-                case 2:
-                    channelName = "TRITC-561nm";
-                    break;
-                case 3:
-                    channelName = "CY5-640nm";
-                    break;
-                default:
-                    break;
-            }
-            return $"{channelID + 1}_{channelName}.tif";
-        }
-
         [RelayCommand]
         void SaveMultiChannel()
         {
@@ -99,6 +76,29 @@ namespace Simscop.Spindisk.Core.ViewModels
                     new MultiChannelMergeMessage(Path.Combine(filepath, "MergeImage.tif"), IsChannelASave, IsChannelBSave, IsChannelCSave, IsChannelDSave));
 
             OpenFolderAndSelectFile(filepath);
+        }
+
+        string GetFilename(int channelID)
+        {
+            string channelName = string.Empty;
+            switch (channelID)
+            {
+                case 0:
+                    channelName = "DAPI-405nm";
+                    break;
+                case 1:
+                    channelName = "FITC-488nm";
+                    break;
+                case 2:
+                    channelName = "TRITC-561nm";
+                    break;
+                case 3:
+                    channelName = "CY5-640nm";
+                    break;
+                default:
+                    break;
+            }
+            return $"{channelID + 1}_{channelName}.tif";
         }
 
         private void OpenFolderAndSelectFile(string fileFullName)

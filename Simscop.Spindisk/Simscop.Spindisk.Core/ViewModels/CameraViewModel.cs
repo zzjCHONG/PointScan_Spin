@@ -30,8 +30,8 @@ public class TestCamera : ICamera
     {
         var paths = new List<string>()
         {
-            "C:/Users/DELL/Desktop/Y_-15800_X_-1800.TIF",
-            //@"C:\\Users\\Administrator\\Pictures\\Camera Roll\\1.jpg"
+            //"C:/Users/DELL/Desktop/Y_-15800_X_-1800.TIF",
+            @"C:\\Users\\Administrator\\Pictures\\Camera Roll\\1.jpg"
         };
 
         Total = paths.Count;
@@ -138,7 +138,7 @@ public partial class CameraViewModel : ObservableObject
 
     public CameraViewModel()
     {
-
+    
         //Camera = new TestCamera();
         Camera = new Andor();
         GlobalValue.GlobalCamera = Camera;
@@ -171,6 +171,11 @@ public partial class CameraViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isNoBusy = true;
+
+    partial void OnIsCaptureChanged(bool value)
+    {
+        WeakReferenceMessenger.Default.Send<CameraControlENableMessage>(new CameraControlENableMessage(value));
+    }
 
     partial void OnIsConnectingChanged(bool value)
     {

@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Windows;
+using System.Windows.Forms;
 
 namespace Simscop.API
 {
@@ -128,14 +130,19 @@ namespace Simscop.API
             if (!AssertRet(AndorAPI.GetInt(Hndl, "imageSizeBytes", ref ImageSizeBytes), assertConnect: false)) return false;
 
             //初始设置
+            //Electronic Shuttering Mode：默认Rolling
+            //Trigger Mode：无外接触发设备 Internal
             SetSpuriousNoiseFilter();//消除噪声
             SetPixelEncoding(PixelEncodingEnum.Mono16);//图像格式
-            SetPixelReadoutRate(PixelReadoutRateEnum.OneHundredMHz);//采样率
+            //SetOverlap();//曝光可以在之前一次曝光读出时就开始，高帧频，最小曝光时间将加至读出时间。当曝光时间小于读出时间,Overlap 模式不适用。添加后延时更高
+            SetSimplePreAmpGainControl(SimplePreAmpGainControlEnum.LowNoiseandHighWellCapacity);//追求高动态范围选 16-bit; 追求采集速度选12-bit
+            SetPixelReadoutRate(PixelReadoutRateEnum.OneHundredMHz);//采样率，只有100和280mhz
             SetCycleMode(CycleModeEnum.Continuous);//采集方式-连续触发
             SetExposure(50);//曝光
 
             ConnectState = "Initialize camera completed!";
             Debug.WriteLine(ConnectState);
+
             return true;
         }
 
@@ -265,6 +272,14 @@ namespace Simscop.API
         {
             //AcqStartCommand();
             if (!AssertRet(AndorAPI.SetBool(Hndl, "SpuriousNoiseFilter", true))) return false;
+            //AcqStopCommand();
+            return true;
+        }
+
+        private bool SetOverlap()
+        {
+            //AcqStartCommand();
+            if (!AssertRet(AndorAPI.SetBool(Hndl, "Overlap", true))) return false;
             //AcqStopCommand();
             return true;
         }
@@ -523,6 +538,7 @@ namespace Simscop.API
                 Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
 
                 //matImg.Flip(FlipMode.X);
+                Cv2.Flip(matImg, matImg, FlipMode.X);//图像翻转
 
                 //4-Re-queue the buffers
                 if (AlignedBuffers == null)
@@ -586,6 +602,8 @@ namespace Simscop.API
                 if (!AcqStopCommand())
                 {
                     Debug.WriteLine("StopAcquisition failed. ");
+
+                    System.Windows.MessageBox.Show("相机停止采集失败，相机或被意外关闭。请确认！", "错误", MessageBoxButton.OK);
                     return false;
                 }                   
                 if (!AssertRet(AndorAPI.Flush(Hndl))) return false;

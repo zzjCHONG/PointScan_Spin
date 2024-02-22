@@ -191,7 +191,6 @@
                         Text="Z步进(μm)" />
                 </StackPanel>
 
-
                 <StackPanel Orientation="Horizontal">
                     <Button
                         x:Name="FocusButton"

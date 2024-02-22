@@ -5,111 +5,118 @@ using System;
 using System.IO;
 using CommunityToolkit.Mvvm.Messaging;
 using Simscop.Spindisk.Core.Messages;
+using OpenCvSharp;
+using System.Threading.Channels;
 
 namespace Simscop.Spindisk.Core.ViewModels
 {
     public partial class CameraSaveViewModel : ObservableObject
     {
+        public CameraSaveViewModel()
+        {
+            WeakReferenceMessenger.Default.Register<ChannelControlEnableMessage>(this, (s, m) =>
+            {
+                switch(m.Channel)
+                {
+                    case 1:
+                        IsFirstChannelEnable = m.IsEnable;
+                        break;
+                    case 2:
+                        IsSecondChannelEnable = m.IsEnable;
+                        break;
+                    case 3:
+                        IsThirdChannelEnable = m.IsEnable;
+                        break;
+                    case 4:
+                        IsFourthChannelEnable = m.IsEnable;
+                        break;
+                }
+
+                IsChannelEnable = IsFirstChannelEnable || IsSecondChannelEnable || IsThirdChannelEnable || IsFourthChannelEnable;
+            });
+        }
+
         [ObservableProperty]
-        private string _root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CameraCapture");//默认路径
+        private bool _isFirstChannelEnable=false;
+
+        [ObservableProperty]
+        private bool _isSecondChannelEnable = false;
+
+        [ObservableProperty]
+        private bool _isThirdChannelEnable = false;
+
+        [ObservableProperty]
+        private bool _isFourthChannelEnable = false;
+
+        [ObservableProperty]
+        private bool _isChannelEnable = false;
 
         [RelayCommand]
         void SaveChannelAOriginalImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, true, Path.Combine(Root, GetFilename(0, true))));
-            }
-
+            SaveFile(0, true);
         }
 
         [RelayCommand]
         void SaveChannelADisposeImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, false, Path.Combine(Root, GetFilename(0, false))));
-            }
+            SaveFile(0, false);
         }
 
         [RelayCommand]
         void SaveChannelBOriginalImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(1, true, Path.Combine(Root, GetFilename(1, true))));
-            }
+            SaveFile(1, true);
         }
 
         [RelayCommand]
         void SaveChannelBDisposeImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(1, false, Path.Combine(Root, GetFilename(1, false))));
-            }
+            SaveFile(1, false);
         }
 
         [RelayCommand]
         void SaveChannelCOriginalImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(2, true, Path.Combine(Root, GetFilename(2, true))));
-            }
+            SaveFile(2, true);
         }
 
         [RelayCommand]
         void SaveChannelCDisposeImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(2, false, Path.Combine(Root, GetFilename(2, false))));
-            }
-
+            SaveFile(2, false);
         }
 
         [RelayCommand]
         void SaveChannelDOriginalImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(3, true, Path.Combine(Root, GetFilename(3, true))));
-            }
-
+            SaveFile(3, true);
         }
 
         [RelayCommand]
         void SaveChannelDDisposeImage()
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
+            SaveFile(3, false);
+        }
+
+        [ObservableProperty]
+        private string _root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CameraCapture");//默认路径
+
+        void SaveFile(int channelID, bool isSaveOriginImage)
+        {
+            var dlg = new SaveFileDialog()
             {
-                Root = dialog.SelectedPath;
-                if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(3, false, Path.Combine(Root, GetFilename(3, false))));
-            }
+                Title = "图像存储",
+                FileName = GetFilename(channelID, isSaveOriginImage),
+                Filter = "TIF|*.tif",
+                DefaultExt = ".tif",
+            };
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, isSaveOriginImage, dlg.FileName));
+                OpenFolderAndSelectFile(dlg.FileName);
+            }                
         }
 
         string GetFilename(int channelID, bool isSaveOriginImage)
@@ -154,10 +161,13 @@ namespace Simscop.Spindisk.Core.ViewModels
         [RelayCommand]
         void SaveSameKindofImage()
         {
+            if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
+
             WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(0, !IsSaveDisposeImage))));
             WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(1, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(1, !IsSaveDisposeImage))));
             WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(2, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(2, !IsSaveDisposeImage))));
             WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(3, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(3, !IsSaveDisposeImage))));
+
             OpenFolderAndSelectFile(Root);
         }
 

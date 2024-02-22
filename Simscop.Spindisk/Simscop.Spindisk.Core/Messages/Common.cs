@@ -135,8 +135,22 @@ public record MainDisplayMessage(int Index);
 /// 非实时画面
 /// </summary>
 /// <param name="Channel"></param>
-/// <param name="isOriginalImage"></param>
-public record CameraSaveMessage(int Channel, bool isOriginalImage,string Filename);
+/// <param name="IsOriginalImage"></param>
+public record CameraSaveMessage(int Channel, bool IsOriginalImage,string Filename);
+
+/// <summary>
+/// 控件Enable
+/// 存图
+/// </summary>
+/// <param name="Channel"></param>
+/// <param name="IsEnable"></param>
+public record ChannelControlEnableMessage(int Channel,bool IsEnable);
+
+/// <summary>
+/// 控件Enable
+/// 存图+多通道采集
+/// </summary>
+public record CameraControlENableMessage(bool IsEnable);
 
 /// <summary>
 /// 多通道采集-多通道合并
