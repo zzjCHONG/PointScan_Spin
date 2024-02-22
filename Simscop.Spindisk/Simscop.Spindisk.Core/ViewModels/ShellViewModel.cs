@@ -107,8 +107,10 @@ public partial class ShellViewModel : ObservableObject
                 if (m.Image is not { } img) return;
                 if (!(EnableFirst || EnableSecond || EnableThird || EnableFourth)) return;
 
+                //Cv2.Rotate(img, img, RotateFlags.Rotate180);
                 //Cv2.Flip(img, img, FlipMode.X);
                 DisplayCurrent.Original = img.Clone();
+                GlobalValue.GlobalShellViewModel.DisplayCurrent = DisplayCurrent;
 
             });
         });
@@ -185,37 +187,40 @@ public partial class ShellViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<MultiChannelMergeMessage>(this, (s, m) =>
         {
             List<Mat> matList = new List<Mat>();
-            if (DisplayFirst.Frame != null)
+            if (DisplayFirst.Frame != null && m.isFirstEnabled)
             {
                 var mat1 = DisplayFirst.Frame.Clone().ToMat();
                 if (mat1.Channels() != 3)
                     Cv2.CvtColor(mat1, mat1, ColorConversionCodes.GRAY2BGR);
                 matList.Add(mat1);
             }
-            if (DisplaySecond.Frame != null)
+            if (DisplaySecond.Frame != null && m.isSecondEnabled)
             {
                 var mat2 = DisplaySecond.Frame.Clone().ToMat();
                 if (mat2.Channels() != 3)
                     Cv2.CvtColor(mat2, mat2, ColorConversionCodes.GRAY2BGR);
                 matList.Add(mat2);
             }
-            if (DisplayThird.Frame != null)
+            if (DisplayThird.Frame != null && m.isThirdEnabled)
             {
                 var mat3 = DisplayThird.Frame.Clone().ToMat();
                 if (mat3.Channels() != 3)
                     Cv2.CvtColor(mat3, mat3, ColorConversionCodes.GRAY2BGR);
                 matList.Add(mat3);
             }
-            if (DisplayFourth.Frame != null)
+            if (DisplayFourth.Frame != null && m.isFourthEnabled)
             {
                 var mat4 = DisplayFourth.Frame.Clone().ToMat();
                 if (mat4.Channels() != 3)
                     Cv2.CvtColor(mat4, mat4, ColorConversionCodes.GRAY2BGR);
                 matList.Add(mat4);
             }
-            var merge = MatsExtension.MergeChannelAsMax(matList);
-            merge.SaveImage(m.Filename);
 
+            if (matList.Count > 0)
+            {
+                var merge = MatsExtension.MergeChannelAsMax(matList);
+                merge.SaveImage(m.Filename);
+            }
         });
 
         //相机是否正常取像

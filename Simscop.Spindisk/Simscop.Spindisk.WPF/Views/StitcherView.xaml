@@ -1,0 +1,337 @@
+﻿<liftui:Window
+    x:Class="Simscop.Spindisk.WPF.Views.StitcherView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Simscop.UI.Controls;assembly=Simscop.UI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:liftui="https://github.com/pchuan98/Lift.UI"
+    xmlns:local="clr-namespaceSimscop.Spindisk.WPF.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:Simscop.Spindisk.Core.Models;assembly=Simscop.Spindisk.Core"
+    xmlns:vm="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
+    Title="StitcherView"
+    Width="1000"
+    Height="800"
+    d:DataContext="{d:DesignInstance vm:StitcherViewModel}"
+    
+    mc:Ignorable="d">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="520" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Margin="3,10">
+            <StackPanel.Resources>
+                <Style TargetType="GroupBox">
+                    <Setter Property="Margin" Value="10,8" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                    <Setter Property="VerticalContentAlignment" Value="Top" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="GroupBox">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Orientation="Horizontal">
+                                        <ContentPresenter
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            ContentSource="Header"
+                                            RecognizesAccessKey="True"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                                    </StackPanel>
+                                    <ContentPresenter
+                                        x:Name="Presenter"
+                                        Grid.Column="1"
+                                        Margin="{TemplateBinding Padding}"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </StackPanel.Resources>
+            <!--  注意！这里的界面，P1 和 P2需要重写  -->
+
+
+            <GroupBox Header="Point1.X">
+                <liftui:NumericUpDown Value="{Binding Point1.X}" />
+            </GroupBox>
+            <GroupBox Header="Point1.Y">
+                <liftui:NumericUpDown Value="{Binding Point1.Y}" />
+            </GroupBox>
+
+            <GroupBox Header="Point2.X">
+                <liftui:NumericUpDown Value="{Binding Point2.X}" />
+            </GroupBox>
+            <GroupBox Header="Point2.Y">
+                <liftui:NumericUpDown Value="{Binding Point2.Y}" />
+            </GroupBox>
+
+            <UniformGrid Margin="10,5" Columns="2">
+                <DockPanel>
+                    <StackPanel>
+                        <TextBlock
+                                        Margin="5,0,0,5"
+                                        HorizontalAlignment="Left"
+                                        FontSize="12"
+                                        Text="像素坐标差值" />
+
+                        <TextBox
+                                        Height="32"
+                                        Margin="5,0"
+                                        Padding="10,0,0,0"
+                                        VerticalContentAlignment="Center"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding PerPixel2Unit}"
+                                        TextAlignment="Left" />
+                    </StackPanel>
+
+                </DockPanel>
+                <DockPanel>
+                    <StackPanel>
+                        <TextBlock
+                                        Margin="5,0,0,5"
+                                        HorizontalAlignment="Left"
+                                        FontSize="12"
+                                        Text="等待时间" />
+
+                        <TextBox
+                                        Height="32"
+                                        Margin="5,0"
+                                        Padding="10,0,0,0"
+                                        VerticalContentAlignment="Center"
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding WaitAcquisitionTime}"
+                                        TextAlignment="Left" />
+                    </StackPanel>
+
+                </DockPanel>
+            </UniformGrid>
+            <UniformGrid Margin="10,5" Columns="2">
+            <Button
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SetCurrentAsPoint1Command}"
+                    Content="添加点1"
+                    ToolTip="设置当前电动台坐标为点1" />
+            <Button
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SetCurrentAsPoint2Command}"
+                    Content="添加点2"
+                    ToolTip="设置当前电动台坐标为点2" />
+            </UniformGrid>
+
+            <Grid
+                Height="1"
+                Margin="5"
+                Background="#fffff1" />
+
+            <liftui:ProgressButton
+                Height="40"
+                Margin="5"
+                HorizontalAlignment="Stretch"
+                Content="开始扫描"
+                Command="{Binding StartScanCommand}"
+                IsChecked="{Binding IsBusy}"
+                Progress="{Binding Progress}" />
+
+
+
+            <!--  颜色要重新改  -->
+            <StackPanel Orientation="Vertical" x:Name="ImageControl">
+                <StackPanel.Resources>
+                    <Style TargetType="GroupBox">
+                        <Setter Property="Margin" Value="20,5" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                        <Setter Property="VerticalContentAlignment" Value="Top" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="GroupBox">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel
+                                            Margin="0,8,6,8"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Orientation="Horizontal">
+                                            <ContentPresenter
+                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                ContentSource="Header"
+                                                RecognizesAccessKey="True"
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                TextElement.Foreground="{TemplateBinding Foreground}" />
+                                        </StackPanel>
+                                        <ContentPresenter
+                                            x:Name="Presenter"
+                                            Grid.Column="1"
+                                            Margin="{TemplateBinding Padding}"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </StackPanel.Resources>
+
+                <TextBlock
+                    Margin="20,10,0,10"
+                    HorizontalAlignment="Left"
+                    FontSize="12"
+                    
+                    Text="图像控制" />
+
+                <Separator Margin="10,0,10,10" Background="{DynamicResource Region01}" />
+
+                <GroupBox Header="归一化">
+                    <ToggleButton
+                        Width="40"
+                        Margin="0,0,328,0"
+                        Background="Black"
+                        DockPanel.Dock="Right"
+                        IsChecked="{Binding Display.Norm}"
+                        Style="{DynamicResource ToggleButtonSwitch}" />
+                </GroupBox>
+
+                <GroupBox Header="色阶">
+                    <DockPanel>
+                        <liftui:NumericUpDown
+                            x:Name="leftLevel"
+                            Width="80"
+                            Height="20"
+                            Value="{Binding ElementName=LevelSlider, Path=StartValue}" />
+                        <liftui:NumericUpDown
+                            x:Name="rightLevel"
+                            Width="80"
+                            Height="20"
+                            DockPanel.Dock="Right"
+                            Value="{Binding ElementName=LevelSlider, Path=EndValue}" />
+                        <controls:RangeSlider
+                            x:Name="LevelSlider"
+                            Margin="20,0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            EndValue="{Binding Display.Max, Mode=TwoWay}"
+                            Maximum="{Binding Display.Threshold}"
+                            Minimum="0"
+                            StartValue="{Binding Display.Min, Mode=TwoWay}" />
+
+                    </DockPanel>
+                </GroupBox>
+
+                <GroupBox Header="亮度">
+                    <DockPanel>
+                        <liftui:NumericUpDown
+                            Width="60"
+                            Height="30"
+                            Padding="8,7,5,5"
+                            HorizontalAlignment="Center"
+                            DockPanel.Dock="Right"
+                            FontSize="12"
+                            Value="{Binding ElementName=BrightnessSlider, Path=Value, StringFormat=N0}" />
+                        <Slider
+                            x:Name="BrightnessSlider"
+                            VerticalAlignment="Center"
+                            Maximum="{Binding Display.ContrastThreshold}"
+                            Minimum="0"
+                            Value="{Binding Display.Brightness, Mode=TwoWay}" />
+                    </DockPanel>
+                </GroupBox>
+
+                <GroupBox Header="对比度">
+                    <DockPanel>
+                        <liftui:NumericUpDown
+                            Width="60"
+                            Height="30"
+                            Padding="8,7,5,5"
+                            DockPanel.Dock="Right"
+                            FontSize="12"
+                            Value="{Binding ElementName=ContrastSlider, Path=Value, StringFormat=N2}" />
+                        <Slider
+                            x:Name="ContrastSlider"
+                            VerticalAlignment="Center"
+                            Maximum="10"
+                            Minimum="0.1"
+                            Value="{Binding Display.Contrast, Mode=TwoWay}" />
+                    </DockPanel>
+                </GroupBox>
+
+                <GroupBox Header="Gamma">
+                    <DockPanel>
+                        <liftui:NumericUpDown
+                            Width="60"
+                            Height="30"
+                            Padding="8,7,5,5"
+                            DockPanel.Dock="Right"
+                            FontSize="12"
+                            Value="{Binding ElementName=GammaSlider, Path=Value, StringFormat=N2}" />
+                        <Slider
+                            x:Name="GammaSlider"
+                            VerticalAlignment="Center"
+                            Maximum="10"
+                            Minimum="0.1"
+                            Value="{Binding Display.Gamma, Mode=TwoWay}" />
+                    </DockPanel>
+                </GroupBox>
+
+                <GroupBox Header="伪彩">
+                    <ComboBox ItemsSource="{x:Static models:MatExtension.Colors}" SelectedIndex="{Binding Display.ColorMode}" />
+                </GroupBox>
+
+                <Button
+                    Height="35"
+                    Margin="20,5"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Command="{Binding Display.SetAsDefaultCommand}"
+                    Content="恢复默认" />
+
+                <!--<UniformGrid Columns="2" Rows="2">
+
+
+    <GroupBox Header="1">
+        <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFirst}" />
+    </GroupBox>
+
+    <GroupBox Header="2">
+        <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorSecond}" />
+    </GroupBox>
+
+    <GroupBox Header="3">
+        <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorThird}" />
+    </GroupBox>
+
+    <GroupBox Header="4">
+        <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFourth}" />
+    </GroupBox>
+
+
+</UniformGrid>-->
+            </StackPanel>
+            <Button Content="实验功能" />
+        </StackPanel>
+        <liftui:ImageViewer
+            Grid.Column="1"
+            Margin="10"
+            ImageSource="{Binding Display.Frame}"
+            MouseRightButtonDown="UIElement_OnMouseRightButtonDown"
+            ShowImgMap="True" />
+
+    </Grid>
+</liftui:Window>
