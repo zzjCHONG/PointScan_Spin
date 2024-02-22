@@ -18,10 +18,11 @@
 
         <Separator Margin="10,0,10,10" Background="{DynamicResource Region01}" />
 
+        <!--IsEnabled="{Binding IsConnected}"-->
         <UniformGrid
             Height="240"
             Margin="5"
-            IsEnabled="{Binding IsConnected}"
+            IsEnabled="True"
             Rows="4">
             <StackPanel>
                 <TextBlock

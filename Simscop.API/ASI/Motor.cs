@@ -115,9 +115,9 @@ namespace Simscop.API.ASI
                         serialPort.Write(text);
                         break;
                     case Axis.Z:
-                        if ((value + z) < 25)
+                        if ((value + z) < 30)
                         {
-                            value = Math.Round(25 - z, 1);
+                            value = Math.Round(30 - z, 1);
                         }
                         text = $"R Z={value * 10}\r\n";
                         serialPort.Write(text);
@@ -145,7 +145,7 @@ namespace Simscop.API.ASI
                     serialPort.Write($"M Y={value * 10}\r\n");
                     break;
                 case Axis.Z:
-                    if (value < 25) value = 25;
+                    if (value < 30) value = 30;
                     serialPort.Write($"M Z={value * 10.0}\r\n");
                     break;
             }
@@ -164,7 +164,7 @@ namespace Simscop.API.ASI
 
             serialPort.Write("M X=0\r\n");
             serialPort.Write("M Y=0\r\n");
-            serialPort.Write("M Z=0\r\n");
+            serialPort.Write("M Z=300\r\n");
         }
 
         /// <summary>

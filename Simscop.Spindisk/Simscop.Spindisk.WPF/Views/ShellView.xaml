@@ -56,6 +56,14 @@
                 Margin="5,0"
                 Background="{DynamicResource Region02}"
                 BorderThickness="0"
+                Click="NavigateBtClick"
+                Content="导航"
+                FontFamily="{StaticResource Harmony}"
+                FontSize="14" />
+            <Button
+                Margin="5,0"
+                Background="{DynamicResource Region02}"
+                BorderThickness="0"
                 Click="HelpBtClick"
                 Content="帮助"
                 FontFamily="{StaticResource Harmony}"
@@ -341,24 +349,24 @@
                             <!--<UniformGrid Columns="2" Rows="2">
 
 
-                                <GroupBox Header="1">
-                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFirst}" />
-                                </GroupBox>
+            <GroupBox Header="1">
+                <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFirst}" />
+            </GroupBox>
 
-                                <GroupBox Header="2">
-                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorSecond}" />
-                                </GroupBox>
+            <GroupBox Header="2">
+                <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorSecond}" />
+            </GroupBox>
 
-                                <GroupBox Header="3">
-                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorThird}" />
-                                </GroupBox>
+            <GroupBox Header="3">
+                <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorThird}" />
+            </GroupBox>
 
-                                <GroupBox Header="4">
-                                    <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFourth}" />
-                                </GroupBox>
+            <GroupBox Header="4">
+                <ComboBox ItemsSource="{Binding Colors}" SelectedIndex="{Binding ColorFourth}" />
+            </GroupBox>
 
 
-                            </UniformGrid>-->
+        </UniformGrid>-->
                         </StackPanel>
                     </Border>
 

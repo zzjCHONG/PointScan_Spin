@@ -50,6 +50,8 @@ public static class SteerMessage
 
     public const string Setting = "SettingMessage";
 
+    public const string Splice = "SpliceMessage";
+
     public static string? GetValue(string name)
     {
         var type = typeof(SteerMessage);
@@ -139,9 +141,23 @@ public record CameraSaveMessage(int Channel, bool isOriginalImage,string Filenam
 /// <summary>
 /// 多通道采集-多通道合并
 /// </summary>
-public record MultiChannelMergeMessage(string Filename);
+public record MultiChannelMergeMessage(string Filename,bool isFirstEnabled, bool isSecondEnabled, bool isThirdEnabled, bool isFourthEnabled);
 
 /// <summary>
 /// 电动台对焦动画状态
 /// </summary>
 public record SteerAnimationStateMessage(int Mode);
+
+/// <summary>
+/// 像素坐标变化
+/// </summary>
+/// <param name="X"></param>
+/// <param name="Y"></param>
+public record CurrentPositionMessage(int X, int Y);
+
+/// <summary>
+/// 反算电动台坐标
+/// </summary>
+/// <param name="X"></param>
+/// <param name="Y"></param>
+public record MappingMoveMessage(double X, double Y);
