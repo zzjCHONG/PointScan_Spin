@@ -505,8 +505,8 @@ namespace Simscop.API
 
     public enum SimplePreAmpGainControlEnum
     {
-        HighWellCapacity,
-        LowNoise,
-        LowNoiseandHighWellCapacity,
+        HighWellCapacity,//12
+        LowNoise,//中间
+        LowNoiseandHighWellCapacity,//16
     }
 }

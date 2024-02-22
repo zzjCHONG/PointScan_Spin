@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="clr-namespace:Simscop.Spindisk.Core.Models;assembly=Simscop.Spindisk.Core"
     xmlns:viewmodels="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
     Title="CameraSaveView"
     Width="500"
@@ -30,7 +29,7 @@
             Rows="4">
 
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsFirstChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="2*" />
@@ -63,13 +62,13 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Command="{Binding SaveChannelADisposeImageCommand}"
-                        Content="加工图保存"
+                        Content="处理图保存"
                         IsEnabled="True" />
                 </Grid>
             </StackPanel>
 
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsSecondChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="2*" />
@@ -102,13 +101,13 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Command="{Binding SaveChannelBDisposeImageCommand}"
-                        Content="加工图保存"
+                        Content="处理图保存"
                         IsEnabled="True" />
                 </Grid>
             </StackPanel>
 
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsThirdChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="2*" />
@@ -141,13 +140,13 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Command="{Binding SaveChannelCDisposeImageCommand}"
-                        Content="加工图保存"
+                        Content="处理图保存"
                         IsEnabled="True" />
                 </Grid>
             </StackPanel>
 
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsFourthChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="2*" />
@@ -180,7 +179,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Command="{Binding SaveChannelDDisposeImageCommand}"
-                        Content="加工图保存"
+                        Content="处理图保存"
                         IsEnabled="True" />
                 </Grid>
             </StackPanel>
@@ -188,7 +187,7 @@
         </UniformGrid>
 
         <StackPanel>
-            <Grid Margin="5,-15,10,0">
+            <Grid Margin="5,-15,10,0" IsEnabled="{Binding IsChannelEnable}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.5*" />
                     <ColumnDefinition Width="5*" />
@@ -210,7 +209,7 @@
                 <CheckBox
                     Grid.Column="2"
                     Margin="5,0,2,0"
-                    Content="加工图"
+                    Content="处理图"
                     Foreground="Black"
                     IsChecked="{Binding IsSaveDisposeImage}" />
                 <Button

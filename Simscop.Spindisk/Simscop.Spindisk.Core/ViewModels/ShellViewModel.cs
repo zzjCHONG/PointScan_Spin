@@ -45,6 +45,9 @@ public partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private bool _enableFourth = false;
 
+    [ObservableProperty]
+    private bool _isCameraCapture=false;
+
     partial void OnEnableFirstChanged(bool value) => SwitchEnable(value, 1);
     partial void OnEnableSecondChanged(bool value) => SwitchEnable(value, 2);
     partial void OnEnableThirdChanged(bool value) => SwitchEnable(value, 3);
@@ -67,6 +70,8 @@ public partial class ShellViewModel : ObservableObject
             4 => DisplayFourth,
             _ => throw new Exception()
         };
+
+        WeakReferenceMessenger.Default.Send<ChannelControlEnableMessage>(new ChannelControlEnableMessage(index, value));
     }
 
     #endregion
@@ -98,26 +103,25 @@ public partial class ShellViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<DisplayFrame, string>(this, "Display", (s, m) =>
         {
             Application.Current?.Dispatcher.Invoke(() =>
-            { 
+            {
                 if (m.Image is not { } img) return;
                 if (!(EnableFirst || EnableSecond || EnableThird || EnableFourth)) return;
 
-                //Cv2.Rotate(img, img, RotateFlags.Rotate180);
-                Cv2.Flip(img, img, FlipMode.X);
+                //Cv2.Flip(img, img, FlipMode.X);
                 DisplayCurrent.Original = img.Clone();
-                
+
             });
         });
 
         //非实时画面存图--存图界面使用
         WeakReferenceMessenger.Default.Register<CameraSaveMessage>(this, (s, m) =>
         {
-            if (m.isOriginalImage)
+            if (m.IsOriginalImage)
             {
                 switch (m.Channel)
                 {
                     case 0:
-                        
+
                         if (!DisplayFirst.Original.Empty())
                             DisplayFirst.Original.SaveImage(m.Filename);//原图
                         break;
@@ -141,24 +145,40 @@ public partial class ShellViewModel : ObservableObject
                 switch (m.Channel)
                 {
                     case 0:
-                        if (DisplayFirst.Frame != null)
-                            DisplayFirst.Frame.Clone().ToMat().SaveImage(m.Filename);//处理图
+                        if (DisplayFirst.Frame == null)
+                        {
+                            MessageBox.Show("通道1无对应图像！");
+                            return;
+                        }
+                        DisplayFirst.Frame.Clone().ToMat().SaveImage(m.Filename);//处理图
                         break;
                     case 1:
-                        if (DisplaySecond.Frame != null)
-                            DisplaySecond.Frame.Clone().ToMat().SaveImage(m.Filename);
+                        if (DisplaySecond.Frame == null)
+                        {
+                            MessageBox.Show("通道2无对应图像！");
+                            return;
+                        }
+                        DisplaySecond.Frame.Clone().ToMat().SaveImage(m.Filename);
                         break;
                     case 2:
-                        if (DisplayThird.Frame != null)
-                            DisplayThird.Frame.Clone().ToMat().SaveImage(m.Filename);
+                        if (DisplayThird.Frame == null)
+                        {
+                            MessageBox.Show("通道3无对应图像！");
+                            return;
+                        }
+                        DisplayThird.Frame.Clone().ToMat().SaveImage(m.Filename);
                         break;
                     case 3:
-                        if (DisplayFourth.Frame != null)
-                            DisplayFourth.Frame.Clone().ToMat().SaveImage(m.Filename);
+                        if (DisplayFourth.Frame == null)
+                        {
+                            MessageBox.Show("通道4无对应图像！");
+                            return;
+                        }
+                        DisplayFourth.Frame.Clone().ToMat().SaveImage(m.Filename);
                         break;
                     default: break;
                 }
-            }    
+            }
         });
 
         //多通道N+1合并
@@ -198,8 +218,11 @@ public partial class ShellViewModel : ObservableObject
 
         });
 
-
-
+        //相机是否正常取像
+        WeakReferenceMessenger.Default.Register<CameraControlENableMessage>(this, (s, m) =>
+        {
+            IsCameraCapture = m.IsEnable;
+        });
     }
 
 }

@@ -43,12 +43,15 @@
             </Viewbox>-->
 
             <Menu>
-                <!--  主菜单项  -->
                 <MenuItem Header="文件">
-                    <!--  子菜单项1  -->
-                    <MenuItem Click="MultiChannel_OnClick" Header="多通道采集" />
-                    <!--  子菜单项2  -->
-                    <MenuItem Click="CameraSave_OnClick" Header="相机存图" />
+                    <MenuItem
+                        Click="MultiChannel_OnClick"
+                        Header="多通道采集"
+                        IsEnabled="{Binding IsCameraCapture}" />
+                    <MenuItem
+                        Click="CameraSave_OnClick"
+                        Header="相机存图"
+                        IsEnabled="{Binding IsCameraCapture}" />
                 </MenuItem>
             </Menu>
 

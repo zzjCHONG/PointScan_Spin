@@ -272,6 +272,9 @@ public partial class SteerViewModel : ObservableObject
         });
 
         IsUnFocusing = true;
+
+        //对焦完成或XYZ中途移动都会跳出此处      
+        //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
     }
 
     void CustomFocus()

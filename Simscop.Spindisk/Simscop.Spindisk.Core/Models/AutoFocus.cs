@@ -81,8 +81,6 @@ namespace Simscop.Spindisk.Core.Models
             return true;
         }
 
-
-
         public override bool SetPosition(double z)
         {
             var value = Math.Round(z, 2);
@@ -99,6 +97,7 @@ namespace Simscop.Spindisk.Core.Models
                 {
                     if ((DateTime.Now - startTime).TotalMilliseconds > timeoutMilliseconds)
                     {
+                        //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
                         throw new TimeoutException("SetPosition operation timed out");
                     }
 
@@ -110,6 +109,7 @@ namespace Simscop.Spindisk.Core.Models
             catch (Exception ex)
             {
                 MessageBox.Show("位移台出现错误，停止对焦");
+
                 return false;
             }
         }
@@ -119,6 +119,8 @@ namespace Simscop.Spindisk.Core.Models
             double num = 5000.0;
             double num2 = 0.0;
             double num3 = 0.0;
+            double xPos = _motor.X;
+            double yPos = _motor.Y;    
             GetPosition(out var z);
 
             Debug.WriteLine(z);
@@ -135,6 +137,11 @@ namespace Simscop.Spindisk.Core.Models
                 double num5 = num4 + (double)i * FirstStep;
                 if (!(num5 <= MinZ) && !(num5 >= MaxZ))
                 {
+                    if (Math.Abs(xPos - _motor.X) > 0.1 || Math.Abs(yPos - _motor.Y) > 0.1) 
+                    {
+                        //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
+                        Debug.WriteLine("111"); return;
+                    }
                     if (!SetPosition(num5)) break;
                     GetPosition(out z);
                     Capture(out var mat);
@@ -164,6 +171,11 @@ namespace Simscop.Spindisk.Core.Models
                 double num6 = num4 + (double)j * SecondStep;
                 if (!(num6 <= MinZ) && !(num6 >= MaxZ))
                 {
+                    if (Math.Abs(xPos - _motor.X) > 0.1 || Math.Abs(yPos - _motor.Y) > 0.1)
+                    {
+                        //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
+                        Debug.WriteLine("222"); return;
+                    }
                     if (!SetPosition(num4 + (double)j * SecondStep)) break;
                     GetPosition(out z);
                     Capture(out var mat2);
@@ -174,8 +186,7 @@ namespace Simscop.Spindisk.Core.Models
                         num = z;
                     }
                     else if (num2 - num3 > Threshold * num2)
-                    {
-                        WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(2));//对焦完成
+                    {                       
                         break;
                     }
                 }
@@ -183,7 +194,9 @@ namespace Simscop.Spindisk.Core.Models
 
             SetPosition(num);
 
+            WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(2));//对焦完成
             Debug.WriteLine("Done");
+            
         }
     }
 }
