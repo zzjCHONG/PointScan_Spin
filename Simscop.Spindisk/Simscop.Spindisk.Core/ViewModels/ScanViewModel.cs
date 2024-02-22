@@ -79,11 +79,6 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty]
     private double _zBottom = 0;
 
-    partial void OnZBottomChanged(double value)
-    {
-        GlobalValue.CustomFocus.SeccondCount = (int)((ZTop - ZBottom) / 2);
-    }
-
     [ObservableProperty]
     private double _percent = 0;
 
@@ -153,12 +148,12 @@ public partial class ScanViewModel : ObservableObject
             IsXYStart = "停止采集";
 
             // 同号满足条件
-            if (stepValue * (xEndValue - xStartValue) <= 0 | stepValue == 0 | stepValue * (yEndValue - yStartValue) <= 0 | stepValue == 0)
-            {
-                EnableAction(true);
-                MessageBox.Show("参数设置有误");
-                return;
-            }
+            //if (stepValue * (xEndValue - xStartValue) <= 0 | stepValue == 0 | stepValue * (yEndValue - yStartValue) <= 0 | stepValue == 0)
+            //{
+            //    EnableAction(true);
+            //    MessageBox.Show("参数设置有误");
+            //    return;
+            //}
 
             var yPos = yStartValue;
 
@@ -166,9 +161,9 @@ public partial class ScanViewModel : ObservableObject
 
             var xReversePos = xEndValue;
 
-            var xCount = (int)Math.Ceiling((xEndValue - xStartValue) / stepValue);
+            var xCount = (int)Math.Ceiling(Math.Abs(xEndValue - xStartValue) / stepValue);
 
-            var yCount = (int)Math.Ceiling((yEndValue - yStartValue) / stepValue);
+            var yCount = (int)Math.Ceiling(Math.Abs(yEndValue - yStartValue) / stepValue);
 
             double value = 1;
 
@@ -187,8 +182,8 @@ public partial class ScanViewModel : ObservableObject
                         xReversePos = result;
                         for (int i = xCount; i >= 0; i--)
                         {
-                            Debug.WriteLine($"[INFO] {flags[0]} -> {xReversePos}");
-                            WeakReferenceMessenger.Default.Send<string, string>(xReversePos.ToString(CultureInfo.InvariantCulture), xMessage);
+                            Debug.WriteLine($"[INFO] {flags[0]} -> {Math.Round(xReversePos,1)}");
+                            WeakReferenceMessenger.Default.Send<string, string>(Math.Round(xReversePos, 1).ToString(CultureInfo.InvariantCulture), xMessage);
 
                             Thread.Sleep((int)(XYSpan * 1000));
 
@@ -197,12 +192,12 @@ public partial class ScanViewModel : ObservableObject
                                 await CustomFocus();
                             };
 
-                            var xPath = System.IO.Path.Join(Root, $"{flags[1]}_{yPos}_{flags[0]}_{xReversePos}.TIF");
+                            var xPath = System.IO.Path.Join(Root, $"{flags[1]}_{yPos}_{flags[0]}_{Math.Round(xReversePos, 1)}.TIF");
                             WeakReferenceMessenger.Default
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
 
                             xReversePos -= stepValue;
-                            if (_cancelToken.IsCancellationRequested) break;
+                            if (_cancelToken.IsCancellationRequested) return;
                         }
                         value++;
                         xReversePos = result;
@@ -212,8 +207,8 @@ public partial class ScanViewModel : ObservableObject
                         for (int i = 0; i <= xCount; i++)
                         {
 
-                            Debug.WriteLine($"[INFO] {flags[0]} -> {xForwardPos}");
-                            WeakReferenceMessenger.Default.Send<string, string>(xForwardPos.ToString(CultureInfo.InvariantCulture), xMessage);
+                            Debug.WriteLine($"[INFO] {flags[0]} -> {Math.Round(xForwardPos, 1)}");
+                            WeakReferenceMessenger.Default.Send<string, string>(Math.Round(xForwardPos, 1).ToString(CultureInfo.InvariantCulture), xMessage);
 
                             Thread.Sleep((int)(XYSpan * 1000));
 
@@ -222,11 +217,11 @@ public partial class ScanViewModel : ObservableObject
                                 await CustomFocus();
                             }
 
-                            var xPath = System.IO.Path.Join(Root, $"{flags[1]}_{yPos}_{flags[0]}_{xForwardPos}.TIF");
+                            var xPath = System.IO.Path.Join(Root, $"{flags[1]}_{yPos}_{flags[0]}_{Math.Round(xForwardPos, 1)}.TIF");
                             WeakReferenceMessenger.Default
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
                             xForwardPos += stepValue;
-                            if (_cancelToken.IsCancellationRequested) break;
+                            if (_cancelToken.IsCancellationRequested) return;
                         }
                         result = xForwardPos - stepValue;
                         value++;
@@ -234,7 +229,7 @@ public partial class ScanViewModel : ObservableObject
                     }
                     yPos += stepValue;
                 }
-                if (_cancelToken.IsCancellationRequested) break;
+                if (_cancelToken.IsCancellationRequested) return;
             } while (value < yCount);
 
             EnableAction(true);
@@ -289,28 +284,28 @@ public partial class ScanViewModel : ObservableObject
             IsZStart = "停止采集";
 
             // 同号满足条件
-            if (stepValue * (endValue - startValue) <= 0 | stepValue == 0)
-            {
-                EnableAction(true);
-                MessageBox.Show("参数设置有误");
-                return;
-            }
+            //if (stepValue * (endValue - startValue) <= 0 | stepValue == 0)
+            //{
+            //    EnableAction(true);
+            //    MessageBox.Show("参数设置有误");
+            //    return;
+            //}
 
             var pos = startValue;
 
-            var count = (int)Math.Ceiling((endValue - startValue) / stepValue);
+            var count = (int)Math.Ceiling(Math.Abs(endValue - startValue) / stepValue);
             var step = 0;
 
             WeakReferenceMessenger.Default.Send<string, string>(pos.ToString(CultureInfo.InvariantCulture), message);
             Thread.Sleep(3000);
             do
             {
-                Debug.WriteLine($"[INFO] {flag} -> {pos}");
-                WeakReferenceMessenger.Default.Send<string, string>(pos.ToString(CultureInfo.InvariantCulture), message);
+                Debug.WriteLine($"[INFO] {flag} -> {Math.Round(pos,2)}");
+                WeakReferenceMessenger.Default.Send<string, string>(Math.Round(pos, 2).ToString(CultureInfo.InvariantCulture), message);
 
                 Thread.Sleep((int)(ZSpan * 1000));
 
-                var path = System.IO.Path.Join(Root, $"{flag}_{pos}.TIF");
+                var path = System.IO.Path.Join(Root, $"{flag}_{Math.Round(pos, 2)}.TIF");
                 WeakReferenceMessenger.Default.Send<string, string>(path, MessageManage.SaveACapture);
 
                 stack.Add(GlobalValue.CurrentFrame);
@@ -323,7 +318,7 @@ public partial class ScanViewModel : ObservableObject
                 if (_cancelToken.IsCancellationRequested)
                 {
                     stack.Clear();
-                    break;
+                    return;
                 };
             } while (step <= count && !_cancelToken.IsCancellationRequested);
 
@@ -357,6 +352,12 @@ public partial class ScanViewModel : ObservableObject
         {
             ZStart = GlobalValue.GlobalMotor.Z;
         }
+    }
+
+    void SetZPos()
+    {
+        GlobalValue.CustomFocus.SeccondCount = (int)((ZTop - ZBottom) / 2);
+        WeakReferenceMessenger.Default.Send(SteerMessage.Setting);
     }
 
     void SetEndPos(uint mode)
@@ -402,4 +403,7 @@ public partial class ScanViewModel : ObservableObject
 
     [RelayCommand]
     void SetZEndPoint() => SetEndPos(1);
+
+    [RelayCommand]
+    void SetZ() => SetZPos();
 }

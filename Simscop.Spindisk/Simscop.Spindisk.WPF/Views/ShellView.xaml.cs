@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.Messaging;
+using Simscop.Spindisk.Core;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.ViewModels;
 
@@ -27,12 +28,14 @@ namespace Simscop.Spindisk.WPF.Views
         private ScanViewModel scanVM;
         private MultiChannelViewModel multiChannelSaveVM;
         private CameraSaveViewModel cameraSaveVM;
+        private StitcherViewModel stitcherVM;
 
         private CameraView cameraView;
         private SettingView settingView;
         private ExampleView exampleView;
         private MultiChannelView multiChannelView;
         private CameraSaveView cameraSaveView;
+        private StitcherView stitcherView;
 
         public static ShellView Instance
         {
@@ -58,12 +61,14 @@ namespace Simscop.Spindisk.WPF.Views
 
             cameraVM = new CameraViewModel();
             shellVM = new ShellViewModel();
+            GlobalValue.GlobalShellViewModel = shellVM;
             spinVM = new SpinViewModel();
             steerVM = new SteerViewModel();
             scanVM = new ScanViewModel();
             laserVM = new LaserViewModel();
             cameraSaveVM = new CameraSaveViewModel();
-            multiChannelSaveVM= new MultiChannelViewModel();
+            multiChannelSaveVM = new MultiChannelViewModel();
+            stitcherVM = new StitcherViewModel();
             exampleVM = new ExampleViewModel()
             {
                 CameraVM = cameraVM,
@@ -78,14 +83,19 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 DataContext = exampleVM,
             };
-            cameraSaveView = new ()
+            cameraSaveView = new()
             {
-                DataContext= cameraSaveVM,
+                DataContext = cameraSaveVM,
             };
             multiChannelView = new()
             {
                 DataContext = multiChannelSaveVM,
             };
+            stitcherView = new()
+            {
+                DataContext = stitcherVM,
+            };
+
             SetDataContext();
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
@@ -184,6 +194,12 @@ namespace Simscop.Spindisk.WPF.Views
                 @"https://www.simscop.com/WebShop/About.aspx");
         }
 
+        private void NavigateBtClick(object sender, RoutedEventArgs e)
+        {
+            stitcherView.Show();
+            exampleView.Topmost = true;
+        }
+        
         private void HelpBtClick(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("explorer.exe",

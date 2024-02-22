@@ -87,6 +87,14 @@ public partial class SteerViewModel : ObservableObject
             WeakReferenceMessenger.Default.Send<ASIMotor, string>(_motor, SteerMessage.Motor);
         });
 
+        
+        WeakReferenceMessenger.Default.Send<ASIMotor, string>(_motor, SteerMessage.Splice);
+
+        WeakReferenceMessenger.Default.Register<string>(SteerMessage.Setting, (s, e) =>
+        {
+            CustomSeccondCount = GlobalValue.CustomFocus.SeccondCount;
+            SetCustomFocus();
+        });
 
         ReSetFocus();
 

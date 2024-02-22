@@ -41,11 +41,11 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 if (selectedTabItem.Name == "XYScanItem")
                 {
-                    this.Height = 510;
+                    this.Height = 530;
                 }
                 else if (selectedTabItem.Name == "ZScanItem")
                 {
-                    this.Height = 320;
+                    this.Height = 340;
                 }
             }
         }
