@@ -538,7 +538,7 @@ namespace Simscop.API
                 Marshal.Copy(imageBytes, 0, matImg.Data, imageBytes.Length);
 
                 //matImg.Flip(FlipMode.X);
-                Cv2.Flip(matImg, matImg, FlipMode.X);//图像翻转
+                //Cv2.Flip(matImg, matImg, FlipMode.X);//图像翻转
 
                 //4-Re-queue the buffers
                 if (AlignedBuffers == null)

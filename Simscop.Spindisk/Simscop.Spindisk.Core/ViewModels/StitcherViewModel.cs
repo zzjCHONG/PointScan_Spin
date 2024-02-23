@@ -37,7 +37,11 @@ public partial class StitcherViewModel : ObservableObject
 
         WeakReferenceMessenger.Default.Register<MappingMoveMessage, string>(this, nameof(MappingMoveMessage), (s, e) =>
         {
-            SetPos(e.X, e.Y);
+            Task.Run(() =>
+            {
+                _motor.Stop();
+                SetPos(e.X, e.Y);
+            });
         });
 
     }
@@ -52,7 +56,7 @@ public partial class StitcherViewModel : ObservableObject
     /// 每次移动到指定位置后的采样前等待时间，一般设置为曝光时间的两倍
     /// </summary>
     [ObservableProperty]
-    private int _waitAcquisitionTime = 1000;
+    private int _waitAcquisitionTime = 200;
 
     /// <summary>
     /// 网格生成的第二个点
@@ -114,7 +118,7 @@ public partial class StitcherViewModel : ObservableObject
     /// 每个像素点对应的实际坐标差值
     /// </summary>
     [ObservableProperty]
-    private double _perPixel2Unit = 0.6;
+    private double _perPixel2Unit = 0.67;
 
     /// <summary>
     /// 图像尺寸
@@ -171,6 +175,7 @@ public partial class StitcherViewModel : ObservableObject
     Mat GetCeil(double x, double y)
     {
         SetPos(x, y);
+        Thread.Sleep(WaitAcquisitionTime);
         var mat = new Mat();
         Application.Current.Dispatcher.Invoke(() =>
         {
@@ -188,21 +193,65 @@ public partial class StitcherViewModel : ObservableObject
     {
         var xPos = Math.Round(x, 2);
         var yPos = Math.Round(y, 2);
-        if (Math.Abs(_motor.X - xPos) > 1) _motor.SetXPosition(xPos);
-        Thread.Sleep(WaitAcquisitionTime);
-        if (Math.Abs(_motor.Y - yPos) > 1) _motor.SetYPosition(yPos);
-        Thread.Sleep(WaitAcquisitionTime);
-        _motor.ReadPosition();
 
-        int timeoutMilliseconds = 2000;
+        int timeoutMilliseconds = 4000;
         int maxIterations = 10;
 
         DateTime startTime = DateTime.Now;
         int iterationCount = 0;
 
+        //do
+        //{
+        //    _motor.SetXYPosition(xPos, yPos);
+        //    _motor.ReadPosition();
+        //} while (Math.Abs(_motor.X - xPos) > 10 && Math.Abs(_motor.Y - yPos) > 10);
+
+        _motor.ReadPosition();
+
+        if(Math.Abs(_motor.X - xPos) > 10)
+        {
+            do
+            {
+                _motor.SetXPosition(xPos);
+                Thread.Sleep(500);
+                _motor.ReadPosition();
+                if ((DateTime.Now - startTime).TotalMilliseconds > timeoutMilliseconds)
+                {
+                    Debug.WriteLine("SetPosition operation timed out");
+                    break;
+                }
+                if (iterationCount > maxIterations)
+                {
+                    Debug.WriteLine("Exceeded maximum iterations");
+                    break;
+                }
+            } while (Math.Abs(_motor.X - xPos) > 10);
+        }
+
+        if(Math.Abs(_motor.Y - yPos) > 10)
+        {
+            do
+            {
+                _motor.SetYPosition(yPos);
+                Thread.Sleep(500);
+                _motor.ReadPosition();
+                if ((DateTime.Now - startTime).TotalMilliseconds > timeoutMilliseconds)
+                {
+                    Debug.WriteLine("SetPosition operation timed out");
+                    break;
+                }
+                if (iterationCount > maxIterations)
+                {
+                    Debug.WriteLine("Exceeded maximum iterations");
+                    break;
+                }
+            } while (Math.Abs(_motor.Y - yPos) > 10);
+        }
+        
+
         try
         {
-            while (Math.Abs(_motor.X - xPos) > 0.1 || Math.Abs(_motor.Y - yPos) > 0.1)
+            while (Math.Abs(_motor.X - xPos) > 1 || Math.Abs(_motor.Y - yPos) > 1)
             {
                 if ((DateTime.Now - startTime).TotalMilliseconds > timeoutMilliseconds)
                 {
@@ -238,7 +287,8 @@ public partial class StitcherViewModel : ObservableObject
 
         var cols = (int)Math.Ceiling(Math.Abs(Point1.X - Point2.X) / sWidth);
         var rows = (int)Math.Ceiling(Math.Abs(Point1.Y - Point2.Y) / sHeight);
-
+        cols = (cols == 0) ? 1 : cols;
+        rows = (rows == 0) ? 1 : rows;
         // note 之类直接强行要求第一个点左上方，第二个右上方
 
         double startX = Math.Min(Point1.X, Point2.X);

@@ -46,7 +46,7 @@ public partial class ShellViewModel : ObservableObject
     private bool _enableFourth = false;
 
     [ObservableProperty]
-    private bool _isCameraCapture=false;
+    private bool _isCameraCapture = false;
 
     partial void OnEnableFirstChanged(bool value) => SwitchEnable(value, 1);
     partial void OnEnableSecondChanged(bool value) => SwitchEnable(value, 2);
@@ -187,28 +187,28 @@ public partial class ShellViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<MultiChannelMergeMessage>(this, (s, m) =>
         {
             List<Mat> matList = new List<Mat>();
-            if (DisplayFirst.Frame != null && m.isFirstEnabled)
+            if (DisplayFirst.Frame != null && m.IsFirstEnabled)
             {
                 var mat1 = DisplayFirst.Frame.Clone().ToMat();
                 if (mat1.Channels() != 3)
                     Cv2.CvtColor(mat1, mat1, ColorConversionCodes.GRAY2BGR);
                 matList.Add(mat1);
             }
-            if (DisplaySecond.Frame != null && m.isSecondEnabled)
+            if (DisplaySecond.Frame != null && m.IsSecondEnabled)
             {
                 var mat2 = DisplaySecond.Frame.Clone().ToMat();
                 if (mat2.Channels() != 3)
                     Cv2.CvtColor(mat2, mat2, ColorConversionCodes.GRAY2BGR);
                 matList.Add(mat2);
             }
-            if (DisplayThird.Frame != null && m.isThirdEnabled)
+            if (DisplayThird.Frame != null && m.IsThirdEnabled)
             {
                 var mat3 = DisplayThird.Frame.Clone().ToMat();
                 if (mat3.Channels() != 3)
                     Cv2.CvtColor(mat3, mat3, ColorConversionCodes.GRAY2BGR);
                 matList.Add(mat3);
             }
-            if (DisplayFourth.Frame != null && m.isFourthEnabled)
+            if (DisplayFourth.Frame != null && m.IsFourthEnabled)
             {
                 var mat4 = DisplayFourth.Frame.Clone().ToMat();
                 if (mat4.Channels() != 3)
@@ -223,7 +223,7 @@ public partial class ShellViewModel : ObservableObject
             }
         });
 
-        //相机是否正常取像
+        //相机是否正常取像,控件使能判断
         WeakReferenceMessenger.Default.Register<CameraControlENableMessage>(this, (s, m) =>
         {
             IsCameraCapture = m.IsEnable;

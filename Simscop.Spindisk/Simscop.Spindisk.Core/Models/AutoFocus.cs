@@ -30,7 +30,8 @@ namespace Simscop.Spindisk.Core.Models
                     if (focus == null)
                     {
                         focus = new AutoFocus();
-                        focus.MinZ = 25;
+                        focus.MaxZ = 75;
+                        focus.MinZ = 30;
                         GlobalValue.GeneralFocus = focus;
                         GlobalValue.CustomFocus = focus;
 

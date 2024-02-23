@@ -67,17 +67,17 @@ public partial class LaserViewModel : ObservableObject
         Laser = new BogaoLaser();
         GlobalValue.GlobalLaser = Laser;
 
-        WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) => 
-        { 
-            if (m.IsPreInit) LaserInit(); 
+        WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) =>
+        {
+            if (m.IsPreInit) LaserInit();
         });
     }
 
     [ObservableProperty]
-    private bool _isConnected=false;
+    private bool _isConnected = false;
 
     [ObservableProperty]
-    private bool _isConnecting=true;
+    private bool _isConnecting = true;
 
     partial void OnIsConnectingChanged(bool value)
     {
@@ -88,7 +88,7 @@ public partial class LaserViewModel : ObservableObject
     void LaserInit()
     {
         IsConnecting = true;
-        IsConnected= Laser.Init();
+        IsConnected = Laser.Init();
         IsConnecting = false;
 
         if (Laser.GetStatus(0, out var aStatus) &&
@@ -140,6 +140,9 @@ public partial class LaserViewModel : ObservableObject
         ChannelBEnable = false;
         ChannelCEnable = false;
         ChannelDEnable = false;
+
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
+
     }
 
     [ObservableProperty]
@@ -164,6 +167,8 @@ public partial class LaserViewModel : ObservableObject
         ChannelAEnable = false;
         ChannelCEnable = false;
         ChannelDEnable = false;
+
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
     }
 
     [ObservableProperty]
@@ -187,6 +192,9 @@ public partial class LaserViewModel : ObservableObject
         ChannelAEnable = false;
         ChannelBEnable = false;
         ChannelDEnable = false;
+
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
+
     }
 
     [ObservableProperty]
@@ -210,6 +218,8 @@ public partial class LaserViewModel : ObservableObject
         ChannelAEnable = false;
         ChannelBEnable = false;
         ChannelCEnable = false;
+
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
     }
 
     void DialogRun(Func<bool> func)

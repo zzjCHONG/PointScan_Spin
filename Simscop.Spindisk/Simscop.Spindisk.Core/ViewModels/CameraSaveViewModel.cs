@@ -114,7 +114,7 @@ namespace Simscop.Spindisk.Core.ViewModels
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, isSaveOriginImage, dlg.FileName));
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(channelID, isSaveOriginImage, dlg.FileName));
                 OpenFolderAndSelectFile(dlg.FileName);
             }                
         }

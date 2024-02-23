@@ -155,7 +155,12 @@ public record CameraControlENableMessage(bool IsEnable);
 /// <summary>
 /// 多通道采集-多通道合并
 /// </summary>
-public record MultiChannelMergeMessage(string Filename,bool isFirstEnabled, bool isSecondEnabled, bool isThirdEnabled, bool isFourthEnabled);
+public record MultiChannelMergeMessage(string Filename, bool IsFirstEnabled, bool IsSecondEnabled, bool IsThirdEnabled, bool IsFourthEnabled);
+
+/// <summary>
+/// 当前界面显示
+/// </summary>
+public record CurrentDispalyChannelEnable(bool IsFirstDisplayEnabled, bool IsSecondDisplayEnabled, bool IsThirdDisplayEnabled, bool IsFourthDisplayEnabled);
 
 /// <summary>
 /// 电动台对焦动画状态
