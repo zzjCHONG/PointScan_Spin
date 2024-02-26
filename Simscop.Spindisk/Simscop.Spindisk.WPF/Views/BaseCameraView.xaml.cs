@@ -58,5 +58,6 @@ namespace Simscop.Spindisk.WPF.Views
                 ExposureTextBox.Text = "";
             }
         }
+
     }
 }

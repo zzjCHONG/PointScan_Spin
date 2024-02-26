@@ -27,6 +27,7 @@ namespace Simscop.Spindisk.Core.ViewModels
 
         public ConnectStateViewModel()
         {
+            //获取各连接返回信息
             WeakReferenceMessenger.Default.Register<CameraConnectMessage>(this, (o, m) =>
             {
                 IsCameraConnected = m.IsConnected;
@@ -48,6 +49,7 @@ namespace Simscop.Spindisk.Core.ViewModels
                 SpinText(m.ConnectState);
             });
 
+            //初始化各硬件
             Task.Run(Init);
         }
 
@@ -55,7 +57,6 @@ namespace Simscop.Spindisk.Core.ViewModels
         private string _cameraTextContext = "Connecting...";
         private string CameraText(string connectState)
         {
-            //return CameraTextContext= IsCameraConnected ? "连接完成！" : "初始化失败！";
             return CameraTextContext = connectState;
         }
 
@@ -63,15 +64,13 @@ namespace Simscop.Spindisk.Core.ViewModels
         private string _laserTextContext = "Connecting...";
         private string LaserText(string connectState)
         {
-            //return LaserTextContext = IsLaserConnected ? "连接完成！" : "初始化失败！";
             return LaserTextContext = connectState;
         }
 
         [ObservableProperty]
         private string _steerTextContext = "Connecting...";
         private string SteerText(string connectState)
-        {
-            //return SteerTextContext = IsSteerConnected ? "连接完成！" : "初始化失败！";
+        { 
             return SteerTextContext = connectState;
         }
 
@@ -79,7 +78,6 @@ namespace Simscop.Spindisk.Core.ViewModels
         private string _spinTextContext = "Connecting...";
         private string SpinText(string connectState)
         {
-            //return SpinTextContext = IsSpinConnected ? "连接完成！" : "初始化失败！";
             return SpinTextContext = connectState;
         }
 

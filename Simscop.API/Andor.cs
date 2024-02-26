@@ -32,6 +32,11 @@ namespace Simscop.API
 
         public bool StopCapture() => _andor.StopAcquisition();
 
+        public bool AcqStartCommand() => _andor.AcqStartCommand();
+
+        public bool AcqStopCommand() => _andor.AcqStopCommand();
+
+
         ~Andor()
         {
             _andor.UnInitializeCamera();
@@ -139,6 +144,9 @@ namespace Simscop.API
             SetPixelReadoutRate(PixelReadoutRateEnum.OneHundredMHz);//采样率，只有100和280mhz
             SetCycleMode(CycleModeEnum.Continuous);//采集方式-连续触发
             SetExposure(50);//曝光
+
+            AcqStartCommand();
+            AcqStopCommand();//预热
 
             ConnectState = "Initialize camera completed!";
             Debug.WriteLine(ConnectState);
@@ -468,7 +476,7 @@ namespace Simscop.API
         public bool Capture(out Mat matImg)
         {
             matImg = new Mat();
-            if (!GetCircularFrame(out matImg, interval: 2000)) return false;
+            if (!GetCircularFrame(out matImg, interval: 1000)) return false;
             matImg.MinMaxLoc(out double min, out double max);
             if (matImg == null || min == 0 || max == 0)
             {

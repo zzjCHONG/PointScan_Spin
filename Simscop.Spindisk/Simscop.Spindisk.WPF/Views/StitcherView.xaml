@@ -147,7 +147,6 @@
                 Progress="{Binding Progress}" />
 
 
-
             <!--  颜色要重新改  -->
             <StackPanel Orientation="Vertical" x:Name="ImageControl">
                 <StackPanel.Resources>

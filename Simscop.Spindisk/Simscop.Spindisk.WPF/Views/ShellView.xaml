@@ -45,10 +45,12 @@
             <Menu>
                 <MenuItem Header="文件">
                     <MenuItem
+                        x:Name="MultiChannelButton"
                         Click="MultiChannel_OnClick"
                         Header="多通道采集"
                         IsEnabled="{Binding IsCameraCapture}" />
                     <MenuItem
+                        x:Name="CameraSaveButton"
                         Click="CameraSave_OnClick"
                         Header="相机存图"
                         IsEnabled="{Binding IsCameraCapture}" />
