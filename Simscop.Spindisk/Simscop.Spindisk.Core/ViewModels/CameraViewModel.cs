@@ -113,6 +113,16 @@ public class TestCamera : ICamera
 
         return "TestCamera init completed!";
     }
+
+    public bool AcqStartCommand()
+    {
+        return true;
+    }
+
+    public bool AcqStopCommand()
+    {
+        return true;
+    }
 }
 
 #endregion
@@ -174,7 +184,7 @@ public partial class CameraViewModel : ObservableObject
 
     partial void OnIsCaptureChanged(bool value)
     {
-        WeakReferenceMessenger.Default.Send<CameraControlENableMessage>(new CameraControlENableMessage(value));
+        WeakReferenceMessenger.Default.Send<CameraControlEnableMessage>(new CameraControlEnableMessage(value));
     }
 
     partial void OnIsConnectingChanged(bool value)

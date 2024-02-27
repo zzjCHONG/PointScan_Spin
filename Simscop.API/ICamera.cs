@@ -63,4 +63,16 @@ public interface ICamera
     /// </summary>
     /// <returns></returns>
     public bool StopCapture();
+
+    /// <summary>
+    /// 开启
+    /// </summary>
+    /// <returns></returns>
+    public bool AcqStartCommand();
+
+    /// <summary>
+    /// 关闭
+    /// </summary>
+    /// <returns></returns>
+    public bool AcqStopCommand();
 }

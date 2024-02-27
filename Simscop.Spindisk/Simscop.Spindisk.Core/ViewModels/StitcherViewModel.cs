@@ -1,15 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Lift.Core.ImageArray.Algorithm;
-using Lift.Core.ImageArray.Extensions;
 using OpenCvSharp;
 using System.Threading;
 using Simscop.Spindisk.Core.Models;
@@ -17,8 +11,6 @@ using System.Windows;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.API;
 using System.Windows.Media.Imaging;
-using OpenCvSharp.WpfExtensions;
-using static System.Windows.Forms.AxHost;
 
 namespace Simscop.Spindisk.Core.ViewModels;
 
@@ -44,6 +36,8 @@ public partial class StitcherViewModel : ObservableObject
             });
         });
 
+        if (cancellationTokenSource != null) cancellationTokenSource.Cancel();
+        cancellationTokenSource = new CancellationTokenSource();
     }
 
     /// <summary>
@@ -80,7 +74,7 @@ public partial class StitcherViewModel : ObservableObject
     {
         Progress = 0;
 
-        // true -> 开始采集
+        //true->开始采集
         if (value)
         {
             Debug.WriteLine("开始任务");
@@ -99,13 +93,13 @@ public partial class StitcherViewModel : ObservableObject
 
         }
 
-        // !false & !false -> 采集过程中停止采集
+        //!false & !false->采集过程中停止采集
         if (!value && !IsFinish)
         {
             Debug.WriteLine("取消任务");
         }
 
-        // !false & ture -> 完成采集后自动停止
+        //!false & ture->完成采集后自动停止
         if (!value && IsFinish)
         {
             IsFinish = false;
@@ -280,7 +274,7 @@ public partial class StitcherViewModel : ObservableObject
     /// <summary>
     /// 这里写的是开始采集的示例程序
     /// </summary>
-    void Start()
+    void Start(CancellationToken cancellationToken)
     {
         var sWidth = ImageSize.Width * PerPixel2Unit;
         var sHeight = ImageSize.Height * PerPixel2Unit;
@@ -300,10 +294,21 @@ public partial class StitcherViewModel : ObservableObject
             , MatType.CV_16UC1
             , new Scalar(0));
 
+        int times = rows * cols;
+        int single = (int)Math.Ceiling(100.0 / times);
+
         for (var i = 0; i < rows; i++)
         {
             for (var j = 0; j < cols; j++)
             {
+                Progress += single;
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    Debug.WriteLine("Stitcher return");
+                    // 如果请求取消，则停止处理
+                    return;
+                }
+
                 var index = i % 2 == 0 ?
                     (startX + j * sWidth, startY + i * sHeight)
                     : (startX + (cols - 1 - j) * sWidth, startY + i * sHeight);
@@ -325,20 +330,19 @@ public partial class StitcherViewModel : ObservableObject
                 {
                     Display.Original = StitchMat.Clone();
                 });
-
             }
-        }
 
-
+        }    
     }
+
+    private CancellationTokenSource cancellationTokenSource;
 
     [RelayCommand]
     void StartScan()
     {
         Task.Run(() =>
         {
-            Start();
+            Start(cancellationTokenSource.Token);
         });
     }
-
 }
