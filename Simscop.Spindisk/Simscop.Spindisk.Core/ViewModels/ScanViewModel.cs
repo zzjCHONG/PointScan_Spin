@@ -100,7 +100,8 @@ public partial class ScanViewModel : ObservableObject
     {
         if (value == 0) Title = "自动扫描";
 
-        if (Percent > 1) Percent = 1;
+        if (Percent > 1) 
+            //Percent = 1;
 
         Title = $"自动扫描 ({value:F2} %)";
     }
@@ -167,6 +168,12 @@ public partial class ScanViewModel : ObservableObject
 
             double value = 1;
 
+            var count = (xCount+1)*(yCount+1);
+
+            double per = (1 / (double)(count)) * 100;
+
+            var step = 0;
+
             WeakReferenceMessenger.Default.Send<string, string>(yStartValue.ToString(CultureInfo.InvariantCulture), yMessage);
             Thread.Sleep(2000);
             WeakReferenceMessenger.Default.Send<string, string>(xStartValue.ToString(CultureInfo.InvariantCulture), xMessage);
@@ -197,6 +204,8 @@ public partial class ScanViewModel : ObservableObject
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
 
                             xReversePos -= stepValue;
+                            step++;
+                            Percent = Percent + per;
                             if (_cancelToken.IsCancellationRequested) return;
                         }
                         value++;
@@ -221,6 +230,8 @@ public partial class ScanViewModel : ObservableObject
                             WeakReferenceMessenger.Default
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
                             xForwardPos += stepValue;
+                            step++;
+                            Percent = Percent + per;
                             if (_cancelToken.IsCancellationRequested) return;
                         }
                         result = xForwardPos - stepValue;
@@ -229,7 +240,7 @@ public partial class ScanViewModel : ObservableObject
                     }
                     yPos += stepValue;
                 }
-                if (_cancelToken.IsCancellationRequested) return;
+                if (step<=count && !_cancelToken.IsCancellationRequested) return;
             } while (value < yCount);
 
             EnableAction(true);
@@ -295,7 +306,7 @@ public partial class ScanViewModel : ObservableObject
 
             var count = (int)Math.Ceiling(Math.Abs(endValue - startValue) / stepValue);
             var step = 0;
-
+            double per = (1 / (double)(count+1)) * 100;
             WeakReferenceMessenger.Default.Send<string, string>(pos.ToString(CultureInfo.InvariantCulture), message);
             Thread.Sleep(3000);
             do
@@ -313,8 +324,8 @@ public partial class ScanViewModel : ObservableObject
                 pos += stepValue;
 
                 pos = stepValue > 0 ? Math.Min(pos, endValue) : Math.Max(pos, endValue);
-
-                Percent = (double)++step / count * 100;
+                step++;
+                Percent = Percent+per;
                 if (_cancelToken.IsCancellationRequested)
                 {
                     stack.Clear();

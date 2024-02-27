@@ -50,7 +50,7 @@
 
         <UniformGrid Height="240" Rows="4">
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsFirstChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
@@ -73,11 +73,10 @@
             </StackPanel>
 
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsSecondChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
-
                     </Grid.ColumnDefinitions>
                     <CheckBox
                         Grid.Column="1"
@@ -98,7 +97,7 @@
             </StackPanel>
 
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsThirdChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
@@ -122,11 +121,10 @@
             </StackPanel>
 
             <StackPanel>
-                <Grid Margin="5,0,10,0">
+                <Grid Margin="5,0,10,0" IsEnabled="{Binding IsFourthChannelEnable}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
-
                     </Grid.ColumnDefinitions>
                     <CheckBox
                         Grid.Column="1"

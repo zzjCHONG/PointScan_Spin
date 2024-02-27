@@ -190,8 +190,7 @@ namespace Simscop.Spindisk.WPF.Views
         {
             switch (ProgressMode)
             {
-                case -1://未进行或中止
-                    if (FocusButton.Background == Brushes.Green) Thread.Sleep(1000);
+                case -1://未进行或中止 
                     FocusButton.Background = Brushes.Transparent;
                     //FocusButton.Foreground = Brushes.LightGray;
                     break;
@@ -200,7 +199,7 @@ namespace Simscop.Spindisk.WPF.Views
                     //FocusButton.Foreground = (FocusButton.Foreground == Brushes.Red) ? Brushes.LightGray : Brushes.Red;
                     break;
                 case 2://完成
-                    FocusButton.Background = Brushes.Green;
+                    FocusButton.Background = Brushes.Green;                
                     //FocusButton.Foreground = Brushes.Green;
                     break;
                 default:

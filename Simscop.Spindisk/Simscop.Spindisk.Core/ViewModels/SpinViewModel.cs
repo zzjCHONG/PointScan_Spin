@@ -125,7 +125,7 @@ public partial class SpinViewModel : ObservableObject
             IsConnectEnable = true;
             IsConnected = false;
             SpinControlEnabled = false;
-            MessageBox.Show("旋转台：接口出现错误，连接失败");
+            //MessageBox.Show("旋转台：接口出现错误，连接失败");
         }
         finally
         {

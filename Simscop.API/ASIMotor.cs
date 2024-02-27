@@ -109,6 +109,10 @@ public class ASIMotor
     public bool SetZPosition(double value)
         => SetPosition(Motor.Axis.Z, value);
 
+    public bool SetXYPosition(double x, double y) => _motor.MoveXYAbsolute(x, y);
+
+    public void Stop() => _motor.StopMove();
+
     #endregion
 
     public void ResetPosition()

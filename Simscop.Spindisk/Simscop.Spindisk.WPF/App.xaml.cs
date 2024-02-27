@@ -34,7 +34,8 @@ namespace Simscop.Spindisk.WPF
             }
             else
             {
-                ShellView.Instance.Show();  
+                var ins = ShellView.Instance;
+                //ShellView.Instance.Show();  
             }
 
             var conView = new ConnectStateView();

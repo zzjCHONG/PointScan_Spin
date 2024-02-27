@@ -30,7 +30,8 @@ namespace Simscop.Spindisk.Core.Models
                     if (focus == null)
                     {
                         focus = new AutoFocus();
-                        focus.MinZ = 25;
+                        focus.MaxZ = 75;
+                        focus.MinZ = 30;
                         GlobalValue.GeneralFocus = focus;
                         GlobalValue.CustomFocus = focus;
 
@@ -97,7 +98,7 @@ namespace Simscop.Spindisk.Core.Models
                 {
                     if ((DateTime.Now - startTime).TotalMilliseconds > timeoutMilliseconds)
                     {
-                        //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
+                        WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
                         throw new TimeoutException("SetPosition operation timed out");
                     }
 
@@ -139,7 +140,7 @@ namespace Simscop.Spindisk.Core.Models
                 {
                     if (Math.Abs(xPos - _motor.X) > 0.1 || Math.Abs(yPos - _motor.Y) > 0.1) 
                     {
-                        //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
+                        WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
                         Debug.WriteLine("111"); return;
                     }
                     if (!SetPosition(num5)) break;
@@ -173,7 +174,7 @@ namespace Simscop.Spindisk.Core.Models
                 {
                     if (Math.Abs(xPos - _motor.X) > 0.1 || Math.Abs(yPos - _motor.Y) > 0.1)
                     {
-                        //WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
+                        WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(-1));
                         Debug.WriteLine("222"); return;
                     }
                     if (!SetPosition(num4 + (double)j * SecondStep)) break;
@@ -193,6 +194,7 @@ namespace Simscop.Spindisk.Core.Models
             }
 
             SetPosition(num);
+
 
             WeakReferenceMessenger.Default.Send<SteerAnimationStateMessage>(new SteerAnimationStateMessage(2));//对焦完成
             Debug.WriteLine("Done");

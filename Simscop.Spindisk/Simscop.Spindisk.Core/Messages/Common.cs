@@ -140,22 +140,26 @@ public record CameraSaveMessage(int Channel, bool IsOriginalImage,string Filenam
 
 /// <summary>
 /// 控件Enable
-/// 存图
+/// 激光通道开关控制：存图对应频道
 /// </summary>
 /// <param name="Channel"></param>
 /// <param name="IsEnable"></param>
 public record ChannelControlEnableMessage(int Channel,bool IsEnable);
+/// <summary>
+/// 当前界面显示
+/// </summary>
+public record CurrentDispalyChannelEnableMessage(bool IsFirstDisplayEnabled, bool IsSecondDisplayEnabled, bool IsThirdDisplayEnabled, bool IsFourthDisplayEnabled);
 
 /// <summary>
 /// 控件Enable
-/// 存图+多通道采集
+/// 相机开关控制：存图+多通道采集
 /// </summary>
-public record CameraControlENableMessage(bool IsEnable);
+public record CameraControlEnableMessage(bool IsEnable);
 
 /// <summary>
 /// 多通道采集-多通道合并
 /// </summary>
-public record MultiChannelMergeMessage(string Filename,bool isFirstEnabled, bool isSecondEnabled, bool isThirdEnabled, bool isFourthEnabled);
+public record MultiChannelMergeMessage(string Filename, bool IsFirstEnabled, bool IsSecondEnabled, bool IsThirdEnabled, bool IsFourthEnabled);
 
 /// <summary>
 /// 电动台对焦动画状态

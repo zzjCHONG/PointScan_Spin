@@ -152,6 +152,13 @@ namespace Simscop.API.ASI
             return true;
         }
 
+        public bool MoveXYAbsolute(double x,double y)
+        {
+            string value = $"M X={x * 10} Y={y * 10}\r\n";
+            serialPort.Write(value);
+            return true;
+        }
+
         /// <summary>
         /// 归零
         /// </summary>
@@ -248,6 +255,11 @@ namespace Simscop.API.ASI
                 if (_portName != null) return true;
                 return false;
             }
+        }
+
+        public void StopMove()
+        {
+            serialPort.Write("HALT\r\n");
         }
 
         ~Motor()
