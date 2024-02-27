@@ -18,7 +18,7 @@
 
         <Separator Margin="10,0,10,10" Background="{DynamicResource Region01}" />
 
-        <!--IsEnabled="{Binding IsConnected}"-->
+        <!--  IsEnabled="{Binding IsConnected}"  -->
         <UniformGrid
             Height="240"
             Margin="5"

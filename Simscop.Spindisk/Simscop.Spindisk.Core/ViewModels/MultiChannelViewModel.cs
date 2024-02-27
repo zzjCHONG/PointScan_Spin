@@ -5,27 +5,56 @@ using Simscop.Spindisk.Core.Messages;
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Simscop.Spindisk.Core.ViewModels
 {
     public partial class MultiChannelViewModel : ObservableObject
     {
-        private static bool _isFirstEnabled = false;
-        private static bool _isSecondEnabled = false;
-        private static bool _isThirdEnabled = false;
-        private static bool _isFourthEnabled = false;
+        private static bool _isChannelASwitch = false;
+        private static bool _isChannelBSwitch = false;
+        private static bool _isChannelCSwitch = false;
+        private static bool _isChannelDSwitch = false;
 
         public MultiChannelViewModel()
         {
-            WeakReferenceMessenger.Default.Register<CurrentDispalyChannelEnable>(this, (s, m) =>
+            WeakReferenceMessenger.Default.Register<CurrentDispalyChannelEnableMessage>(this, (s, m) =>
             {
-                _isFirstEnabled = m.IsFirstDisplayEnabled;
-                _isSecondEnabled = m.IsSecondDisplayEnabled;
-                _isThirdEnabled = m.IsThirdDisplayEnabled;
-                _isFourthEnabled = m.IsFourthDisplayEnabled;
+                _isChannelASwitch = m.IsFirstDisplayEnabled;
+                _isChannelBSwitch = m.IsSecondDisplayEnabled;
+                _isChannelCSwitch = m.IsThirdDisplayEnabled;
+                _isChannelDSwitch = m.IsFourthDisplayEnabled;
+            });
+
+            WeakReferenceMessenger.Default.Register<ChannelControlEnableMessage>(this, (s, m) =>
+            {
+                switch (m.Channel)
+                {
+                    case 1:
+                        IsFirstChannelEnable = m.IsEnable;
+                        break;
+                    case 2:
+                        IsSecondChannelEnable = m.IsEnable;
+                        break;
+                    case 3:
+                        IsThirdChannelEnable = m.IsEnable;
+                        break;
+                    case 4:
+                        IsFourthChannelEnable = m.IsEnable;
+                        break;
+                }
             });
         }
+
+        [ObservableProperty]
+        private bool _isFirstChannelEnable = false;
+        [ObservableProperty]
+        private bool _isSecondChannelEnable = false;
+        [ObservableProperty]
+        private bool _isThirdChannelEnable = false;
+        [ObservableProperty]
+        private bool _isFourthChannelEnable = false;
 
         [ObservableProperty]
         private bool _isChannelASave = false;
@@ -54,66 +83,46 @@ namespace Simscop.Spindisk.Core.ViewModels
         [RelayCommand]
         void SaveMultiChannel()
         {
-            string filepath = Path.Combine(Root, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff"));
-            if (IsChannelASave || IsChannelBSave || IsChannelCSave || IsChannelDSave && !Directory.Exists(filepath))
-                Directory.CreateDirectory(filepath);
-
-            if (IsChannelASave)
+            Task.Run(() =>
             {
-                GlobalValue.GlobalLaser?.SetStatus(0, true);
-                WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(0, true), nameof(LaserMessage));//切换显示界面
-                WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(0), nameof(SpindiskMessage));//切换转盘
-                Thread.Sleep(1500);//频道切换需要缓冲时间   
-                WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(0));//全屏显示
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, true, Path.Combine(filepath, GetFilename(0))));//存原图    
-                Thread.Sleep(200);
-            }
-            if (IsChannelBSave)
-            {
-                GlobalValue.GlobalLaser?.SetStatus(1, true);
-                WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(1, true), nameof(LaserMessage));
-                WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(1), nameof(SpindiskMessage));
-                Thread.Sleep(1500);
-                WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(1));
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(1, true, Path.Combine(filepath, GetFilename(1))));
-                Thread.Sleep(200);
-            }
-            if (IsChannelCSave)
-            {
-                GlobalValue.GlobalLaser?.SetStatus(2, true);
-                WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(2, true), nameof(LaserMessage));
-                WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(2), nameof(SpindiskMessage));
-                Thread.Sleep(1500);
-                WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(2));
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(2, true, Path.Combine(filepath, GetFilename(2))));
-                Thread.Sleep(200);
-            }
-            if (IsChannelDSave)
-            {
-                GlobalValue.GlobalLaser?.SetStatus(3, true);
-                WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(3, true), nameof(LaserMessage));
-                WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(3), nameof(SpindiskMessage));
-                Thread.Sleep(1500);
-                WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(3));
-                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(3, false, Path.Combine(filepath, GetFilename(3))));
-                Thread.Sleep(200);
-            }
+                string filepath = Path.Combine(Root, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff"));
+                if (IsChannelASave || IsChannelBSave || IsChannelCSave || IsChannelDSave && !Directory.Exists(filepath))
+                    Directory.CreateDirectory(filepath);
 
-            if (IsChannelASave || IsChannelBSave || IsChannelCSave || IsChannelDSave)
-                WeakReferenceMessenger.Default.Send<MultiChannelMergeMessage>(
-                    new MultiChannelMergeMessage(Path.Combine(filepath, "MergeImage.tif"), IsChannelASave, IsChannelBSave, IsChannelCSave, IsChannelDSave));
+                if (IsChannelASave) ChannelSave(0, filepath);
+                if (IsChannelBSave) ChannelSave(1, filepath);
+                if (IsChannelCSave) ChannelSave(2, filepath);
+                if (IsChannelDSave) ChannelSave(3, filepath);
 
-            OpenFolderAndSelectFile(filepath);
+                if (IsChannelASave || IsChannelBSave || IsChannelCSave || IsChannelDSave)
+                    WeakReferenceMessenger.Default.Send<MultiChannelMergeMessage>(
+                        new MultiChannelMergeMessage(Path.Combine(filepath, "MergeImage.tif"), IsChannelASave, IsChannelBSave, IsChannelCSave, IsChannelDSave));
+                        
+                OpenFolderAndSelectFile(filepath);
 
-            int code = 0;
-            if (_isFirstEnabled) code = 0;
-            if (_isSecondEnabled) code = 1;
-            if (_isThirdEnabled) code = 2;
-            if (_isFourthEnabled) code = 3;
-            GlobalValue.GlobalLaser?.SetStatus(code, true);
-            WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(code, true), nameof(LaserMessage));
-            WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(code), nameof(SpindiskMessage));
-            WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(code));
+                int code = 0;
+                if (_isChannelASwitch) code = 0;
+                if (_isChannelBSwitch) code = 1;
+                if (_isChannelCSwitch) code = 2;
+                if (_isChannelDSwitch) code = 3;
+                GlobalValue.GlobalLaser?.SetStatus(code, true);
+                WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(code, true), nameof(LaserMessage));
+                WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(code), nameof(SpindiskMessage));
+                WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(code));
+
+                GlobalValue.GlobalCamera?.StopCapture();
+                GlobalValue.GlobalCamera?.StartCapture();
+            });
+        }
+
+        private void ChannelSave(int ChannelId, string filepath)
+        {
+            GlobalValue.GlobalLaser?.SetStatus(ChannelId, true);//激光设置
+            WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(ChannelId, true), nameof(LaserMessage));//切换显示
+            WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(ChannelId), nameof(SpindiskMessage));//旋转台切换
+            Thread.Sleep(1500);//频道切换缓冲
+            WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(ChannelId, true, Path.Combine(filepath, GetFilename(ChannelId))));//存图
+            Thread.Sleep(200);
         }
 
         string GetFilename(int channelID)

@@ -212,14 +212,10 @@ namespace Simscop.Spindisk.WPF.Views
             exampleView.Topmost = true;
             exampleView.Topmost = false;
         }
-
-        private void LevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<UI.Controls.RangeValue> e)
-        {
-
-        }
     
         private void MultiChannel_OnClick(object sender, RoutedEventArgs e)
         {
+            BaseCameraControl.CameraStartButton.IsStart = false;
             multiChannelView.Show();
             multiChannelView.Topmost = true;
             multiChannelView.Topmost = false;

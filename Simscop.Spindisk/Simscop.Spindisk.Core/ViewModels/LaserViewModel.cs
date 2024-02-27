@@ -141,7 +141,7 @@ public partial class LaserViewModel : ObservableObject
         ChannelCEnable = false;
         ChannelDEnable = false;
 
-        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnableMessage>(new CurrentDispalyChannelEnableMessage(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
 
     }
 
@@ -168,7 +168,7 @@ public partial class LaserViewModel : ObservableObject
         ChannelCEnable = false;
         ChannelDEnable = false;
 
-        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnableMessage>(new CurrentDispalyChannelEnableMessage(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
     }
 
     [ObservableProperty]
@@ -193,7 +193,7 @@ public partial class LaserViewModel : ObservableObject
         ChannelBEnable = false;
         ChannelDEnable = false;
 
-        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnableMessage>(new CurrentDispalyChannelEnableMessage(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
 
     }
 
@@ -219,7 +219,7 @@ public partial class LaserViewModel : ObservableObject
         ChannelBEnable = false;
         ChannelCEnable = false;
 
-        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnable>(new CurrentDispalyChannelEnable(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
+        WeakReferenceMessenger.Default.Send<CurrentDispalyChannelEnableMessage>(new CurrentDispalyChannelEnableMessage(ChannelAEnable, ChannelBEnable, ChannelCEnable, ChannelDEnable));
     }
 
     void DialogRun(Func<bool> func)

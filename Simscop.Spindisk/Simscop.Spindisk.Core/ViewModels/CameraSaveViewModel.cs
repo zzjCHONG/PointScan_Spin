@@ -5,8 +5,6 @@ using System;
 using System.IO;
 using CommunityToolkit.Mvvm.Messaging;
 using Simscop.Spindisk.Core.Messages;
-using OpenCvSharp;
-using System.Threading.Channels;
 
 namespace Simscop.Spindisk.Core.ViewModels
 {
@@ -34,6 +32,7 @@ namespace Simscop.Spindisk.Core.ViewModels
 
                 IsChannelEnable = IsFirstChannelEnable || IsSecondChannelEnable || IsThirdChannelEnable || IsFourthChannelEnable;
             });
+
         }
 
         [ObservableProperty]
@@ -54,55 +53,55 @@ namespace Simscop.Spindisk.Core.ViewModels
         [RelayCommand]
         void SaveChannelAOriginalImage()
         {
-            SaveFile(0, true);
+            SaveSingleImage(0, true);
         }
 
         [RelayCommand]
         void SaveChannelADisposeImage()
         {
-            SaveFile(0, false);
+            SaveSingleImage(0, false);
         }
 
         [RelayCommand]
         void SaveChannelBOriginalImage()
         {
-            SaveFile(1, true);
+            SaveSingleImage(1, true);
         }
 
         [RelayCommand]
         void SaveChannelBDisposeImage()
         {
-            SaveFile(1, false);
+            SaveSingleImage(1, false);
         }
 
         [RelayCommand]
         void SaveChannelCOriginalImage()
         {
-            SaveFile(2, true);
+            SaveSingleImage(2, true);
         }
 
         [RelayCommand]
         void SaveChannelCDisposeImage()
         {
-            SaveFile(2, false);
+            SaveSingleImage(2, false);
         }
 
         [RelayCommand]
         void SaveChannelDOriginalImage()
         {
-            SaveFile(3, true);
+            SaveSingleImage(3, true);
         }
 
         [RelayCommand]
         void SaveChannelDDisposeImage()
         {
-            SaveFile(3, false);
+            SaveSingleImage(3, false);
         }
 
         [ObservableProperty]
         private string _root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CameraCapture");//默认路径
 
-        void SaveFile(int channelID, bool isSaveOriginImage)
+        void SaveSingleImage(int channelID, bool isSaveOriginImage)
         {
             var dlg = new SaveFileDialog()
             {
@@ -163,10 +162,16 @@ namespace Simscop.Spindisk.Core.ViewModels
         {
             if (!Directory.Exists(Root)) Directory.CreateDirectory(Root);
 
-            WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(0, !IsSaveDisposeImage))));
-            WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(1, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(1, !IsSaveDisposeImage))));
-            WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(2, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(2, !IsSaveDisposeImage))));
-            WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(3, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(3, !IsSaveDisposeImage))));
+            //IsChannelEnable = IsFirstChannelEnable || IsSecondChannelEnable || IsThirdChannelEnable || IsFourthChannelEnable;
+
+            if (IsFirstChannelEnable)
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(0, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(0, !IsSaveDisposeImage))));
+            if (IsSecondChannelEnable)
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(1, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(1, !IsSaveDisposeImage))));
+            if (IsThirdChannelEnable)
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(2, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(2, !IsSaveDisposeImage))));
+            if (IsFourthChannelEnable)
+                WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(3, !IsSaveDisposeImage, Path.Combine(Root, GetFilename(3, !IsSaveDisposeImage))));
 
             OpenFolderAndSelectFile(Root);
         }

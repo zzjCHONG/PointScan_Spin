@@ -96,6 +96,7 @@
                     <controls:CameraButton
                         Width="100"
                         Height="100"
+                        x:Name="CameraStartButton"
                         Margin="0,25,0,0"
                         Command="{Binding InitCommand}"
                         Focusable="False"
