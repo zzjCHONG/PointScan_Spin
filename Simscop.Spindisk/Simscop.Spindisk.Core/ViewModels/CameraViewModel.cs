@@ -148,7 +148,7 @@ public partial class CameraViewModel : ObservableObject
 
     public CameraViewModel()
     {
-    
+
         //Camera = new TestCamera();
         Camera = new Andor();
         GlobalValue.GlobalCamera = Camera;

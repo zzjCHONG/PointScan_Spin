@@ -111,7 +111,7 @@ namespace Simscop.Spindisk.Core.ViewModels
                 WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(code));
 
                 GlobalValue.GlobalCamera?.StopCapture();
-                GlobalValue.GlobalCamera?.StartCapture();
+                GlobalValue.GlobalCamera?.StartCapture();//热重载
             });
         }
 

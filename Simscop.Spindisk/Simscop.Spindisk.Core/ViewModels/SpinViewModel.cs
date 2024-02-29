@@ -141,53 +141,6 @@ public partial class SpinViewModel : ObservableObject
 
     }
 
-    //[RelayCommand]
-    //async void ConnectCom()
-    //{
-    //    IsConnecting = false;
-    //    SpinControlEnabled = false;
-    //    try
-    //    {
-    //        if (!IsConnected)
-    //        {
-    //            IsConnected = await XLight.Connect(ComName);
-
-    //            if (IsConnected)
-    //            {
-    //                XLight.LoadAllFlag();
-
-    //                SpiningIndex = XLight.FlagD;
-    //                DichroicIndex = XLight.FlagC - 1;
-    //                EmissionIndex = XLight.FlagB - 1;
-    //                ExcitationIndex = XLight.FlagA - 1;
-    //                DiskEnable = XLight.FlagN == 1;
-
-    //                SpinControlEnabled = true;
-    //            }
-
-    //            IsConnecting = true;
-    //        }
-    //        else
-    //        {
-    //            XLight.Disconnect();
-    //            IsConnected = false;
-    //            SpinControlEnabled = false;
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        IsConnecting = true;
-    //        IsConnected = false;
-    //        SpinControlEnabled = false;
-    //        MessageBox.Show("接口出现错误，连接失败");
-    //    }
-    //    finally
-    //    {
-    //        IsConnecting = true;
-    //    }
-
-    //}
-
     [RelayCommand]
     void Reset()
     {

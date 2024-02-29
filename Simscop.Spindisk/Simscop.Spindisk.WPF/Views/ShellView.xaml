@@ -64,7 +64,8 @@
                 Click="NavigateBtClick"
                 Content="导航"
                 FontFamily="{StaticResource Harmony}"
-                FontSize="14" />
+                FontSize="14"
+                IsEnabled="{Binding IsCameraCapture}" />
             <Button
                 Margin="5,0"
                 Background="{DynamicResource Region02}"
@@ -163,6 +164,7 @@
                         BorderBrush="{DynamicResource Region01}"
                         BorderThickness="1"
                         CornerRadius="8">
+
                         <local:SettingView x:Name="SettingControl" />
                     </Border>
 
@@ -200,7 +202,7 @@
                         BorderBrush="{DynamicResource Region01}"
                         BorderThickness="1"
                         CornerRadius="8">
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel IsEnabled="{Binding IsCameraCapture}" Orientation="Vertical">
                             <StackPanel.Resources>
                                 <Style TargetType="GroupBox">
                                     <Setter Property="Margin" Value="20,5" />
