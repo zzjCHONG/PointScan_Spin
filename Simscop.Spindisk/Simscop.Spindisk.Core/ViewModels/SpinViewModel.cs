@@ -32,13 +32,20 @@ public partial class SpinViewModel : ObservableObject
             if (ComList == null || !ComList.Contains(ComName))
             {
                 ConnectState = $"The serial port {ComName} is not found";
-                //MessageBox.Show(ConnectState);
                 WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(false, false, ConnectState));
                 return;
             }
-            if (m.IsPreInit) ConnectCom();
+            if (m.IsPreInit)
+            {
+                isFirstInit = true;
+                ConnectCom();
+                isFirstInit = false;
+            }
+               
         });
     }
+
+    private bool isFirstInit = false;
 
     [ObservableProperty]
     private bool _spinViewEnabled = true;
@@ -61,12 +68,12 @@ public partial class SpinViewModel : ObservableObject
     }
 
     partial void OnIsConnectingChanged(bool value)
-    {   
+    {
         if (!IsConnected)
         {
             ConnectState = $"The serial port {ComName} is disconnected or in use.";
             WeakReferenceMessenger.Default.Send<SpinConnectMessage>(new SpinConnectMessage(IsConnected, value, ConnectState));
-        }         
+        }
     }
 
     [ObservableProperty]
@@ -78,7 +85,7 @@ public partial class SpinViewModel : ObservableObject
     private string _comName = "COM6";
 
     [ObservableProperty]
-    private bool _isConnected = false;
+    private static bool _isConnected = false;
 
     [ObservableProperty]
     private bool _isConnectEnable = true;
@@ -87,20 +94,20 @@ public partial class SpinViewModel : ObservableObject
     private bool _isConnecting = true;
 
     [RelayCommand]
-     async void ConnectCom()
+    async void ConnectCom()
     {
         IsConnectEnable = false;
         SpinControlEnabled = false;
         try
         {
-            if (!IsConnected)
+            if (IsConnected|| isFirstInit)
             {
-                IsConnecting= true;
+                IsConnecting = true;
                 IsConnected = await XLight.Connect(ComName);
                 IsConnecting = false;
-               
+
                 if (IsConnected)
-                {                
+                {
                     XLight.LoadAllFlag();
                     SpiningIndex = XLight.FlagD;
                     DichroicIndex = XLight.FlagC - 1;

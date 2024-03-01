@@ -215,7 +215,6 @@ namespace Simscop.Spindisk.WPF.Views
     
         private void MultiChannel_OnClick(object sender, RoutedEventArgs e)
         {
-            BaseCameraControl.CameraStartButton.IsStart = false;
             multiChannelView.Show();
             multiChannelView.Topmost = true;
             multiChannelView.Topmost = false;

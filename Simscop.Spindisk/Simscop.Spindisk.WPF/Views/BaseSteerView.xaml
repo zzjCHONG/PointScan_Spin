@@ -198,8 +198,8 @@
                         Height="28"
                         Margin="0,10,0,0"
                         Padding="0"
-                        Command="{Binding FocusCommand}"
                         Click="FocusButton_Click"
+                        Command="{Binding FocusCommand}"
                         Content="自动对焦"
                         FontSize="12"
                         IsEnabled="{Binding IsUnFocusing}" />
