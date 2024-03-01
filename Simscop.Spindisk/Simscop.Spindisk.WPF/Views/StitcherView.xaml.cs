@@ -24,7 +24,7 @@ namespace Simscop.Spindisk.WPF.Views;
 /// <summary>
 /// Interaction logic for StitcherView.xaml
 /// </summary>
-public partial class StitcherView
+public partial class StitcherView: Lift.UI.Controls.Window
 {
     public StitcherView()
     {

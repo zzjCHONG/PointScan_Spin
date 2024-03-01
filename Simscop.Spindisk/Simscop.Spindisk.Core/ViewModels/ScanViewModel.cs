@@ -100,10 +100,10 @@ public partial class ScanViewModel : ObservableObject
     {
         if (value == 0) Title = "自动扫描";
 
-        if (Percent > 1) 
+        if (Percent > 1)
             //Percent = 1;
 
-        Title = $"自动扫描 ({value:F2} %)";
+            Title = $"自动扫描 ({value:F2} %)";
     }
 
     [ObservableProperty]
@@ -146,7 +146,7 @@ public partial class ScanViewModel : ObservableObject
         {
             EnableAction(false);
             Percent = 0;
-            IsXYStart = "停止采集";
+            IsXYStart = "停止扫描";
 
             // 同号满足条件
             //if (stepValue * (xEndValue - xStartValue) <= 0 | stepValue == 0 | stepValue * (yEndValue - yStartValue) <= 0 | stepValue == 0)
@@ -168,7 +168,7 @@ public partial class ScanViewModel : ObservableObject
 
             double value = 1;
 
-            var count = (xCount+1)*(yCount+1);
+            var count = (xCount + 1) * (yCount + 1);
 
             double per = (1 / (double)(count)) * 100;
 
@@ -189,7 +189,13 @@ public partial class ScanViewModel : ObservableObject
                         xReversePos = result;
                         for (int i = xCount; i >= 0; i--)
                         {
-                            Debug.WriteLine($"[INFO] {flags[0]} -> {Math.Round(xReversePos,1)}");
+                            if (_cancelToken.IsCancellationRequested)
+                            {
+                                IsXYStart = "开始扫描";
+                                EnableAction(true);
+                                return;
+                            }
+                            Debug.WriteLine($"[INFO] {flags[0]} -> {Math.Round(xReversePos, 1)}");
                             WeakReferenceMessenger.Default.Send<string, string>(Math.Round(xReversePos, 1).ToString(CultureInfo.InvariantCulture), xMessage);
 
                             Thread.Sleep((int)(XYSpan * 1000));
@@ -205,8 +211,8 @@ public partial class ScanViewModel : ObservableObject
 
                             xReversePos -= stepValue;
                             step++;
-                            Percent = Percent + per;
-                            if (_cancelToken.IsCancellationRequested) return;
+                            Percent += per;
+                            
                         }
                         value++;
                         xReversePos = result;
@@ -215,7 +221,12 @@ public partial class ScanViewModel : ObservableObject
                     {
                         for (int i = 0; i <= xCount; i++)
                         {
-
+                            if (_cancelToken.IsCancellationRequested)
+                            {
+                                IsXYStart = "开始扫描";
+                                EnableAction(true);
+                                return;
+                            }
                             Debug.WriteLine($"[INFO] {flags[0]} -> {Math.Round(xForwardPos, 1)}");
                             WeakReferenceMessenger.Default.Send<string, string>(Math.Round(xForwardPos, 1).ToString(CultureInfo.InvariantCulture), xMessage);
 
@@ -231,8 +242,8 @@ public partial class ScanViewModel : ObservableObject
                             .Send<string, string>(xPath, MessageManage.SaveACapture);
                             xForwardPos += stepValue;
                             step++;
-                            Percent = Percent + per;
-                            if (_cancelToken.IsCancellationRequested) return;
+                            Percent += per;
+                            
                         }
                         result = xForwardPos - stepValue;
                         value++;
@@ -240,11 +251,16 @@ public partial class ScanViewModel : ObservableObject
                     }
                     yPos += stepValue;
                 }
-                if (step<=count && !_cancelToken.IsCancellationRequested) return;
+                if (step <= count && !_cancelToken.IsCancellationRequested)
+                {
+                    IsXYStart = "开始扫描";
+                    EnableAction(true);
+                    return;
+                }
             } while (value < yCount);
 
             EnableAction(true);
-            IsXYStart = "开始采集";
+            IsXYStart = "开始扫描";
         });
     }
 
@@ -292,7 +308,7 @@ public partial class ScanViewModel : ObservableObject
         {
             EnableAction(false);
             Percent = 0;
-            IsZStart = "停止采集";
+            IsZStart = "停止扫描";
 
             // 同号满足条件
             //if (stepValue * (endValue - startValue) <= 0 | stepValue == 0)
@@ -306,12 +322,12 @@ public partial class ScanViewModel : ObservableObject
 
             var count = (int)Math.Ceiling(Math.Abs(endValue - startValue) / stepValue);
             var step = 0;
-            double per = (1 / (double)(count+1)) * 100;
+            double per = (1 / (double)(count + 1)) * 100;
             WeakReferenceMessenger.Default.Send<string, string>(pos.ToString(CultureInfo.InvariantCulture), message);
             Thread.Sleep(3000);
             do
             {
-                Debug.WriteLine($"[INFO] {flag} -> {Math.Round(pos,2)}");
+                Debug.WriteLine($"[INFO] {flag} -> {Math.Round(pos, 2)}");
                 WeakReferenceMessenger.Default.Send<string, string>(Math.Round(pos, 2).ToString(CultureInfo.InvariantCulture), message);
 
                 Thread.Sleep((int)(ZSpan * 1000));
@@ -325,10 +341,11 @@ public partial class ScanViewModel : ObservableObject
 
                 pos = stepValue > 0 ? Math.Min(pos, endValue) : Math.Max(pos, endValue);
                 step++;
-                Percent = Percent+per;
                 if (_cancelToken.IsCancellationRequested)
                 {
                     stack.Clear();
+                    IsZStart = "开始扫描";
+                    EnableAction(true);
                     return;
                 };
             } while (step <= count && !_cancelToken.IsCancellationRequested);
@@ -341,8 +358,10 @@ public partial class ScanViewModel : ObservableObject
                 Percent = 0;
 
             EnableAction(true);
-            IsZStart = "开始采集";
+            IsZStart = "开始扫描";
+
         });
+        
     }
 
     void SetStartPos(uint mode)
@@ -393,11 +412,29 @@ public partial class ScanViewModel : ObservableObject
 
     [RelayCommand]
     public void StartScan()
-        => StartScanXY();
+    {
+        if (IsXYStart == "开始扫描")
+        {
+            StartScanXY();
+        }
+        else
+        {
+            _cancelToken?.Cancel();
+        }
+    }
 
     [RelayCommand]
     public void StartScanZ()
-        => StartScan(2);
+    {
+        if (IsZStart == "开始扫描")
+        {
+            StartScan(2);
+        }
+        else
+        {
+            _cancelToken?.Cancel();
+        }
+    }
 
     [RelayCommand]
     void StopScan()
