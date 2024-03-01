@@ -84,14 +84,21 @@ namespace Simscop.API.ASI
 
         public void ReadPosition()
         {
-            if (serialPort.IsOpen)
+            try
             {
-                serialPort.Write("W X\r\n");
-                serialPort.Write("W Y\r\n");
-                serialPort.Write("W Z\r\n");
+                if (serialPort.IsOpen)
+                {
+                    serialPort.Write("W X\r\n");
+                    serialPort.Write("W Y\r\n");
+                    serialPort.Write("W Z\r\n");
+                }
+                Convert(serialPort.ReadExisting());
             }
-            Convert(serialPort.ReadExisting());
-
+            catch
+            {
+                
+            }
+            
         }
 
         /// <summary>

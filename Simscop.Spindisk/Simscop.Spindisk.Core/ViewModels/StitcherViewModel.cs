@@ -11,6 +11,7 @@ using System.Windows;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.API;
 using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace Simscop.Spindisk.Core.ViewModels;
 
@@ -50,7 +51,7 @@ public partial class StitcherViewModel : ObservableObject
     /// 每次移动到指定位置后的采样前等待时间，一般设置为曝光时间的两倍
     /// </summary>
     [ObservableProperty]
-    private int _waitAcquisitionTime = 200;
+    private int _waitAcquisitionTime = 500;
 
     /// <summary>
     /// 网格生成的第二个点
@@ -70,6 +71,16 @@ public partial class StitcherViewModel : ObservableObject
     [ObservableProperty]
     private int _progress = 0;
 
+    /// <summary>
+    /// 扫描次数
+    /// </summary>
+    private int _count = 0;
+
+    /// <summary>
+    /// 每次移动的百分比
+    /// </summary>
+    private int _per = 0;
+
     partial void OnIsBusyChanged(bool value)
     {
         Progress = 0;
@@ -78,24 +89,30 @@ public partial class StitcherViewModel : ObservableObject
         if (value)
         {
             Debug.WriteLine("开始任务");
-
+            IsStart = "停止扫描";
             Task.Run(() =>
             {
+                Start(cancellationTokenSource.Token);
                 while (true)
                 {
                     if (Progress == 100) break;
-                    Progress += 10;
+                    Progress += _per;
                     Thread.Sleep(500);
                 }
                 IsFinish = true;
                 IsBusy = false;
+                IsStart = "开始扫描";
             });
-
+            
+            
         }
 
         //!false & !false->采集过程中停止采集
         if (!value && !IsFinish)
         {
+            cancellationTokenSource.Cancel();
+            IsStart = "开始扫描";
+            cancellationTokenSource = new CancellationTokenSource();
             Debug.WriteLine("取消任务");
         }
 
@@ -139,6 +156,12 @@ public partial class StitcherViewModel : ObservableObject
     /// 是否完成任务
     /// </summary>
     public bool IsFinish = false;
+
+    /// <summary>
+    /// 是否开始文本切换
+    /// </summary>
+    [ObservableProperty]
+    public string _isStart = "开始扫描";
 
     /// <summary>
     /// 设置当前电动台位置为点1
@@ -188,17 +211,11 @@ public partial class StitcherViewModel : ObservableObject
         var xPos = Math.Round(x, 2);
         var yPos = Math.Round(y, 2);
 
-        int timeoutMilliseconds = 4000;
+        int timeoutMilliseconds = 5000;
         int maxIterations = 10;
 
         DateTime startTime = DateTime.Now;
         int iterationCount = 0;
-
-        //do
-        //{
-        //    _motor.SetXYPosition(xPos, yPos);
-        //    _motor.ReadPosition();
-        //} while (Math.Abs(_motor.X - xPos) > 10 && Math.Abs(_motor.Y - yPos) > 10);
 
         _motor.ReadPosition();
 
@@ -283,6 +300,8 @@ public partial class StitcherViewModel : ObservableObject
         var rows = (int)Math.Ceiling(Math.Abs(Point1.Y - Point2.Y) / sHeight);
         cols = (cols == 0) ? 1 : cols;
         rows = (rows == 0) ? 1 : rows;
+        _count = cols * rows;
+        _per = 1 / _count;
         // note 之类直接强行要求第一个点左上方，第二个右上方
 
         double startX = Math.Min(Point1.X, Point2.X);
@@ -305,7 +324,6 @@ public partial class StitcherViewModel : ObservableObject
                 if (cancellationToken.IsCancellationRequested)
                 {
                     Debug.WriteLine("Stitcher return");
-                    // 如果请求取消，则停止处理
                     return;
                 }
 
@@ -329,10 +347,15 @@ public partial class StitcherViewModel : ObservableObject
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Display.Original = StitchMat.Clone();
+
+                    //Mat mat = StitchMat.Clone();
+                    //Display.Original = CompressImage(mat);
+                    //mat.Dispose();
                 });
             }
 
-        }    
+        }
+        
     }
 
     private CancellationTokenSource cancellationTokenSource;
@@ -340,9 +363,31 @@ public partial class StitcherViewModel : ObservableObject
     [RelayCommand]
     void StartScan()
     {
-        Task.Run(() =>
+        if(IsStart == "开始扫描")
         {
-            Start(cancellationTokenSource.Token);
-        });
+            IsStart = "停止扫描";
+            Task.Run(() =>
+            {
+                Start(cancellationTokenSource.Token);
+            });
+            IsStart = "开始扫描";
+        }
+        else
+        {
+            cancellationTokenSource.Cancel();
+        }
+    }
+
+    static Mat CompressImage(Mat originalImage)
+    {
+        var compressionParams = new[] { (int)ImwriteFlags.TiffCompression,5 };
+
+        byte[] compressedData;
+        
+         Cv2.ImEncode(".tiff", originalImage, out compressedData,compressionParams);
+
+        Mat compressedImage = Cv2.ImDecode(compressedData, ImreadModes.Color);
+
+        return compressedImage;
     }
 }
