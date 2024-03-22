@@ -93,6 +93,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Reference Include="NationalInstruments.Common">
+	    <HintPath>bin\Debug\net6.0-windows\NationalInstruments.Common.dll</HintPath>
+	  </Reference>
+	  <Reference Include="NationalInstruments.DAQmx">
+	    <HintPath>bin\Debug\net6.0-windows\NationalInstruments.DAQmx.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
 		<Resource Include="Image\blue.jpg" />
 		<Resource Include="Image\camera.png" />
 		<Resource Include="Image\green.jpg" />

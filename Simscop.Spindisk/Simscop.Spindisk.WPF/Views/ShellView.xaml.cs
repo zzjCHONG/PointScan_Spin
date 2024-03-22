@@ -19,9 +19,12 @@ namespace Simscop.Spindisk.WPF.Views
         private int frameCount = 0;
         private DateTime lastTime = DateTime.Now;
 
+        private ShellViewModel shellVM;
         private CameraViewModel cameraVM;
+
+        //private SpinViewModel_old spinVM;
         private SpinViewModel spinVM;
-        private readonly ShellViewModel shellVM;
+
         private SteerViewModel steerVM;
         private LaserViewModel laserVM;
         private ExampleViewModel exampleVM;
@@ -62,7 +65,10 @@ namespace Simscop.Spindisk.WPF.Views
             cameraVM = new CameraViewModel();
             shellVM = new ShellViewModel();
             GlobalValue.GlobalShellViewModel = shellVM;
+
+            //spinVM = new SpinViewModel_old();
             spinVM = new SpinViewModel();
+
             steerVM = new SteerViewModel();
             scanVM = new ScanViewModel();
             laserVM = new LaserViewModel();

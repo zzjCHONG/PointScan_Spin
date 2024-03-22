@@ -1,50 +1,15 @@
 ﻿using OpenCvSharp;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Forms;
 
-namespace Simscop.API
+namespace Simscop.API.AndorCam
 {
-
-    public class Andor : ICamera
-    {
-        AndorImplemented _andor = new AndorImplemented();
-
-        public string GetConnectState() => _andor.ConnectState;
-
-        public bool Capture(out Mat mat) => _andor.Capture(out mat);
-
-        public bool GetExposure(out double exposure) => _andor.GetExpose(out exposure);
-
-        public bool GetFrameRate(out double frameRate) => _andor.GetFrameRate(out frameRate);
-
-        public bool Init() => _andor.InitializeSdk() && _andor.InitializeCamera();
-
-        public bool SaveCapture(string path) => _andor.SaveSingleFrame(path);
-
-        public bool SetExposure(double exposure) => _andor.SetExposure(exposure);
-
-        public bool StartCapture() => _andor.StartAcquisition();
-
-        public bool StopCapture() => _andor.StopAcquisition();
-
-        public bool AcqStartCommand() => _andor.AcqStartCommand();
-
-        public bool AcqStopCommand() => _andor.AcqStopCommand();
-
-
-        ~Andor()
-        {
-            _andor.UnInitializeCamera();
-            _andor.UninitializeSdk();
-        }
-    }
-
-    class AndorImplemented
+    class Andor
     {
         internal string ConnectState = string.Empty;
         private static int Hndl = 0;
@@ -399,7 +364,7 @@ namespace Simscop.API
         #endregion
 
         #region Save
-        public Mat? CurrentFrameforSaving { get; set; }
+        private Mat? CurrentFrameforSaving { get; set; }
 
         /// <summary>
         /// 单张存图
@@ -613,7 +578,7 @@ namespace Simscop.API
 
                     System.Windows.MessageBox.Show("相机停止采集失败，相机或被意外关闭。请确认！", "错误", MessageBoxButton.OK);
                     return false;
-                }                   
+                }
                 if (!AssertRet(AndorAPI.Flush(Hndl))) return false;
                 return true;
             }
@@ -624,7 +589,7 @@ namespace Simscop.API
             finally
             {
                 AlignedBuffers = null;
-                
+
             }
         }
 

@@ -13,8 +13,6 @@ namespace Simscop.Spindisk.WPF
     /// </summary>
     public partial class App : Application
     {
-        public static Mat CurrentFrame;
-
         public App()
         {
             DispatcherUnhandledException += App_DispatcherUnhandledException;         
@@ -35,9 +33,7 @@ namespace Simscop.Spindisk.WPF
             else
             {
                 var ins = ShellView.Instance;
-                //ShellView.Instance.Show();  
             }
-
             var conView = new ConnectStateView();
             var conVm = new ConnectStateViewModel();
             conView.DataContext = conVm;

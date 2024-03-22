@@ -9,7 +9,8 @@
     <Import_RootNamespace>Simscop.API</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Andor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AndorCamera.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Andor\Andor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IStitcher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Native\Andor\AndorAPI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ASIMotor.cs" />
@@ -24,10 +25,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dhyana.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Native\Mshot\Constant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Native\Mshot\Motor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Thorlabs\ELL6.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TopticaLaser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Toptica\Toptica.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XLight.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Native\Dhyana\" />
     <Folder Include="$(MSBuildThisFileDirectory)Native\Andor\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Thorlabs\" />
   </ItemGroup>
 </Project>

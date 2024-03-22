@@ -72,25 +72,25 @@ public record SpindiskMessage(int Mode);
 /// 相机初始化
 /// </summary>
 /// <param name="IsPreInit"></param>
-public record CameraInitMessage(bool IsPreInit);
+public record CameraInitMessage();
 
 /// <summary>
 /// 激光初始化
 /// </summary>
 /// <param name="IsPreInit"></param>
-public record LaserInitMessage(bool IsPreInit);
+public record LaserInitMessage();
 
 /// <summary>
 /// 电动台初始化
 /// </summary>
 /// <param name="IsPreInit"></param>
-public record SteerInitMessage(bool IsPreInit);
+public record SteerInitMessage();
 
 /// <summary>
 /// 旋转台初始化
 /// </summary>
 /// <param name="IsPreInit"></param>
-public record SpinInitMessage(bool IsPreInit);
+public record SpinInitMessage();
 #endregion
 
 #region 连接状态

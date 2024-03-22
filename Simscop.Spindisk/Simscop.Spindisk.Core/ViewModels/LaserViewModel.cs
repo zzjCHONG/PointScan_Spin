@@ -4,6 +4,7 @@ using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Simscop.API;
+using Simscop.API.TopLaser;
 using Simscop.Spindisk.Core.Messages;
 
 namespace Simscop.Spindisk.Core.ViewModels;
@@ -52,6 +53,11 @@ public class TestLaser : ILaser
 
         return "TestLaser init completed!";
     }
+
+    public bool DisConnect()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 /// <summary>
@@ -59,18 +65,17 @@ public class TestLaser : ILaser
 /// </summary>
 public partial class LaserViewModel : ObservableObject
 {
-    public ILaser Laser { get; set; }
+    public ILaser? Laser { get; set; }
 
     public LaserViewModel()
     {
         // todo 这里初始化laser并且准备好Laser本身的数据
-        Laser = new BogaoLaser();
+        Laser = new TopticaLaser();
+        //Laser = new BogaoLaser();
+        //Laser = new TestLaser();
         GlobalValue.GlobalLaser = Laser;
 
-        WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) =>
-        {
-            if (m.IsPreInit) LaserInit();
-        });
+        WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) => LaserInit());
     }
 
     [ObservableProperty]
@@ -90,32 +95,28 @@ public partial class LaserViewModel : ObservableObject
         IsConnecting = true;
         IsConnected = Laser.Init();
         IsConnecting = false;
-
-        if (Laser.GetStatus(0, out var aStatus) &&
-            Laser.GetStatus(1, out var bStatus) &&
-            Laser.GetStatus(2, out var cStatus) &&
-            Laser.GetStatus(3, out var dStatus))
+        if (IsConnected)
         {
-            ChannelAEnable = aStatus;
-            ChannelBEnable = bStatus;
-            ChannelCEnable = cStatus;
-            ChannelDEnable = dStatus;
+            if (Laser.GetStatus(0, out var aStatus) && Laser.GetStatus(1, out var bStatus)
+                && Laser.GetStatus(2, out var cStatus) && Laser.GetStatus(3, out var dStatus))
+            {
+                ChannelAEnable = aStatus;
+                ChannelBEnable = bStatus;
+                ChannelCEnable = cStatus;
+                ChannelDEnable = dStatus;
+            }
+            else throw new Exception("Laser get status error.");
+            Thread.Sleep(100);
+            if (Laser.GetPower(0, out var aPower) && Laser.GetPower(1, out var bPower) &&
+                Laser.GetPower(2, out var cPower) && Laser.GetPower(3, out var dPower))
+            {
+                ChannelAValue = aPower;
+                ChannelBValue = bPower;
+                ChannelCValue = cPower;
+                ChannelDValue = dPower;
+            }
+            else throw new Exception("Laser get power error.");
         }
-
-        else throw new Exception("Laser get status error.");
-        Thread.Sleep(500);
-
-        if (Laser.GetPower(0, out var aPower) &&
-            Laser.GetPower(1, out var bPower) &&
-            Laser.GetPower(2, out var cPower) &&
-            Laser.GetPower(3, out var dPower))
-        {
-            ChannelAValue = aPower;
-            ChannelBValue = bPower;
-            ChannelCValue = cPower;
-            ChannelDValue = dPower;
-        }
-        else throw new Exception("Laser get power error.");
     }
 
     [ObservableProperty]
@@ -228,5 +229,11 @@ public partial class LaserViewModel : ObservableObject
         {
             //MessageBox.Show("Error laser command");
         }
+    }
+
+    ~LaserViewModel()
+    {
+        Laser?.DisConnect();
+        Laser = null;
     }
 }

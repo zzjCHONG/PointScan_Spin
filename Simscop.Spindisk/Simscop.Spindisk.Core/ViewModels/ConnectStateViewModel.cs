@@ -1,10 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
-using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -85,22 +81,22 @@ namespace Simscop.Spindisk.Core.ViewModels
         {
             Task.Run(() =>
             {
-                WeakReferenceMessenger.Default.Send<LaserInitMessage>(new LaserInitMessage(true));
+                WeakReferenceMessenger.Default.Send<LaserInitMessage>(new LaserInitMessage());
             });
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                WeakReferenceMessenger.Default.Send<SteerInitMessage>(new SteerInitMessage(true));
+                WeakReferenceMessenger.Default.Send<SteerInitMessage>(new SteerInitMessage());
             });
+
+            //Task.Run(() =>
+            //{
+            //    WeakReferenceMessenger.Default.Send<SpinInitMessage>(new SpinInitMessage());
+            //});
 
             Task.Run(() =>
             {
-                WeakReferenceMessenger.Default.Send<SpinInitMessage>(new SpinInitMessage(true));
-            });
-
-            Task.Run(() =>
-            {
-                WeakReferenceMessenger.Default.Send<CameraInitMessage>(new CameraInitMessage(true));
+                WeakReferenceMessenger.Default.Send<CameraInitMessage>(new CameraInitMessage());
             });
 
         }

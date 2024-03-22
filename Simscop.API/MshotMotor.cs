@@ -1,6 +1,5 @@
 ﻿using Simscop.API.Native.Mshot;
 using System;
-using System.Net;
 using Motor = Simscop.API.Native.Mshot.Motor;
 
 namespace Simscop.API;
@@ -18,67 +17,85 @@ public class MshotMotor
 
     private const uint ZAddress = 3;
 
-
-    public bool InitializeMotor()
+    public bool InitializeMotor(out string msg)
     {
-        Motor.SetControlAxis(MshotAxis.ALL);
+        msg=string.Empty;
+       Motor.SetControlAxis(MshotAxis.ALL);
 
-        if (!Motor.OpenQk(true)) return false;
-
+        if (!Motor.OpenQk(true))
+        {
+            var code = Motor.GetError();
+            Motor.ErrorMessage = Enum.IsDefined(typeof(MshotErrorCode), code) ? (MshotErrorCode)code : MshotErrorCode.NO_DEFINE;
+            msg = Motor.ErrorMessage.ToString();
+            return false;
+        }
+           
         // NOTE 这里的true和false因为这个sdk的神奇之处，没有一丢丢参考价值
         Motor.AxisEnable(XAddress, true);
         Motor.AxisEnable(YAddress, true);
         Motor.AxisEnable(ZAddress, true);
 
+        msg = "Initialize motor completed";
         return true;
     }
 
     #region Position
 
-    public double X
-        => (double)Motor.ReadPosition(XAddress) / Factor;
+    public double X { get; set; } = (double)Motor.ReadPosition(XAddress) / Factor;
+    public double Y { get; set; } = (double)Motor.ReadPosition(YAddress) / Factor;
+    public double Z { get; set; } = (double)Motor.ReadPosition(ZAddress) / Factor;
 
-    public double Y
-        => (double)Motor.ReadPosition(YAddress) / Factor;
+    public void ReadPosition()
+    {
+        X = (double)Motor.ReadPosition(XAddress) / Factor;
+        Y = (double)Motor.ReadPosition(YAddress) / Factor;
+        Z = (double)Motor.ReadPosition(ZAddress) / Factor;
+    }
 
-    public double Z
-        => (double)Motor.ReadPosition(ZAddress) / Factor;
+    //public double X
+    //    => (double)Motor.ReadPosition(XAddress) / Factor;
+
+    //public double Y
+    //    => (double)Motor.ReadPosition(YAddress) / Factor;
+
+    //public double Z
+    //    => (double)Motor.ReadPosition(ZAddress) / Factor;
 
     #endregion
 
     #region Enable
 
-    public bool XEnabled => Motor.GetAxisStatus(XAddress, MshotAxisStatus.ENABLE);
+    //public bool XEnabled => Motor.GetAxisStatus(XAddress, MshotAxisStatus.ENABLE);
 
-    public bool YEnabled => Motor.GetAxisStatus(YAddress, MshotAxisStatus.ENABLE);
+    //public bool YEnabled => Motor.GetAxisStatus(YAddress, MshotAxisStatus.ENABLE);
 
-    public bool ZEnabled => Motor.GetAxisStatus(ZAddress, MshotAxisStatus.ENABLE);
+    //public bool ZEnabled => Motor.GetAxisStatus(ZAddress, MshotAxisStatus.ENABLE);
 
     #endregion
 
     #region Action 舵机状态
 
-    public bool XAction 
-        => Motor.GetAxisStatus(XAddress, MshotAxisStatus.ACTION);
+    //public bool XAction 
+    //    => Motor.GetAxisStatus(XAddress, MshotAxisStatus.ACTION);
 
-    public bool YAction 
-        => Motor.GetAxisStatus(YAddress, MshotAxisStatus.ACTION);
+    //public bool YAction 
+    //    => Motor.GetAxisStatus(YAddress, MshotAxisStatus.ACTION);
 
-    public bool ZAction 
-        => Motor.GetAxisStatus(ZAddress, MshotAxisStatus.ACTION);
+    //public bool ZAction 
+    //    => Motor.GetAxisStatus(ZAddress, MshotAxisStatus.ACTION);
 
     #endregion
 
     #region Exception
 
-    public bool XException 
-        => Motor.GetAxisStatus(XAddress, MshotAxisStatus.CONTROL);
+    //public bool XException 
+    //    => Motor.GetAxisStatus(XAddress, MshotAxisStatus.CONTROL);
 
-    public bool YException 
-        => Motor.GetAxisStatus(YAddress, MshotAxisStatus.CONTROL);
+    //public bool YException 
+    //    => Motor.GetAxisStatus(YAddress, MshotAxisStatus.CONTROL);
 
-    public bool ZException 
-        => Motor.GetAxisStatus(ZAddress, MshotAxisStatus.CONTROL);
+    //public bool ZException 
+    //    => Motor.GetAxisStatus(ZAddress, MshotAxisStatus.CONTROL);
 
     #endregion
 
@@ -136,8 +153,24 @@ public class MshotMotor
         Motor.PositionAbsoluteMove(ZAddress, 0);
     }
 
-    ~MshotMotor()
+    public bool UnInitializeMotor()
     {
-        Motor.OpenQk(0);
+        return Motor.OpenQk(0) == 1;
     }
+
+    public void Stop()
+    {
+        //可能无对应函数
+        Motor.AxisEnable(XAddress, false);
+        Motor.AxisEnable(YAddress, false);
+        Motor.AxisEnable(ZAddress, false);
+    }
+
+
+    //~MshotMotor()
+    //{
+    //    Motor.OpenQk(0);
+    //}
+
+
 }

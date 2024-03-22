@@ -9,7 +9,8 @@ public static class GlobalValue
 {
     public static Mat? CurrentFrame;
 
-    public static ASIMotor? GlobalMotor;
+    //public static ASIMotor? GlobalMotor;
+    public static MshotMotor? GlobalMotor;
 
     public static ICamera? GlobalCamera;
 

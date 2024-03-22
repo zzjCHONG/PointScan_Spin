@@ -1,9 +1,4 @@
-﻿using OpenCvSharp;
-using Simscop.API.Bogao;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using Simscop.API.Bogao;
 
 namespace Simscop.API;
 
@@ -14,6 +9,11 @@ public class BogaoLaser : ILaser
     public BogaoLaser()
     {
         _laser = new Laser();
+    }
+
+    public bool DisConnect()
+    {
+        throw new System.NotImplementedException();
     }
 
     public string GetConnectState() => _laser._connectState;

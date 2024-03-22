@@ -14,6 +14,13 @@ public interface ICamera
     public string GetConnectState();
 
     /// <summary>
+    /// 初始化相机并返回可用列表
+    /// </summary>
+    /// <param name="devices"></param>
+    /// <returns></returns>
+    public bool Init(out List<string> devices);
+
+    /// <summary>
     /// 相机初始化
     /// note: Deinit的代码写到析构函数中
     /// </summary>
@@ -65,13 +72,13 @@ public interface ICamera
     public bool StopCapture();
 
     /// <summary>
-    /// 开启
+    /// 开启（热重载）-andor
     /// </summary>
     /// <returns></returns>
     public bool AcqStartCommand();
 
     /// <summary>
-    /// 关闭
+    /// 关闭(热重载)-andor
     /// </summary>
     /// <returns></returns>
     public bool AcqStopCommand();

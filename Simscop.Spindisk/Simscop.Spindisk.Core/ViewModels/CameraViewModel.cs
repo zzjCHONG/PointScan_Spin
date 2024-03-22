@@ -13,145 +13,107 @@ using OpenCvSharp;
 using Simscop.API;
 using Simscop.Spindisk.Core.Messages;
 using Simscop.Spindisk.Core.Models;
+using Simscop.Spindisk.Core.Models.NIDevice;
+using Simscop.Spindisk.Core.NICamera;
 
 namespace Simscop.Spindisk.Core.ViewModels;
 
-#region Test
-public class TestCamera : ICamera
-{
-
-    private readonly Mat[] _imgs;
-
-    public int Count { get; set; }
-
-    public int Total { get; set; }
-
-    public TestCamera()
-    {
-        var paths = new List<string>()
-        {
-            "C:/Users/DELL/Desktop/Y_-15800_X_-1800.TIF",
-            //@"C:\\Users\\Administrator\\Pictures\\Camera Roll\\1.jpg"
-        };
-
-        Total = paths.Count;
-
-        _imgs = paths
-            .Select(path => Cv2.ImRead(path, ImreadModes.AnyDepth)).ToArray();
-
-        //var count = 0;
-        //while (true)
-        //{
-        //    Thread.Sleep(300);
-
-        //    WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
-        //    {
-        //        Image = imgs[(count++) % 4]
-        //    }, "Display");
-        //}
-    }
-
-    public bool Init()
-    {
-        Debug.WriteLine($"Camera-> TestCamera.Init");
-        Thread.Sleep(1);
-        return true;
-    }
-
-    public bool StartCapture()
-    {
-        Debug.WriteLine($"Camera-> TestCamera.StartCapture");
-        return true;
-    }
-
-    public bool Capture(out Mat mat)
-    {
-        mat = _imgs[Count++ % Total];
-
-        return true;
-    }
-
-    public bool SaveCapture(string path)
-    {
-        Debug.WriteLine($"Camera-> TestCamera.SaveCapture {path}");
-        return true;
-    }
-
-    public bool GetExposure(out double exposure)
-    {
-        Debug.WriteLine($"Camera-> TestCamera.GetExposure");
-
-        exposure =0.1;
-        return true;
-    }
-
-    public bool SetExposure(double exposure)
-    {
-        Debug.WriteLine($"Camera-> TestCamera.SetExposure");
-
-        exposure = 100;
-        return true;
-    }
-
-    public bool StopCapture()
-    {
-        Debug.WriteLine($"Camera-> TestCamera.StopCapture");
-        return true;
-    }
-
-    public bool GetFrameRate(out double frameRate)
-    {
-        Debug.WriteLine($"-> TestCamera.GetFrameRate");
-
-        frameRate = 100;
-        return true;
-    }
-
-    public string GetConnectState()
-    {
-        Debug.WriteLine($"Camera-> TestCamera.GetConnectState");
-
-        return "TestCamera init completed!";
-    }
-
-    public bool AcqStartCommand()
-    {
-        return true;
-    }
-
-    public bool AcqStopCommand()
-    {
-        return true;
-    }
-}
-
-#endregion
-
 public partial class CameraViewModel : ObservableObject
 {
-    public ICamera Camera { get; set; }
+    ICamera camera { get; set; }
 
-    public List<string> ResolutionsLite { get; set; } = new()
+    Config Config { get; set; }
+
+    public List<string> ResolutionsRatio { get; set; } = new()
     {
-        "2560 * 2160"
+        "50*50",
+        "100*100",
+        "200*200",
+        "300*300",
     };
 
-    public List<string> ImageModes { get; set; } = new()
+    public List<string> WaveSelection { get; set; } = new()
     {
-        "NONE"
+        "锯齿波",
+        "三角波",
     };
 
-    public List<string> RoiModeLite { get; set; } = new()
+    [ObservableProperty]
+    private int _resolutionsRatioSelectIndex = 3;
+    [ObservableProperty]
+    private int _waveSelectionSelectIndex = 0;
+    [ObservableProperty]
+    private List<string> _devicesList =new();
+    [ObservableProperty]
+    private int _deviceSelectIndex = 0;
+    [ObservableProperty]
+    private int _voltageSweepRangeUpperLimit = 0;
+    [ObservableProperty]
+    private int _voltageSweepRangeLowerLimit = 0;
+    [ObservableProperty]
+    private int _pixelDwelTime = 0;
+    partial void OnResolutionsRatioSelectIndexChanged(int value)
     {
-        "NONE"
-    };
+        int X = 0;
+        int Y = 0;
+        int index = ResolutionsRatioSelectIndex;
+        switch (index)
+        {
+            case 0:
+                X = 50 ;
+                Y = 50 ;
+                break;
+            case 1:
+                X = 100;
+                Y = 100 ;
+                break;
+            case 2:
+                X= 200;
+                Y= 200 ;
+                break;
+            case 3:
+                X = 300;
+                Y = 300;
+                break;
+        }
+        Config.Write(ConfigSettingEnum.XPixelFactor, X);
+        Config.Write(ConfigSettingEnum.YPixelFactor, Y);
+    }
+    partial void OnWaveSelectionSelectIndexChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.WaveMode, value);//0为锯齿波，1为三角波
+    }
+    partial void OnDeviceSelectIndexChanged(int value)
+    {
+        string deviceName = DevicesList[value];
+        Config.Write(ConfigSettingEnum.DeviceName, deviceName);
+    }
+    partial void OnDevicesListChanged(List<string> value)
+    {
+        Config.Write(ConfigSettingEnum.DeviceName, DevicesList[DeviceSelectIndex]);
+    }
+    partial void OnVoltageSweepRangeUpperLimitChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.maxXV, value);
+        Config.Write(ConfigSettingEnum.maxYV, value);
+    }
+    partial void OnVoltageSweepRangeLowerLimitChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.minXV, value);
+        Config.Write(ConfigSettingEnum.minYV, value);
+    }
+    partial void OnPixelDwelTimeChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.PixelDwelTime, value);
+    }
 
     public CameraViewModel()
     {
-
-        //Camera = new TestCamera();
-        Camera = new Andor();
-        GlobalValue.GlobalCamera = Camera;
+        Config = new();
+        camera = new NICam();
+        //camera = new TestCamera();
+        //Camera = new Andor();
+        GlobalValue.GlobalCamera = camera;
 
         WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture, (s, e) =>
         throw new Exception("当前方法不准使用了"));
@@ -162,10 +124,7 @@ public partial class CameraViewModel : ObservableObject
                 GlobalValue.CurrentFrame?.SaveImage(e);
         });
 
-        WeakReferenceMessenger.Default.Register<CameraInitMessage>(this, (o, m) =>
-        {
-            if (m.IsPreInit) CameraInit();      
-        });
+        WeakReferenceMessenger.Default.Register<CameraInitMessage>(this, (o, m) => CameraInit());
     }
 
     [ObservableProperty]
@@ -177,75 +136,28 @@ public partial class CameraViewModel : ObservableObject
     private bool _isCapture = false;
 
     [ObservableProperty]
+    private bool _isCaptureOpposite = false;
+
+    [ObservableProperty]
     private bool _isConnecting = true;
 
     [ObservableProperty]
     private bool _isNoBusy = true;
 
+    [ObservableProperty]
+    private bool _isStartAcquisition = false;
+
     partial void OnIsCaptureChanged(bool value)
     {
+        IsCaptureOpposite=!value;
         WeakReferenceMessenger.Default.Send<CameraControlEnableMessage>(new CameraControlEnableMessage(value));
     }
 
     partial void OnIsConnectingChanged(bool value)
     {
         if (!value)
-            WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value, Camera.GetConnectState()));
+            WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value, camera.GetConnectState()));
     }
-
-    bool CameraInit()//初始化
-    {
-        IsConnecting = true;
-        IsInit = Camera.Init();
-        IsConnecting = false;
-        if (IsInit)
-        {       
-            Camera.GetExposure(out var exposure);
-            Exposure = Math.Floor(exposure * 1000.0);
-            Camera.GetFrameRate(out var frameRate);
-            FrameRate = frameRate;
-            return true;
-        }
-        else
-        {
-            IsNoBusy = false;//初始化不成功
-            return false;
-        }
-    }
-
-    [RelayCommand]
-    void Init()//按键
-    {
-            IsNoBusy = false;
-            if (!IsInit)
-            {
-                Task.Run(() =>
-                {
-                    if (CameraInit())
-                    {
-                        IsCapture = Camera.StartCapture();
-                        IsStartAcquisition = true;
-                    }
-                    IsNoBusy = true;
-                });
-            }
-            else if (IsInit && !IsCapture)
-            {
-                IsCapture = Camera.StartCapture();
-                IsStartAcquisition = true;
-                IsNoBusy = true;
-            }
-            else if (IsCapture)
-            {
-                IsCapture = !Camera.StopCapture();
-                IsStartAcquisition = false;
-                IsNoBusy = true;
-            }
-            else { }   
-    }
-
-    [ObservableProperty]
-    private bool _isStartAcquisition = false;
 
     partial void OnIsStartAcquisitionChanged(bool value)//显示
     {
@@ -257,7 +169,7 @@ public partial class CameraViewModel : ObservableObject
                 {
                     try
                     {
-                        if (Camera.Capture(out var mat))
+                        if (camera.Capture(out var mat))
                         {
                             GlobalValue.CurrentFrame = mat.Clone();
                             WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
@@ -273,16 +185,98 @@ public partial class CameraViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    void BtnInit()//按键
+    {
+        IsNoBusy = false;
+        if (!IsInit)
+        {
+            Task.Run(() =>
+            {
+                if (CameraInit())
+                {
+                    IsCapture = camera.StartCapture();
+                    IsStartAcquisition = true;
+                }
+                IsNoBusy = true;
+            });
+        }
+        else if (IsInit && !IsCapture)
+        {
+            IsCapture = camera.StartCapture();
+            IsStartAcquisition = true;
+            IsNoBusy = true;
+        }
+        else if (IsCapture)
+        {
+            IsCapture = !camera.StopCapture();
+            IsStartAcquisition = false;
+            IsNoBusy = true;
+        }
+        else { }
+    }
+
+    bool CameraInit()
+    {
+        IsConnecting = true;
+        IsInit = camera.Init(out List<string> devices);
+
+        IsConnecting = false;
+        if (IsInit)
+        {
+            DevicesList = devices;
+            WaveSelectionSelectIndex = Config.WaveMode;
+            VoltageSweepRangeLowerLimit =(int)Config.MinXV;
+            VoltageSweepRangeUpperLimit =(int)Config.MaxXV;
+            PixelDwelTime=(int)Config.PixelDwelTime;
+            switch (Config.XPixelFactor)
+            {
+                case 50:
+                    ResolutionsRatioSelectIndex = 0;
+                    break;
+                case 100:
+                    ResolutionsRatioSelectIndex = 1;
+                    break;
+                case 200:
+                    ResolutionsRatioSelectIndex = 2;
+                    break;
+                case 300:
+                    ResolutionsRatioSelectIndex = 3;
+                    break;
+                    default:
+                    break;
+            }
+
+            //camera.GetExposure(out var exposure);
+            //Exposure = Math.Floor(exposure * 1000.0);
+            //camera.GetFrameRate(out var frameRate);
+            //FrameRate = frameRate;
+            return true;
+        }
+        else
+        {
+            IsNoBusy = false;//初始化不成功
+            return false;
+        }
+    }
+
+    #region Old-Andor
+
+    public List<string> ImageModes { get; set; } = new()
+    {
+        "NONE"
+    };
+
+    public List<string> RoiModeLite { get; set; } = new()
+    {
+        "NONE"
+    };
+
     [ObservableProperty]
     private double _exposure = 0;//[10,30000]，ms
 
     [ObservableProperty]
     private double _frameRate = 0;//随曝光&采样率实时变化
-
-    partial void OnExposureChanged(double value)
-    {
-
-    }
 
     [ObservableProperty]
     private bool isExposureSettingEnable=true;
@@ -291,11 +285,13 @@ public partial class CameraViewModel : ObservableObject
     void SetExposure()
     {
         IsExposureSettingEnable = false;
-        Camera.SetExposure(Exposure);
-        Camera.GetFrameRate(out var rate);
+        camera.SetExposure(Exposure);
+        camera.GetFrameRate(out var rate);
         FrameRate = rate;
         IsExposureSettingEnable = true;
-    }       
+    }
+
+    #endregion
 
     #region File
 
@@ -349,4 +345,123 @@ public partial class CameraViewModel : ObservableObject
     }
 
     #endregion
+}
+
+public class TestCamera : ICamera
+{
+    private readonly Mat[] _imgs;
+
+    public int Count { get; set; }
+
+    public int Total { get; set; }
+
+    public TestCamera()
+    {
+        //Simscop.Spindisk.Core.Models.NIDevice.TestExample testExample = new();
+        //testExample.Test();
+
+        var paths = new List<string>()
+        {
+            @"C:\\Users\\simscop\\Desktop\\3-11\\00\\1.tif",
+            //"C:/Users/DELL/Desktop/Y_-15800_X_-1800.TIF",
+            //@"C:\\Users\\Administrator\\Pictures\\Camera Roll\\1.jpg"
+        };
+
+        Total = paths.Count;
+
+        _imgs = paths
+            .Select(path => Cv2.ImRead(path, ImreadModes.AnyDepth)).ToArray();
+
+        //var count = 0;
+        //while (true)
+        //{
+        //    Thread.Sleep(300); 
+
+        //    WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
+        //    {
+        //        Image = imgs[(count++) % 4]
+        //    }, "Display");
+        //}
+    }
+
+    public bool Init()
+    {
+        Debug.WriteLine($"Camera-> TestCamera.Init");
+        Thread.Sleep(1);
+        return true;
+    }
+
+    public bool StartCapture()
+    {
+        Debug.WriteLine($"Camera-> TestCamera.StartCapture");
+        return true;
+    }
+
+    public bool Capture(out Mat mat)
+    {
+        mat = _imgs[Count++ % Total];
+
+        return true;
+    }
+
+    public bool SaveCapture(string path)
+    {
+        Debug.WriteLine($"Camera-> TestCamera.SaveCapture {path}");
+        return true;
+    }
+
+    public bool GetExposure(out double exposure)
+    {
+        Debug.WriteLine($"Camera-> TestCamera.GetExposure");
+
+        exposure = 0.1;
+        return true;
+    }
+
+    public bool SetExposure(double exposure)
+    {
+        Debug.WriteLine($"Camera-> TestCamera.SetExposure");
+
+        exposure = 100;
+        return true;
+    }
+
+    public bool StopCapture()
+    {
+        Debug.WriteLine($"Camera-> TestCamera.StopCapture");
+        return true;
+    }
+
+    public bool GetFrameRate(out double frameRate)
+    {
+        Debug.WriteLine($"-> TestCamera.GetFrameRate");
+
+        frameRate = 100;
+        return true;
+    }
+
+    public string GetConnectState()
+    {
+        Debug.WriteLine($"Camera-> TestCamera.GetConnectState");
+
+        return "TestCamera init completed!";
+    }
+
+    public bool AcqStartCommand()
+    {
+        return true;
+    }
+
+    public bool AcqStopCommand()
+    {
+        return true;
+    }
+
+    public bool Init(out List<string> devices)
+    {
+        devices = new List<string>();
+        Debug.WriteLine($"Camera-> TestCamera.Init");
+        Thread.Sleep(1);
+        return true;
+    }
 }

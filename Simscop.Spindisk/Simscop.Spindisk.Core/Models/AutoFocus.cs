@@ -44,13 +44,13 @@ namespace Simscop.Spindisk.Core.Models
             return focus;
         }
 
-
-        ASIMotor _motor;
+        MshotMotor _motor;
+        //ASIMotor _motor;
 
         private AutoFocus()
         {
 
-            WeakReferenceMessenger.Default.Register<ASIMotor, string>(this, SteerMessage.Motor, (s, e) =>
+            WeakReferenceMessenger.Default.Register<MshotMotor, string>(this, SteerMessage.Motor, (s, e) =>
             {
                 _motor = e;
             });

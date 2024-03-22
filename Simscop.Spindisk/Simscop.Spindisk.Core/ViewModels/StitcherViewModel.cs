@@ -20,10 +20,12 @@ namespace Simscop.Spindisk.Core.ViewModels;
 /// </summary>
 public partial class StitcherViewModel : ObservableObject
 {
-    ASIMotor _motor;
+    MshotMotor _motor;
+    //ASIMotor _motor;
+
     public StitcherViewModel()
     {
-        WeakReferenceMessenger.Default.Register<ASIMotor, string>(this, SteerMessage.Splice, (s, e) =>
+        WeakReferenceMessenger.Default.Register<MshotMotor, string>(this, SteerMessage.Splice, (s, e) =>
         {
             _motor = e;
         });
@@ -32,7 +34,7 @@ public partial class StitcherViewModel : ObservableObject
         {
             Task.Run(() =>
             {
-                _motor.Stop();
+                _motor?.Stop();
                 SetPos(e.X, e.Y);
             });
         });

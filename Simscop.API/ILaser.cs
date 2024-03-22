@@ -18,6 +18,8 @@ public interface ILaser
     /// <returns></returns>
     public bool Init();
 
+    public bool DisConnect();
+
     /// <summary>
     /// 
     /// </summary>

@@ -107,11 +107,11 @@ namespace Simscop.Spindisk.Core.ViewModels
                 if (_isChannelDSwitch) code = 3;
                 GlobalValue.GlobalLaser?.SetStatus(code, true);
                 WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(code, true), nameof(LaserMessage));
-                WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(code), nameof(SpindiskMessage));
+                //WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(code), nameof(SpindiskMessage));
                 WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(code));
 
-                GlobalValue.GlobalCamera?.StopCapture();
-                GlobalValue.GlobalCamera?.StartCapture();//热重载
+                //GlobalValue.GlobalCamera?.StopCapture();
+                //GlobalValue.GlobalCamera?.StartCapture();//热重载-andor
             });
         }
 
@@ -119,8 +119,8 @@ namespace Simscop.Spindisk.Core.ViewModels
         {
             GlobalValue.GlobalLaser?.SetStatus(ChannelId, true);//激光设置
             WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(ChannelId, true), nameof(LaserMessage));//切换显示
-            WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(ChannelId), nameof(SpindiskMessage));//旋转台切换
-            Thread.Sleep(1500);//频道切换缓冲
+            //WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(ChannelId), nameof(SpindiskMessage));//旋转台切换
+            Thread.Sleep(1000);//频道切换缓冲
             WeakReferenceMessenger.Default.Send<CameraSaveMessage>(new CameraSaveMessage(ChannelId, true, Path.Combine(filepath, GetFilename(ChannelId))));//存图
             Thread.Sleep(200);
         }
