@@ -79,6 +79,8 @@ namespace Simscop.Spindisk.Core.ViewModels
             if (result == DialogResult.OK)
                 Root = folderBrowserDialog.SelectedPath;
         }
+        [ObservableProperty]
+        private  string _fileMergeImage=string.Empty;
 
         [RelayCommand]
         void SaveMultiChannel()
@@ -86,20 +88,26 @@ namespace Simscop.Spindisk.Core.ViewModels
             Task.Run(() =>
             {
                 string filepath = Path.Combine(Root, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff"));
+                string fileMergeImage = Path.Combine(filepath, "MergeImage.tif");
+
+                //多通道采集
                 if (IsChannelASave || IsChannelBSave || IsChannelCSave || IsChannelDSave && !Directory.Exists(filepath))
                     Directory.CreateDirectory(filepath);
-
                 if (IsChannelASave) ChannelSave(0, filepath);
                 if (IsChannelBSave) ChannelSave(1, filepath);
                 if (IsChannelCSave) ChannelSave(2, filepath);
                 if (IsChannelDSave) ChannelSave(3, filepath);
-
                 if (IsChannelASave || IsChannelBSave || IsChannelCSave || IsChannelDSave)
                     WeakReferenceMessenger.Default.Send<MultiChannelMergeMessage>(
-                        new MultiChannelMergeMessage(Path.Combine(filepath, "MergeImage.tif"), IsChannelASave, IsChannelBSave, IsChannelCSave, IsChannelDSave));
-                        
+                        new MultiChannelMergeMessage(fileMergeImage, IsChannelASave, IsChannelBSave, IsChannelCSave, IsChannelDSave));
+
+                //打开对应文件夹
                 OpenFolderAndSelectFile(filepath);
 
+                //打开对应窗体
+                WeakReferenceMessenger.Default.Send<MultiChannelOpenImageWindowMwssage>(new MultiChannelOpenImageWindowMwssage(fileMergeImage));
+
+                //恢复初始激光通道显示
                 int code = 0;
                 if (_isChannelASwitch) code = 0;
                 if (_isChannelBSwitch) code = 1;
@@ -107,11 +115,9 @@ namespace Simscop.Spindisk.Core.ViewModels
                 if (_isChannelDSwitch) code = 3;
                 GlobalValue.GlobalLaser?.SetStatus(code, true);
                 WeakReferenceMessenger.Default.Send<LaserMessage, string>(new LaserMessage(code, true), nameof(LaserMessage));
-                //WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(code), nameof(SpindiskMessage));
+                WeakReferenceMessenger.Default.Send<SpindiskMessage, string>(new SpindiskMessage(code), nameof(SpindiskMessage));
                 WeakReferenceMessenger.Default.Send<MainDisplayMessage>(new MainDisplayMessage(code));
 
-                //GlobalValue.GlobalCamera?.StopCapture();
-                //GlobalValue.GlobalCamera?.StartCapture();//热重载-andor
             });
         }
 

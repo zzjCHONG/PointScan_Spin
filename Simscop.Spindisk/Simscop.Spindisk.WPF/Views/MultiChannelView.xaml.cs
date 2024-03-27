@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace Simscop.Spindisk.WPF.Views
 {
@@ -18,5 +19,7 @@ namespace Simscop.Spindisk.WPF.Views
             this.Hide();
             e.Cancel = true;
         }
+
+
     }
 }

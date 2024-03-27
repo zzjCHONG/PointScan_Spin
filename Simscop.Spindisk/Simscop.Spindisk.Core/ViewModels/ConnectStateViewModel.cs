@@ -89,10 +89,10 @@ namespace Simscop.Spindisk.Core.ViewModels
                 WeakReferenceMessenger.Default.Send<SteerInitMessage>(new SteerInitMessage());
             });
 
-            //Task.Run(() =>
-            //{
-            //    WeakReferenceMessenger.Default.Send<SpinInitMessage>(new SpinInitMessage());
-            //});
+            Task.Run(() =>
+            {
+                WeakReferenceMessenger.Default.Send<SpinInitMessage>(new SpinInitMessage());
+            });
 
             Task.Run(() =>
             {

@@ -70,9 +70,9 @@ public partial class LaserViewModel : ObservableObject
     public LaserViewModel()
     {
         // todo 这里初始化laser并且准备好Laser本身的数据
-        Laser = new TopticaLaser();
+        //Laser = new TopticaLaser();
         //Laser = new BogaoLaser();
-        //Laser = new TestLaser();
+        Laser = new TestLaser();
         GlobalValue.GlobalLaser = Laser;
 
         WeakReferenceMessenger.Default.Register<LaserInitMessage>(this, (o, m) => LaserInit());

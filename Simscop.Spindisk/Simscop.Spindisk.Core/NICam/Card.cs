@@ -320,43 +320,47 @@ namespace Simscop.Spindisk.Core.NICamera
                 {
                     for (int j = 0; j < x; j++)
                     {
-                        int imageIndex = i * (_wave.XPts - _wave.XMargin) + j;
+                        //1、计算待填入的新数组的序号
+                        int arrayIndex = i * (_wave.XPts - _wave.XMargin) + j;
 
-                        int arrayIndex = 0;
-                        if (Convert.ToBoolean(waveModel))
+                        //2、计算待填入的图像信息数组的序号
+                        int imageIndex = 0;
+                        if (Convert.ToBoolean(waveModel))//三角波
                         {
                             if (i % 2 == 0)
                             {
-                                arrayIndex = i * _wave.XPts + j + _wave.XMargin;
-                                //arrayIndex = 0;
+                                //偶数行
+                                imageIndex = i * _wave.XPts + j + _wave.XMargin;
                             }
                             else
                             {
-                                arrayIndex = i * _wave.XPts + (_wave.XPts - j - 1 - _wave.XMargin);
-                                //arrayIndex = 0;
+                                //奇数行，前边若干位舍弃，后边数逐一向前补齐，因增加了X的偏移，有效图像数量能够对应
+                                //imageIndex = i * _wave.XPts + (_wave.XPts - j - 1 - _wave.XMargin);//不做任何处理对应的奇数行图像序号，重影
+                                imageIndex = i * _wave.XPts + (_wave.XPts - j - 1 - _wave.XMargin) + _wave.XOffsetforTriangle;
                             }
                         }
-                        else
+                        else//锯齿波
                         {
-                            arrayIndex = i * _wave.XPts + j + _wave.XMargin;
+                            imageIndex = i * _wave.XPts + j + _wave.XMargin;
                         }
 
-                        double data = (imageData[arrayIndex] - min) / denominator * short.MaxValue;//对应*不同格式的maxvalue
+                        //3、图像归一化，maxvalue对应不同的类型
+                        double data = (imageData[imageIndex] - min) / denominator * short.MaxValue;
                         if (double.IsNaN(data)) data = 0;
 
+                        //4、填入对应数组
                         //bytes[imageIndex] = (byte)(data);
                         //ushorts[imageIndex] = (ushort)data;
-                        shorts[imageIndex] = (short)data;
+                        shorts[arrayIndex] = (short)data;
                         //doubles[imageIndex] = data;
                     }
                 }
 
-                ArrayTransferinTriggleWave(23, shorts, out short[] outputArray);
-
+                //5、输出图像
                 //byte[] bytes = new byte[x * y];
                 //Buffer.BlockCopy(ushorts, 0, bytes, 0, bytes.Length);//若转成ushort类型，需先转成byte
                 //Marshal.Copy(bytes, 0, matImage.Data, x * y);
-                Marshal.Copy(outputArray, 0, matImage.Data, x * y);
+                Marshal.Copy(shorts, 0, matImage.Data, x * y);
                 //Marshal.Copy(doubles, 0, matImage.Data, x * y);
 
                 return true;
@@ -372,13 +376,20 @@ namespace Simscop.Spindisk.Core.NICamera
         {
             outputArray=new short[inputArray.Length];
 
-            int newLength = inputArray.Length - removeCount;       
-            short[] newArray = new short[newLength];
-            Array.Copy(inputArray, removeCount, newArray, 0, newLength);
+            // 舍弃前removeCount个数字       
+            short[] newArray = new short[inputArray.Length - removeCount];
+            Array.Copy(inputArray, removeCount, newArray, 0, newArray.Length);
 
-            short[] tmpArray = new short[removeCount];
+            //将剩余数字前移
+            Array.Copy(newArray, 0, inputArray, 0, newArray.Length);
 
-            outputArray = newArray.Concat(tmpArray).ToArray();
+            //末位的10个数字补零
+            Array.Clear(inputArray, newArray.Length, 10);
+
+            outputArray = inputArray;
+
+            //short[] tmpArray = new short[removeCount];
+            //outputArray = newArray.Concat(tmpArray).ToArray();
         }
 
         private double[,] CombineArrays(double[] array1, double[] array2)

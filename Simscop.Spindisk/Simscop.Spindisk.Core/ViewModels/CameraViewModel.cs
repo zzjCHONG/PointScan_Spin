@@ -90,7 +90,8 @@ public partial class CameraViewModel : ObservableObject
     }
     partial void OnDevicesListChanged(List<string> value)
     {
-        Config.Write(ConfigSettingEnum.DeviceName, DevicesList[DeviceSelectIndex]);
+        if (value.Count > 0)
+            Config.Write(ConfigSettingEnum.DeviceName, DevicesList[DeviceSelectIndex]);
     }
     partial void OnVoltageSweepRangeUpperLimitChanged(int value)
     {
@@ -159,30 +160,36 @@ public partial class CameraViewModel : ObservableObject
             WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value, camera.GetConnectState()));
     }
 
+    [ObservableProperty]
+    private static bool _isCapturing=false;
+
     partial void OnIsStartAcquisitionChanged(bool value)//显示
     {
         if (IsStartAcquisition)
         {
             Task.Run(() =>
+        {
+            while (IsStartAcquisition)
             {
-                while (IsStartAcquisition)
+                try
                 {
-                    try
-                    {
-                        if (camera.Capture(out var mat))
+                    Task.Run(() => { IsCapturing = true; });
+                    if (camera.Capture(out var mat))
+                    {    
+                        GlobalValue.CurrentFrame = mat.Clone();
+                        WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
                         {
-                            GlobalValue.CurrentFrame = mat.Clone();
-                            WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
-                            {
-                                Image = mat,
-                            }, "Display");
-                        }
+                            Image = mat,
+                        }, "Display");
                     }
-                    catch (Exception)
-                    { }
+                    Task.Run(() => { IsCapturing = false; });
                 }
-            });
+                catch (Exception)
+                { }
+            }
+        });
         }
+
     }
 
     [RelayCommand]
@@ -220,7 +227,7 @@ public partial class CameraViewModel : ObservableObject
     {
         IsConnecting = true;
         IsInit = camera.Init(out List<string> devices);
-
+        devices = new List<string>();
         IsConnecting = false;
         if (IsInit)
         {

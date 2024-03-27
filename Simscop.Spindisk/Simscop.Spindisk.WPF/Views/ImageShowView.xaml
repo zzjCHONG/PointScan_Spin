@@ -1,0 +1,27 @@
+﻿<Window
+    x:Class="Simscop.Spindisk.WPF.Views.ImageShowView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:liftui="https://github.com/pchuan98/Lift.UI"
+    xmlns:local="clr-namespace:Simscop.Spindisk.WPF.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:Simscop.Spindisk.Core.ViewModels;assembly=Simscop.Spindisk.Core"
+    Title="ImageShowView"
+    Width="800"
+    Height="450"
+    d:DataContext="{d:DesignInstance vm:ImageShowViewModel}"
+    mc:Ignorable="d">
+    <UniformGrid>
+        <liftui:ImageViewer
+            Background="{DynamicResource Region01}"
+            BorderThickness="0"
+            ImageSource="{Binding ImageFrame}"
+            ShowImgMap="True" />
+        <!--<Image
+            x:Name="imageDisplay"
+            Source="{Binding MergeImageSource}"
+            Stretch="Uniform" />-->
+    </UniformGrid>
+
+</Window>

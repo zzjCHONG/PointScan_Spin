@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using OpenCvSharp;
 using Simscop.Spindisk.Core.ViewModels;
@@ -38,6 +39,7 @@ namespace Simscop.Spindisk.WPF
             var conVm = new ConnectStateViewModel();
             conView.DataContext = conVm;
             conView.ShowDialog();
+
         }
 
     }

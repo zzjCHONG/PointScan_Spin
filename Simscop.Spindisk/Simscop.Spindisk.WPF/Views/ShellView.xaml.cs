@@ -32,6 +32,7 @@ namespace Simscop.Spindisk.WPF.Views
         private MultiChannelViewModel multiChannelSaveVM;
         private CameraSaveViewModel cameraSaveVM;
         private StitcherViewModel stitcherVM;
+        private ImageShowViewModel imageShowVM;
 
         private CameraView cameraView;
         private SettingView settingView;
@@ -39,6 +40,7 @@ namespace Simscop.Spindisk.WPF.Views
         private MultiChannelView multiChannelView;
         private CameraSaveView cameraSaveView;
         private StitcherView stitcherView;
+        private ImageShowView ImageShowView;
 
         public static ShellView Instance
         {
@@ -65,6 +67,7 @@ namespace Simscop.Spindisk.WPF.Views
             cameraVM = new CameraViewModel();
             shellVM = new ShellViewModel();
             GlobalValue.GlobalShellViewModel = shellVM;
+            imageShowVM= new ImageShowViewModel();
 
             //spinVM = new SpinViewModel_old();
             spinVM = new SpinViewModel();
@@ -101,6 +104,12 @@ namespace Simscop.Spindisk.WPF.Views
             {
                 DataContext = stitcherVM,
             };
+            ImageShowView = new()
+            {
+                DataContext = imageShowVM,
+            };
+
+            ImageShowView.Show();
 
             SetDataContext();
 

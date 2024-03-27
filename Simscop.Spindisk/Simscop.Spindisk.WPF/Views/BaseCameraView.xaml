@@ -39,6 +39,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.5*" />
                     <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="1.5*" />
                 </Grid.ColumnDefinitions>
                 <Button
                     Grid.Column="0"
@@ -56,11 +58,46 @@
                     VerticalAlignment="Stretch"
                     Command="{Binding QuickSaveFileCommand}"
                     Content="存储图片" />
-
+                <CheckBox
+                    Grid.Column="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding IsCapturing}"
+                    IsEnabled="False"
+                    Style="{StaticResource SwitchCheckBox}" />
+                <Ellipse
+                    x:Name="redDot"
+                    Grid.Column="3"
+                    Width="20"
+                    Height="20"
+                    Fill="Red"
+                    Stroke="Black"
+                    StrokeThickness="1">
+                    <Ellipse.Style>
+                        <Style TargetType="Ellipse">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCapturing}">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation
+                                                    AutoReverse="True"
+                                                    Storyboard.TargetProperty="Opacity"
+                                                    From="1.0"
+                                                    To="0.0"
+                                                    Duration="0:0:0.5" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Style>
+                </Ellipse>
             </Grid>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" >
+        <StackPanel Grid.Row="2">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.5*" />
@@ -68,22 +105,22 @@
                     <ColumnDefinition Width="1.5*" />
                 </Grid.ColumnDefinitions>
                 <Viewbox Grid.Column="0" Margin="0,5,5,0">
-                    <ComboBox   
+                    <ComboBox
                         Width="100"
                         ItemsSource="{Binding DevicesList}"
                         SelectedIndex="{Binding DeviceSelectIndex}" />
                 </Viewbox>
-                <Viewbox Grid.Column="1" Margin="0,5,5,0" >
+                <Viewbox Grid.Column="1" Margin="0,5,5,0">
                     <ComboBox
-                        IsEnabled="{Binding IsCaptureOpposite}" 
                         Width="100"
+                        IsEnabled="{Binding IsCaptureOpposite}"
                         ItemsSource="{Binding WaveSelection}"
                         SelectedIndex="{Binding WaveSelectionSelectIndex}" />
                 </Viewbox>
                 <Viewbox Grid.Column="2" Margin="0,5,5,0">
                     <ComboBox
-                        IsEnabled="{Binding IsCaptureOpposite}"
                         Width="100"
+                        IsEnabled="{Binding IsCaptureOpposite}"
                         ItemsSource="{Binding ResolutionsRatio}"
                         SelectedIndex="{Binding ResolutionsRatioSelectIndex}" />
                 </Viewbox>

@@ -77,6 +77,10 @@ namespace Simscop.Spindisk.Core.NICamera
         /// 像素停留时间
         /// </summary>
         public double PixelDwelTime { get; set; } = 20;
+        /// <summary>
+        /// 三角波偏移
+        /// </summary>
+        public int XOffsetforTriangle { get; set; } = 1;
 
         public double _rate; //采样速率(Hz)
         public int _sampsPerChan;//每通道的采样点数
@@ -99,6 +103,18 @@ namespace Simscop.Spindisk.Core.NICamera
             PixelDwelTime = config.PixelDwelTime;
             DeviceName = config.DeviceName;
             WaveModel = config.WaveMode;
+
+            //OriginX = 5;
+            //OriginY = 5;
+            if (Convert.ToBoolean(WaveModel))
+            {
+                XMargin = XOffsetforTriangle;//X偏移，三角波会有行错位
+            }
+            else
+            {
+                XMargin = 100;//X偏移100，锯齿波会有转折过程的拖影错位           
+            }
+
             SetWaveform();
         }
 

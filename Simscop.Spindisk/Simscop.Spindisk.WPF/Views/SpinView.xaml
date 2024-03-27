@@ -10,7 +10,7 @@
     d:DataContext="{d:DesignInstance vm:SpinViewModel}"
     mc:Ignorable="d">
 
-    <!--IsEnabled="{Binding SpinViewEnabled}"-->
+    <!--  IsEnabled="{Binding SpinViewEnabled}"  -->
     <StackPanel IsEnabled="False">
 
         <TextBlock

@@ -162,6 +162,12 @@ public record CameraControlEnableMessage(bool IsEnable);
 public record MultiChannelMergeMessage(string Filename, bool IsFirstEnabled, bool IsSecondEnabled, bool IsThirdEnabled, bool IsFourthEnabled);
 
 /// <summary>
+/// 多通道采集-打开图像窗体
+/// </summary>
+/// <param name="Filename"></param>
+public record MultiChannelOpenImageWindowMwssage(string Filename);
+
+/// <summary>
 /// 电动台对焦动画状态
 /// </summary>
 public record SteerAnimationStateMessage(int Mode);
@@ -179,3 +185,8 @@ public record CurrentPositionMessage(int X, int Y);
 /// <param name="X"></param>
 /// <param name="Y"></param>
 public record MappingMoveMessage(double X, double Y);
+
+/// <summary>
+/// 多通道合并弹窗
+/// </summary>
+public record PopupWindowMessage();
