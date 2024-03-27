@@ -99,13 +99,12 @@ namespace Simscop.Spindisk.Core.NICamera
             MinAO = config.MinAO;
             OriginX = config.XPixelFactor;
             OriginY = config.YPixelFactor;
+            //OriginX = 5;
+            //OriginY = 5;
             LowTime = config.LowTime;
             PixelDwelTime = config.PixelDwelTime;
             DeviceName = config.DeviceName;
             WaveModel = config.WaveMode;
-
-            //OriginX = 5;
-            //OriginY = 5;
             if (Convert.ToBoolean(WaveModel))
             {
                 XMargin = XOffsetforTriangle;//X偏移，三角波会有行错位
@@ -115,10 +114,10 @@ namespace Simscop.Spindisk.Core.NICamera
                 XMargin = 100;//X偏移100，锯齿波会有转折过程的拖影错位           
             }
 
-            SetWaveform();
+            GenerateWaveform();
         }
 
-        private void SetWaveform()
+        private void GenerateWaveform()
         {
             XPts = OriginX + XMargin;
             YPts = OriginY + YMargin;

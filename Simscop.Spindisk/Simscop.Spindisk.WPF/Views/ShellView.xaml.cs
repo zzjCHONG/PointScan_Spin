@@ -109,8 +109,6 @@ namespace Simscop.Spindisk.WPF.Views
                 DataContext = imageShowVM,
             };
 
-            ImageShowView.Show();
-
             SetDataContext();
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;

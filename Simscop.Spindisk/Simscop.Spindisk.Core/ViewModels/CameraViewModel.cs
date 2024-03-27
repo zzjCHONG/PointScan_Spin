@@ -184,8 +184,10 @@ public partial class CameraViewModel : ObservableObject
                     }
                     Task.Run(() => { IsCapturing = false; });
                 }
-                catch (Exception)
-                { }
+                catch (Exception ex)
+                {
+                    
+                }
             }
         });
         }
@@ -216,6 +218,7 @@ public partial class CameraViewModel : ObservableObject
         }
         else if (IsCapture)
         {
+
             IsCapture = !camera.StopCapture();
             IsStartAcquisition = false;
             IsNoBusy = true;
