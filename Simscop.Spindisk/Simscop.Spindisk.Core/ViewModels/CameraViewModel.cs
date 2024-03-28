@@ -22,112 +22,6 @@ public partial class CameraViewModel : ObservableObject
 {
     ICamera camera { get; set; }
 
-    Config Config { get; set; }
-
-    public List<string> ResolutionsRatio { get; set; } = new()
-    {
-        "50*50",
-        "100*100",
-        "200*200",
-        "300*300",
-    };
-
-    public List<string> WaveSelection { get; set; } = new()
-    {
-        "锯齿波",
-        "三角波",
-    };
-
-    [ObservableProperty]
-    private int _resolutionsRatioSelectIndex = 3;
-    [ObservableProperty]
-    private int _waveSelectionSelectIndex = 0;
-    [ObservableProperty]
-    private List<string> _devicesList =new();
-    [ObservableProperty]
-    private int _deviceSelectIndex = 0;
-    [ObservableProperty]
-    private int _voltageSweepRangeUpperLimit = 0;
-    [ObservableProperty]
-    private int _voltageSweepRangeLowerLimit = 0;
-    [ObservableProperty]
-    private int _pixelDwelTime = 0;
-    partial void OnResolutionsRatioSelectIndexChanged(int value)
-    {
-        int X = 0;
-        int Y = 0;
-        int index = ResolutionsRatioSelectIndex;
-        switch (index)
-        {
-            case 0:
-                X = 50 ;
-                Y = 50 ;
-                break;
-            case 1:
-                X = 100;
-                Y = 100 ;
-                break;
-            case 2:
-                X= 200;
-                Y= 200 ;
-                break;
-            case 3:
-                X = 300;
-                Y = 300;
-                break;
-        }
-        Config.Write(ConfigSettingEnum.XPixelFactor, X);
-        Config.Write(ConfigSettingEnum.YPixelFactor, Y);
-    }
-    partial void OnWaveSelectionSelectIndexChanged(int value)
-    {
-        Config.Write(ConfigSettingEnum.WaveMode, value);//0为锯齿波，1为三角波
-    }
-    partial void OnDeviceSelectIndexChanged(int value)
-    {
-        string deviceName = DevicesList[value];
-        Config.Write(ConfigSettingEnum.DeviceName, deviceName);
-    }
-    partial void OnDevicesListChanged(List<string> value)
-    {
-        if (value.Count > 0)
-            Config.Write(ConfigSettingEnum.DeviceName, DevicesList[DeviceSelectIndex]);
-    }
-    partial void OnVoltageSweepRangeUpperLimitChanged(int value)
-    {
-        Config.Write(ConfigSettingEnum.maxXV, value);
-        Config.Write(ConfigSettingEnum.maxYV, value);
-    }
-    partial void OnVoltageSweepRangeLowerLimitChanged(int value)
-    {
-        Config.Write(ConfigSettingEnum.minXV, value);
-        Config.Write(ConfigSettingEnum.minYV, value);
-    }
-    partial void OnPixelDwelTimeChanged(int value)
-    {
-        Config.Write(ConfigSettingEnum.PixelDwelTime, value);
-    }
-
-    public CameraViewModel()
-    {
-        Config = new();
-        camera = new NICam();
-        //camera = new TestCamera();
-        //Camera = new Andor();
-        GlobalValue.GlobalCamera = camera;
-
-        WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture, (s, e) =>
-        throw new Exception("当前方法不准使用了"));
-
-        WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.SaveACapture, (s, e) =>
-        {
-            if (IsCapture)
-                GlobalValue.CurrentFrame?.SaveImage(e);
-        });
-
-        WeakReferenceMessenger.Default.Register<CameraInitMessage>(this, (o, m) => CameraInit());
-    }
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotInit))]
     private bool _isInit = false;
@@ -148,6 +42,27 @@ public partial class CameraViewModel : ObservableObject
     [ObservableProperty]
     private bool _isStartAcquisition = false;
 
+    [ObservableProperty]
+    private static bool _isCapturing = false;
+
+    public CameraViewModel()
+    {
+        Config = new();
+        camera = new NICam();
+        GlobalValue.GlobalCamera = camera;
+
+        WeakReferenceMessenger.Default.Register<SaveFrameModel, string>(this, MessageManage.SaveCurrentCapture, (s, e) =>
+        throw new Exception("当前方法不准使用了"));
+
+        WeakReferenceMessenger.Default.Register<string, string>(this, MessageManage.SaveACapture, (s, e) =>
+        {
+            if (IsCapture)
+                GlobalValue.CurrentFrame?.SaveImage(e);
+        });
+
+        WeakReferenceMessenger.Default.Register<CameraInitMessage>(this, (o, m) => CameraInit());
+    }
+
     partial void OnIsCaptureChanged(bool value)
     {
         IsCaptureOpposite=!value;
@@ -160,10 +75,7 @@ public partial class CameraViewModel : ObservableObject
             WeakReferenceMessenger.Default.Send<CameraConnectMessage>(new CameraConnectMessage(IsInit, value, camera.GetConnectState()));
     }
 
-    [ObservableProperty]
-    private static bool _isCapturing=false;
-
-    partial void OnIsStartAcquisitionChanged(bool value)//显示
+    partial void OnIsStartAcquisitionChanged(bool value)
     {
         if (IsStartAcquisition)
         {
@@ -175,27 +87,37 @@ public partial class CameraViewModel : ObservableObject
                 {
                     Task.Run(() => { IsCapturing = true; });
                     if (camera.Capture(out var mat))
-                    {    
+                    {
                         GlobalValue.CurrentFrame = mat.Clone();
                         WeakReferenceMessenger.Default.Send<DisplayFrame, string>(new DisplayFrame()
                         {
                             Image = mat,
                         }, "Display");
-                    }
+                    }         
                     Task.Run(() => { IsCapturing = false; });
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    
                 }
             }
         });
         }
+        else
+        {
+            Task.Run(() => { IsCapturing = false; });
+        }
+    }
 
+    partial void OnIsCapturingChanged(bool value)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            WeakReferenceMessenger.Default.Send<CameraCaptureStatusMessage>(new CameraCaptureStatusMessage(value));
+        });
     }
 
     [RelayCommand]
-    void BtnInit()//按键
+    void BtnInit()
     {
         IsNoBusy = false;
         if (!IsInit)
@@ -213,12 +135,18 @@ public partial class CameraViewModel : ObservableObject
         else if (IsInit && !IsCapture)
         {
             IsCapture = camera.StartCapture();
+            if (!IsCapture)//开启异常时（上一帧的线程未释放，重新开启一次即可）
+            {
+                IsNoBusy = true;
+                IsCapture =false;
+                IsStartAcquisition = false;
+                return;
+            }               
             IsStartAcquisition = true;
             IsNoBusy = true;
         }
         else if (IsCapture)
         {
-
             IsCapture = !camera.StopCapture();
             IsStartAcquisition = false;
             IsNoBusy = true;
@@ -241,26 +169,24 @@ public partial class CameraViewModel : ObservableObject
             PixelDwelTime=(int)Config.PixelDwelTime;
             switch (Config.XPixelFactor)
             {
-                case 50:
+                case 100:
                     ResolutionsRatioSelectIndex = 0;
                     break;
-                case 100:
+                case 200:
                     ResolutionsRatioSelectIndex = 1;
                     break;
-                case 200:
+                case 300:
                     ResolutionsRatioSelectIndex = 2;
                     break;
-                case 300:
+                case 400:
                     ResolutionsRatioSelectIndex = 3;
                     break;
-                    default:
+                case 500:
+                    ResolutionsRatioSelectIndex = 4;
+                    break;
+                default:
                     break;
             }
-
-            //camera.GetExposure(out var exposure);
-            //Exposure = Math.Floor(exposure * 1000.0);
-            //camera.GetFrameRate(out var frameRate);
-            //FrameRate = frameRate;
             return true;
         }
         else
@@ -269,6 +195,98 @@ public partial class CameraViewModel : ObservableObject
             return false;
         }
     }
+
+    #region NISetting
+
+    Config Config { get; set; }
+    public List<string> ResolutionsRatio { get; set; } = new()
+    {
+        "100*100",
+        "200*200",
+        "300*300",
+        "400*400",
+        "500*500",
+    };
+    public List<string> WaveSelection { get; set; } = new()
+    {
+        "锯齿波",
+        "三角波",
+    };
+    [ObservableProperty]
+    private int _resolutionsRatioSelectIndex = 2;
+    [ObservableProperty]
+    private int _waveSelectionSelectIndex = 0;
+    [ObservableProperty]
+    private List<string> _devicesList = new();
+    [ObservableProperty]
+    private int _deviceSelectIndex = 0;
+    [ObservableProperty]
+    private int _voltageSweepRangeUpperLimit = 0;
+    [ObservableProperty]
+    private int _voltageSweepRangeLowerLimit = 0;
+    [ObservableProperty]
+    private int _pixelDwelTime = 0;
+    partial void OnResolutionsRatioSelectIndexChanged(int value)
+    {
+        int X = 0;
+        int Y = 0;
+        int index = ResolutionsRatioSelectIndex;
+        switch (index)
+        {
+            case 0:
+                X = 100;
+                Y = 100;
+                break;
+            case 1:
+                X = 200;
+                Y = 200;
+                break;
+            case 2:
+                X = 300;
+                Y = 300;
+                break;
+            case 3:
+                X = 400;
+                Y = 400;
+                break;
+            case 4:
+                X = 500;
+                Y = 500;
+                break;
+        }
+
+        Config.Write(ConfigSettingEnum.XPixelFactor, X);
+        Config.Write(ConfigSettingEnum.YPixelFactor, Y);
+    }
+    partial void OnWaveSelectionSelectIndexChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.WaveMode, value);//0为锯齿波，1为三角波
+    }
+    partial void OnDeviceSelectIndexChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.DeviceName, DevicesList[value]);
+    }
+    partial void OnDevicesListChanged(List<string> value)
+    {
+        if (value.Count > 0)
+            Config.Write(ConfigSettingEnum.DeviceName, DevicesList[DeviceSelectIndex]);
+    }
+    partial void OnVoltageSweepRangeUpperLimitChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.maxXV, value);
+        Config.Write(ConfigSettingEnum.maxYV, value);
+    }
+    partial void OnVoltageSweepRangeLowerLimitChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.minXV, value);
+        Config.Write(ConfigSettingEnum.minYV, value);
+    }
+    partial void OnPixelDwelTimeChanged(int value)
+    {
+        Config.Write(ConfigSettingEnum.PixelDwelTime, value);
+    }
+
+    #endregion
 
     #region Old-Andor
 

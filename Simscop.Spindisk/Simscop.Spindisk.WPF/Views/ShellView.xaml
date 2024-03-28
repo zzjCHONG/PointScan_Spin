@@ -43,17 +43,15 @@
             </Viewbox>-->
 
             <Menu>
-                <MenuItem Header="文件">
+                <MenuItem Header="文件" IsEnabled="{Binding IsCameraCapture}">
                     <MenuItem
                         x:Name="MultiChannelButton"
                         Click="MultiChannel_OnClick"
-                        Header="多通道采集"
-                        IsEnabled="{Binding IsCameraCapture}" />
+                        Header="多通道采集" />
                     <MenuItem
                         x:Name="CameraSaveButton"
                         Click="CameraSave_OnClick"
-                        Header="相机存图"
-                        IsEnabled="{Binding IsCameraCapture}" />
+                        Header="相机存图" />
                 </MenuItem>
             </Menu>
 
@@ -103,13 +101,15 @@
         <!--  客户区  -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="520" />
+                <ColumnDefinition Width="200.4" />
+                <ColumnDefinition Width="319.6" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
 
             <ScrollViewer
                 Grid.Column="0"
+                Grid.ColumnSpan="2"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Hidden">
                 <StackPanel Margin="5">
@@ -425,10 +425,10 @@
 
             <UniformGrid
                 Name="Client"
-                Grid.Column="1"
+                Grid.Column="2"
                 Margin="0,0,5,0"
                 Background="{DynamicResource Region01}"
-                Columns="2"
+                Columns="3"
                 Rows="2">
 
                 <Border
@@ -462,6 +462,7 @@
                     CornerRadius="10">
                     <liftui:ImageViewer BorderThickness="0" ImageSource="{Binding DisplayFourth.Frame}" />
                 </Border>
+
             </UniformGrid>
         </Grid>
     </Grid>

@@ -53,17 +53,14 @@ namespace Simscop.Spindisk.Core.NICamera
 
         public void Write(ConfigSettingEnum configSetting, double value)
         {
-            string section = string.Empty;
-            section = configSetting.ToString() == "SavePath" ? "File" : "Camera";
+            string section = configSetting.ToString() == "SavePath" ? "File" : "Camera";
             IniFile iniFile = new IniFile(System.Environment.CurrentDirectory + "\\config.ini");
             iniFile.WriteValue(section, configSetting.ToString(), value);
         }
 
         public void Write(ConfigSettingEnum configSetting, string value)
         {
-            string section = string.Empty;
-            section = configSetting.ToString() == "SavePath" ? "File" : "Camera";
-
+            string section = configSetting.ToString() == "SavePath" ? "File" : "Camera";
             IniFile iniFile = new IniFile(System.Environment.CurrentDirectory + "\\config.ini");
             iniFile.WriteValue(section, configSetting.ToString(), value);
         }

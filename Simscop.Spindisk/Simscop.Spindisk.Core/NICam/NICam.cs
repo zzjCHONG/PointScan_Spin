@@ -1,12 +1,13 @@
 ﻿using OpenCvSharp;
 using Simscop.API;
+using Simscop.Spindisk.Core.NICamera;
 using System.Collections.Generic;
 
 namespace Simscop.Spindisk.Core.Models.NIDevice
 {
     public class NICam : ICamera
     {
-        NIImplementation _NICam = new();
+        readonly NIImplementation _NICam = new();
 
         public bool AcqStartCommand() => _NICam.AcqStartCommand();
 

@@ -7,6 +7,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Simscop.Spindisk.Core.NICamera
 {
@@ -157,10 +158,10 @@ namespace Simscop.Spindisk.Core.NICamera
         public bool WaitUntilDone(byte index, int millisecond)
         {
             if (isDisposeTask) return true;
+            var task = index == 0 ? AOTask : AITask;
             try
             {
-                var task = index == 0 ? AOTask : AITask;
-                if (task == null) return false  ;
+                if (task == null) return false;
                 if (millisecond == 0)
                 {
                     task?.WaitUntilDone();
@@ -174,6 +175,18 @@ namespace Simscop.Spindisk.Core.NICamera
             catch (TimeoutException ex)
             {
                 Debug.WriteLine($"WaitUntilDone-TimeoutException: {ex.Message}");
+                return false;
+            }
+            catch (ObjectDisposedException)
+            {
+                // 如果任务已经被释放，则在这里处理 ObjectDisposedException 异常
+                Debug.WriteLine($"Task-{task} has already been disposed.");
+                return false;
+            }
+            catch (DaqException ex)
+            {
+                // 处理 DAQmx 异常
+                Debug.WriteLine("DisposeTask DAQmxException occurred: " + ex.Message);
                 return false;
             }
             catch (Exception ex)
@@ -377,7 +390,7 @@ namespace Simscop.Spindisk.Core.NICamera
             //将剩余数字前移
             Array.Copy(newArray, 0, inputArray, 0, newArray.Length);
 
-            //末位的10个数字补零
+            //末位的removeCount个数字补零
             Array.Clear(inputArray, newArray.Length, 10);
 
             outputArray = inputArray;

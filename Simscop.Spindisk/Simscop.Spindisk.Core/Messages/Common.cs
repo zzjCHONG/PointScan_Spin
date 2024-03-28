@@ -190,3 +190,9 @@ public record MappingMoveMessage(double X, double Y);
 /// 多通道合并弹窗
 /// </summary>
 public record PopupWindowMessage();
+
+/// <summary>
+/// 相机取图状态-红点闪烁
+/// </summary>
+/// <param name="IsBlinking"></param>
+public record CameraCaptureStatusMessage(bool IsBlinking);
